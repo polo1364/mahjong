@@ -897,14 +897,33 @@ button:disabled {
     border-radius: 6px;
     padding: 6px;
     display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 60px;
+    position: relative;
+  }
+  
+  .discard-area-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffd36f;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  
+  .discard-area-content {
+    display: flex;
     flex-wrap: wrap;
     gap: 3px;
-    min-height: 60px;
+    flex: 1;
   }
   
   /* 上方棄牌區（東家） */
   .discard-area.top {
     grid-area: discard-top;
+  }
+  
+  .discard-area.top .discard-area-content {
     justify-content: center;
     align-items: flex-start;
   }
@@ -912,6 +931,9 @@ button:disabled {
   /* 左方棄牌區（北家） */
   .discard-area.left {
     grid-area: discard-left;
+  }
+  
+  .discard-area.left .discard-area-content {
     justify-content: flex-end;
     align-items: center;
   }
@@ -919,6 +941,9 @@ button:disabled {
   /* 右方棄牌區（南家） */
   .discard-area.right {
     grid-area: discard-right;
+  }
+  
+  .discard-area.right .discard-area-content {
     justify-content: flex-start;
     align-items: center;
   }
@@ -926,6 +951,9 @@ button:disabled {
   /* 下方棄牌區（西家） */
   .discard-area.bottom {
     grid-area: discard-bottom;
+  }
+  
+  .discard-area.bottom .discard-area-content {
     justify-content: center;
     align-items: flex-end;
   }
@@ -3162,11 +3190,16 @@ function renderAll() {
   // 輔助函式：產生棄牌區HTML
   function buildDiscardHTML(i) {
     const p = S.players[i];
-    return p.discards.map((t) => {
+    const name = playerName(i);
+    const dealerTag = (i === S.dealer) ? ' 莊' : '';
+    const tilesHTML = p.discards.map((t) => {
       const k = tileKey(t);
       const suitClass = `suit-${t.suit}`;
       return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
     }).join('');
+    
+    return `<div class="discard-area-header">${name}${dealerTag}</div>` +
+           `<div class="discard-area-content">${tilesHTML}</div>`;
   }
   
   // 輔助函式：產生玩家資訊HTML
