@@ -943,6 +943,11 @@ function playerName(i) {
   return ['東(你)', '南', '西', '北'][i];
 }
 
+// 計算玩家已經形成的槓組數
+function countKongs(pl) {
+  return pl.melds.filter(m => m.type === 'kong').length;
+}
+
 // 檢查並設定天聽/地聽狀態。當玩家宣告聽牌時調用。
 // 天聽：莊家摸完第一張牌打出後即處於聽牌，且無其他明吃碰槓；地聽：起牌後海底打進8張牌內且四家皆未吃碰，宣告聽牌。
 function updateTianDiTing(pid) {
@@ -1190,6 +1195,23 @@ function doChow(pid, tile, pattern) {
   S.waitReact = null;
   hideReactionPanel();
   renderAll();
+
+  // 如果是玩家吃牌，檢查是否可報聽（吃牌後總牌數為17 + 槓數）
+  if (pid === 0) {
+    const me = S.players[0];
+    if (!me.declaredListen) {
+      const kongCount = countKongs(me);
+      const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+      const expectedFull = 17 + kongCount;
+      if (totalTiles === expectedFull) {
+        const canListenNow = me.hand.some(tile2 => {
+          const testHand = me.hand.filter(t => t !== tile2);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) showListenPanel();
+      }
+    }
+  }
 }
 
 function canPong(pid, tile) {
@@ -1363,6 +1385,23 @@ function doPong(pid, tile) {
   S.waitReact = null;
   hideReactionPanel();
   renderAll();
+
+  // 若是玩家碰牌，檢查吃碰後是否可報聽
+  if (pid === 0) {
+    const me = S.players[0];
+    if (!me.declaredListen) {
+      const kongCount = countKongs(me);
+      const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+      const expectedFull = 17 + kongCount;
+      if (totalTiles === expectedFull) {
+        const canListenNow = me.hand.some(tile2 => {
+          const testHand = me.hand.filter(t => t !== tile2);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) showListenPanel();
+      }
+    }
+  }
 }
 
 function doKong(pid, tile) {
@@ -1396,6 +1435,30 @@ function doKong(pid, tile) {
   S.waitReact = null;
   hideReactionPanel();
   renderAll();
+
+  // 若由玩家進行明槓，補牌後檢查自摸及聽牌
+  if (pid === 0) {
+    const me = S.players[0];
+    // 檢查補牌後是否自摸
+    const t = me.hand[me.hand.length - 1];
+    if (isWinningNow(me.hand, me.melds, t)) {
+      document.getElementById('btnHu').disabled = false;
+      log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
+    }
+    // 檢查是否可報聽
+    if (!me.declaredListen) {
+      const kongCount = countKongs(me);
+      const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+      const expectedFull = 17 + kongCount;
+      if (totalTiles === expectedFull) {
+        const canListenNow = me.hand.some(tile2 => {
+          const testHand = me.hand.filter(t => t !== tile2);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) showListenPanel();
+      }
+    }
+  }
 }
 
 /* ========= 出牌與反應 ========= */
@@ -1715,19 +1778,16 @@ function stepNext() {
   if (S.turn === 0) {
     // 輪到玩家
     const me = S.players[0];
+    // 計算玩家已擁有的槓組數
+    const kongCount = countKongs(me);
     const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
-    
-    // 判斷是否需要摸牌：
-    // 1. 莊家開局有17張，不摸牌
-    // 2. 碰牌/吃牌/槓牌後，手牌+副露=16張，不摸牌（需要先出牌）
-    // 3. 其他情況，摸牌至17張
-    
-    // 總牌數 = 手牌 + 副露牌數
-    // 總牌数17張 → 不摸牌（剛摸過或莊家開局）
-    // 總牌数16張 → 摸牌（出牌後或碰牌後出牌）
-    
-    if (totalTiles === 17) {
-      // 總牌數17張，不需摸牌，請出牌
+    // 基本上，玩家在摸牌後應持有 base+槓數 張牌；出牌後為 base-1+槓數 張牌
+    const base = 17;
+    const expectedFull = base + kongCount;
+    const expectedEmpty = (base - 1) + kongCount;
+
+    if (totalTiles === expectedFull) {
+      // 玩家已經持有完整張數，不需摸牌，請出牌
       log('👉 請選擇要打出的牌');
       renderAll();
       // 檢查是否可報聽並尚未宣告，若可則顯示報聽面板
@@ -1736,12 +1796,10 @@ function stepNext() {
           const testHand = me.hand.filter(t => t !== tile);
           return isListening(testHand, me.melds);
         });
-        if (canListenNow) {
-          showListenPanel();
-        }
+        if (canListenNow) showListenPanel();
       }
-    } else if (totalTiles === 16) {
-      // 總牌數16張，需要摸牌
+    } else if (totalTiles === expectedEmpty) {
+      // 需要摸牌
       drawTile(0);
       const t = me.hand[me.hand.length - 1];
       if (isWinningNow(me.hand, me.melds, t)) {
@@ -1755,13 +1813,11 @@ function stepNext() {
           const testHand = me.hand.filter(t => t !== tile);
           return isListening(testHand, me.melds);
         });
-        if (canListenNow) {
-          showListenPanel();
-        }
+        if (canListenNow) showListenPanel();
       }
     } else {
       // 異常狀況，記錄錯誤
-      log(`⚠️ 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組`);
+      log(`⚠️ 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
       renderAll();
     }
   } else {
@@ -1773,8 +1829,18 @@ function stepAI() {
   if (S.phase === 'end') return;
   const p = S.turn;
   const me = S.players[p];
-  drawTile(p);
-  if (S.phase === 'end') return;
+  // 根據槓數判斷是否需要摸牌
+  const kongCount = countKongs(me);
+  const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+  const expectedFull = 17 + kongCount;
+  const expectedEmpty = 16 + kongCount;
+  if (totalTiles === expectedEmpty) {
+    // 需要摸牌
+    drawTile(p);
+    if (S.phase === 'end') return;
+  } else if (totalTiles !== expectedFull) {
+    log(`⚠️ AI 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
+  }
   renderAll();
   // AI 檢查加槓
   const aks = canAddedKong(p);
@@ -1799,13 +1865,13 @@ function stepAI() {
     doConcealedKong(p, cks[0]);
     return;
   }
-  
+  // 檢查自摸
   const t = me.hand[me.hand.length - 1];
   if (isWinningNow(me.hand, me.melds, t)) {
     doWin(p, -1, t, true);
     return;
   }
-  
+  // 一般出牌
   const out = aiChooseDiscard(p);
   setTimeout(() => discard(p, out), 400);
 }
@@ -1828,15 +1894,18 @@ document.getElementById('btnListen').onclick = () => {
   }
   // 檢查是否可聽牌：依據目前手牌張數選擇不同檢查方式
   const total = me.hand.length + me.melds.reduce((s, m) => s + m.tiles.length, 0);
+  const kongCount = countKongs(me);
+  const expectedFull = 17 + kongCount;
+  const expectedEmpty = 16 + kongCount;
   let canListen = false;
-  if (total === 17) {
-    // 17 張：打出其中一張後是否聽牌
+  if (total === expectedFull) {
+    // 擁有完整張數：打出其中一張後是否聽牌
     canListen = me.hand.some(tile => {
       const testHand = me.hand.filter(t => t !== tile);
       return isListening(testHand, me.melds);
     });
-  } else if (total === 16) {
-    // 16 張：手牌本身是否聽牌
+  } else if (total === expectedEmpty) {
+    // 少一張的狀態：當前手牌是否已經聽牌
     canListen = isListening(me.hand, me.melds);
   } else {
     // 其他張數不允許報聽
@@ -1981,14 +2050,13 @@ function renderAll() {
   // just drew a winning tile.
   const btnHu = document.getElementById('btnHu');
   btnHu.disabled = true;
-  // If it's the player's turn and the game is ongoing, check whether
-  // their last drawn tile completes a winning hand. Only then enable the
-  // self-draw (胡牌) button.
+  // 若輪到玩家且遊戲未結束，檢查最近摸的牌是否形成自摸：
   if (S.turn === 0 && S.phase !== 'end') {
     const mePlayer = S.players[0];
-    // Total tiles = hand cards + melded tiles count (should be 17 after drawing)
+    const kongCount = countKongs(mePlayer);
     const total = mePlayer.hand.length + mePlayer.melds.reduce((sum, m) => sum + m.tiles.length, 0);
-    if (total === 17) {
+    const expectedFull = 17 + kongCount;
+    if (total === expectedFull) {
       const lastTile = mePlayer.hand[mePlayer.hand.length - 1];
       if (isWinningNow(mePlayer.hand, mePlayer.melds, lastTile)) {
         btnHu.disabled = false;
@@ -2000,18 +2068,21 @@ function renderAll() {
   const me = S.players[0];
   let canListenBtn = false;
   if (S.turn === 0 && !me.declaredListen && S.phase !== 'end') {
+    const kongCount = countKongs(me);
     const totalTilesMe = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
-    // 16 張手牌情況：檢查是否已經聽牌（加任一牌即胡）
-    if (totalTilesMe === 16) {
-      canListenBtn = isListening(me.hand, me.melds);
-    }
-    // 17 張手牌情況：檢查打出其中一張後是否聽牌
-    if (totalTilesMe === 17) {
+    const expectedFull = 17 + kongCount;
+    const expectedEmpty = 16 + kongCount;
+    // 出牌狀態：expectedFull，檢查打出任一牌後是否聽牌
+    if (totalTilesMe === expectedFull) {
       const canListenAfterDiscard = me.hand.some(tile => {
         const testHand = me.hand.filter(t => t !== tile);
         return isListening(testHand, me.melds);
       });
       if (canListenAfterDiscard) canListenBtn = true;
+    }
+    // 摸牌後待摸狀態：expectedEmpty，檢查手牌是否已經聽牌
+    if (totalTilesMe === expectedEmpty) {
+      canListenBtn = isListening(me.hand, me.melds);
     }
   }
   document.getElementById('btnListen').disabled = !canListenBtn;
