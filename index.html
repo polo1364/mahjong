@@ -1600,46 +1600,41 @@ function renderAll() {
   const you = S.players[0];
   you.hand.sort((a, b) => tileSortKey(a) - tileSortKey(b));
   
-  // 分離最後一張牌（摸的牌）和其他牌
-  const handTiles = you.hand.slice(0, -1); // 前16張或前15張
-  const drawnTile = you.hand.length > 0 ? you.hand[you.hand.length - 1] : null; // 最後一張（摸的牌）
-  
   // 上排8張，下排剩餘的
-  const topRow = handTiles.slice(0, 8);
-  const bottomRow = handTiles.slice(8);
+  const topRow = you.hand.slice(0, 8);
+  const bottomRow = you.hand.slice(8);
   
   let handHTML = '<div class="hand-container">';
   
   // 上排
-  handHTML += '<div class="hand-row">';
-  topRow.forEach((t, idx) => {
-    const k = tileKey(t);
-    const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
-    const suitClass = `suit-${t.suit}`;
-    handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
-  });
-  handHTML += '</div>';
-  
-  // 下排 + 摸的牌
-  handHTML += '<div class="hand-row">';
-  bottomRow.forEach((t, idx) => {
-    const k = tileKey(t);
-    const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
-    const suitClass = `suit-${t.suit}`;
-    const realIdx = 8 + idx;
-    handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${realIdx})">${keyToText(k)}</div>`;
-  });
-  
-  // 摸的牌放在右側，用特殊樣式標記
-  if (drawnTile) {
-    const k = tileKey(drawnTile);
-    const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
-    const suitClass = `suit-${drawnTile.suit}`;
-    const drawnIdx = you.hand.length - 1;
-    handHTML += `<div class="tile tile-drawn ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${drawnIdx})">${keyToText(k)}</div>`;
+  if (topRow.length > 0) {
+    handHTML += '<div class="hand-row">';
+    topRow.forEach((t, idx) => {
+      const k = tileKey(t);
+      const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+      const suitClass = `suit-${t.suit}`;
+      handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
+    });
+    handHTML += '</div>';
   }
   
-  handHTML += '</div></div>';
+  // 下排
+  if (bottomRow.length > 0) {
+    handHTML += '<div class="hand-row">';
+    bottomRow.forEach((t, idx) => {
+      const k = tileKey(t);
+      const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+      const suitClass = `suit-${t.suit}`;
+      const realIdx = 8 + idx;
+      // 最後一張牌用特殊樣式標記（摸的牌）
+      const isLastTile = (realIdx === you.hand.length - 1);
+      const drawnClass = isLastTile ? 'tile-drawn' : '';
+      handHTML += `<div class="tile ${suitClass} ${drawnClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${realIdx})">${keyToText(k)}</div>`;
+    });
+    handHTML += '</div>';
+  }
+  
+  handHTML += '</div>';
   
   document.getElementById('yourHand').innerHTML = handHTML;
   
