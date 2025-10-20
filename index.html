@@ -1652,7 +1652,24 @@ function renderAll() {
   // 花牌顯示已移除
   document.getElementById('yourMelds').innerHTML = meldsHTML;
   
-  document.getElementById('btnHu').disabled = true;
+  // Reset the self-draw button state. It will be enabled below if the player
+  // just drew a winning tile.
+  const btnHu = document.getElementById('btnHu');
+  btnHu.disabled = true;
+  // If it's the player's turn and the game is ongoing, check whether
+  // their last drawn tile completes a winning hand. Only then enable the
+  // self-draw (胡牌) button.
+  if (S.turn === 0 && S.phase !== 'end') {
+    const mePlayer = S.players[0];
+    // Total tiles = hand cards + melded tiles count (should be 17 after drawing)
+    const total = mePlayer.hand.length + mePlayer.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+    if (total === 17) {
+      const lastTile = mePlayer.hand[mePlayer.hand.length - 1];
+      if (isWinningNow(mePlayer.hand, mePlayer.melds, lastTile)) {
+        btnHu.disabled = false;
+      }
+    }
+  }
   
   // 聽牌按鈕：輪到玩家且未報聽時啟用
   const me = S.players[0];
