@@ -1846,6 +1846,12 @@ function stepAI() {
     log(`⚠️ AI 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
   }
   renderAll();
+  // 檢查自摸：優先於槓牌行為
+  const lastTile = me.hand[me.hand.length - 1];
+  if (isWinningNow(me.hand, me.melds, lastTile)) {
+    doWin(p, -1, lastTile, true);
+    return;
+  }
   // AI 檢查加槓
   const aks = canAddedKong(p);
   if (aks.length > 0) {
@@ -1869,10 +1875,9 @@ function stepAI() {
     doConcealedKong(p, cks[0]);
     return;
   }
-  // 檢查自摸
-  const t = me.hand[me.hand.length - 1];
-  if (isWinningNow(me.hand, me.melds, t)) {
-    doWin(p, -1, t, true);
+  // 檢查自摸（再次檢查，理論上在加槓與暗槓處理後）
+  if (isWinningNow(me.hand, me.melds, lastTile)) {
+    doWin(p, -1, lastTile, true);
     return;
   }
   // 一般出牌
