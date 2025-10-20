@@ -1563,8 +1563,18 @@ document.getElementById('newGameBtn').onclick = () => {
 };
 
 function onClickYourTile(idx) {
-  if (S.turn !== 0 || S.phase === 'end') return;
+  // Only allow discarding when it's the player's turn and the game is not ended.
+  if (S.turn !== 0 || S.phase === 'end') {
+    log('⚠️ 現在不是你的回合，請稍候。');
+    return;
+  }
   const me = S.players[0];
+  // The player should have drawn a tile (total tiles == 17) before discarding.
+  const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+  if (totalTiles !== 17) {
+    log('⚠️ 你必須先摸牌才能出牌。');
+    return;
+  }
   const tile = me.hand[idx];
   discard(0, tile);
 }
