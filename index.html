@@ -483,7 +483,6 @@ button:disabled {
     <div id="yourHand" class="hand"></div>
     <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
     <div id="controls" class="row">
-      <button id="btnDraw">🎯 摸牌</button>
       <button id="btnHu" disabled>🎉 胡牌</button>
       <button id="btnPong" disabled>🔥 碰</button>
       <button id="btnKong" disabled>💥 槓</button>
@@ -648,7 +647,7 @@ function startNewHand(isFirstGame = false) {
       isAI: i !== 0
     })),
     goldKeys: [],
-    kongAdded: 0,
+    kongCount: 0, // 槓牌次數，每槓一次海底多保留1張
     rules: clone(RULES),
     turn: newDealer,
     dealer: newDealer,
@@ -682,7 +681,7 @@ function startNewHand(isFirstGame = false) {
 }
 
 function dealTiles() {
-  const dead = 14;
+  const dead = 16; // 海底牌16張
   // 發牌：莊家（dealer，固定為0）發17張，其他玩家發16張
   while (S.wall.length > dead && S.players[0].hand.length < 16) {
     for (let p = 0; p < 4; p++) {
@@ -696,8 +695,9 @@ function dealTiles() {
     S.players[S.dealer].hand.push(S.wall.pop());
   }
   
-  // 設定王牌區
-  S.deadWall = S.wall.splice(0, Math.max(0, S.wall.length - dead));
+  // 設定王牌區：從牌山尾端取最後14張作為王牌
+  const deadWallSize = Math.min(dead, S.wall.length);
+  S.deadWall = S.wall.splice(-deadWallSize, deadWallSize);
   
   // 處理發牌時的花牌：從手牌中移除花牌並補牌
   for (let p = 0; p < 4; p++) {
@@ -747,8 +747,10 @@ function processFlowersInHand(p) {
 }
 
 function drawTile(p) {
-  if (!S.wall.length) {
-    log('🚫 牌山枯竭，流局');
+  // 檢查是否到達海底：16張 + 槓牌次數
+  const deadWallLimit = 16 + S.kongCount;
+  if (S.wall.length <= 0) {
+    log(`🚫 牌山枯竭（剩餘${S.deadWall.length}張海底牌），流局`);
     S.phase = 'end';
     S.winner = null;
     renderAll();
@@ -786,7 +788,6 @@ function drawTile(p) {
   }
   pl.hand.push(t);
   S.remain = S.wall.length;
-  if (p === 0) document.getElementById('btnDraw').disabled = true;
 }
 
 function drawFlowerReplacement(p) {
@@ -1024,6 +1025,7 @@ function doKong(pid, tile) {
     }
   }
   pl.melds.push({ type: 'kong', tiles });
+  S.kongCount++; // 槓牌次數+1，海底多保留1張
   log(`💥 ${playerName(pid)} 槓了 ${keyToText(k)}，從王牌補牌`);
   
   // 槓牌後從王牌補牌
@@ -1288,7 +1290,22 @@ function stepNext() {
   renderAll();
   if (S.phase === 'end') return;
   if (S.turn === 0) {
-    document.getElementById('btnDraw').disabled = false;
+    // 輪到玩家，自動摸牌
+    const me = S.players[0];
+    // 莊家開局有17張牌，不需摸牌
+    if (S.turn === S.dealer && me.hand.length === 17) {
+      log('👉 莊家持有17張牌，請直接出牌');
+      renderAll();
+    } else {
+      // 自動摸牌
+      drawTile(0);
+      const t = me.hand[me.hand.length - 1];
+      if (isWinningNow(me.hand, me.melds, t)) {
+        document.getElementById('btnHu').disabled = false;
+        log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
+      }
+      renderAll();
+    }
   } else {
     setTimeout(stepAI, 600);
   }
@@ -1313,19 +1330,6 @@ function stepAI() {
 }
 
 /* ========= UI 操作 ========= */
-document.getElementById('btnDraw').onclick = () => {
-  if (S.turn !== 0 || S.phase === 'end') return;
-  drawTile(0);
-  renderAll();
-  const me = S.players[0];
-  const t = me.hand[me.hand.length - 1];
-  if (isWinningNow(me.hand, me.melds, t)) {
-    document.getElementById('btnHu').disabled = false;
-    log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
-  } else {
-    document.getElementById('btnHu').disabled = true;
-  }
-};
 
 document.getElementById('btnHu').onclick = () => {
   const me = S.players[0];
@@ -1368,8 +1372,11 @@ function renderAll() {
     </div>`;
   }).join('') + '</div>';
   
+  // 計算剩餘可摸牌數：牌山 - 海底16張
+  const remainDrawable = Math.max(0, S.wall.length);
+  
   document.getElementById('roundinfo').innerHTML =
-    `<span class="pill">🎴 剩餘牌：${S.wall.length}</span>
+    `<span class="pill">🎴 剩餘牌：${remainDrawable}</span>
      <span class="pill">👤 輪到：${playerName(S.turn)}</span>`;
   
   const you = S.players[0];
@@ -1393,9 +1400,6 @@ function renderAll() {
   document.getElementById('yourMelds').innerHTML = meldsHTML;
   
   document.getElementById('btnHu').disabled = true;
-  // 莊家開局時有17張牌，不需摸牌，直接出牌
-  const dealerHas17 = (S.turn === S.dealer && S.players[S.dealer].hand.length === 17);
-  document.getElementById('btnDraw').disabled = (S.turn !== 0 || S.phase === 'end' || dealerHas17);
   
   const wrap = document.getElementById('others');
   wrap.innerHTML = [1, 2, 3].map(i => {
