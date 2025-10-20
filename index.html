@@ -681,6 +681,11 @@ const RULES = {
     RobKong: 1,
     Rinshan: 1,
     Haitei: 1
+    ,
+    // 地聽：起牌後海底打進8張牌內且無人吃碰時宣告聽牌
+    EarthReady: 4,
+    // 天聽：莊家第一張打出後即聽牌
+    HeavenReady: 8
   },
   points: { base: 50, perFan: 100 },
   initialPoints: 100000
@@ -733,7 +738,11 @@ function startNewHand(isFirstGame = false) {
       flowers: [],
       points: (S?.players?.[i]?.points ?? RULES.initialPoints),
       declaredListen: false,
-      isAI: i !== 0
+      // 標記是否為天聽或地聽，預設為否
+      tianTing: false,
+      diTing: false,
+      isAI: i !== 0,
+      rinshan: false
     })),
     goldKeys: [],
     kongCount: 0, // 槓牌次數，每槓一次海底多保留1張
@@ -747,7 +756,12 @@ function startNewHand(isFirstGame = false) {
     fromPlayer: null,
     winTile: null,
     phase: 'deal',
-    remain: 0
+    remain: 0,
+    // 摸牌次數，用於判斷地聽/天聽
+    drawCount: 0,
+    // 是否已有玩家做出明吃碰槓，若有則地聽不再成立
+    anyOpenMeld: false,
+    robKong: false
   };
   S.rules.gold.enabled = useGold;
 
@@ -846,8 +860,12 @@ function drawTile(p) {
     }, 2000);
     return;
   }
-  const t = S.wall.pop();
+  // 非槓補牌摸牌前，重置槓上開花旗標
   const pl = S.players[p];
+  pl.rinshan = false;
+  const t = S.wall.pop();
+  // 記錄摸牌次數：僅計算從牌山摸牌，不含補王牌
+  S.drawCount++;
   if (false) { // 花牌處理已移除
     pl.flowers.push(t);
     log(`🌸 ${playerName(p)} 摸到花（${keyToText(tileKey(t))}），從王牌補牌`);
@@ -923,6 +941,23 @@ function initGoldTiles() {
 
 function playerName(i) {
   return ['東(你)', '南', '西', '北'][i];
+}
+
+// 檢查並設定天聽/地聽狀態。當玩家宣告聽牌時調用。
+// 天聽：莊家摸完第一張牌打出後即處於聽牌，且無其他明吃碰槓；地聽：起牌後海底打進8張牌內且四家皆未吃碰，宣告聽牌。
+function updateTianDiTing(pid) {
+  const pl = S.players[pid];
+  // 已有開明牌則不計天聽/地聽
+  if (S.anyOpenMeld) return;
+  // 天聽僅適用於莊家第一輪摸打結束後即聽牌
+  if (pid === S.dealer && S.drawCount === 1) {
+    pl.tianTing = true;
+    return;
+  }
+  // 地聽：前8次摸牌內
+  if (S.drawCount <= 8) {
+    pl.diTing = true;
+  }
 }
 
 /* ========= 胡牌判定 ========= */
@@ -1146,6 +1181,8 @@ function doChow(pid, tile, pattern) {
   tiles.sort((a, b) => a.rank - b.rank);
   
   pl.melds.push({ type: 'chow', tiles });
+  // 吃牌屬於明牌
+  S.anyOpenMeld = true;
   log(`🍜 ${playerName(pid)} 吃了 ${tiles.map(t => keyToText(tileKey(t))).join(' ')}`);
   
   S.turn = pid;
@@ -1174,6 +1211,23 @@ function canConcealedKong(pid) {
   const pl = S.players[pid];
   const counts = countByKey(pl.hand);
   return Object.keys(counts).filter(k => counts[k] >= 4);
+}
+
+// 檢查是否可以加槓：已碰的牌中若有3張相同，且手牌裡還有第4張
+function canAddedKong(pid) {
+  const pl = S.players[pid];
+  const res = [];
+  pl.melds.forEach((m, idx) => {
+    if (m.type === 'pong') {
+      const k = tileKey(m.tiles[0]);
+      // 檢查手牌中是否還有同樣一張
+      const hasFourth = pl.hand.some(t => tileKey(t) === k);
+      if (hasFourth) {
+        res.push({ meldIndex: idx, key: k });
+      }
+    }
+  });
+  return res;
 }
 
 // 執行暗槓
@@ -1229,6 +1283,67 @@ function doConcealedKong(pid, key) {
   }
 }
 
+// 執行加槓：將已碰的三張牌補為四張
+function doAddedKong(pid, meldIndex) {
+  const pl = S.players[pid];
+  const meld = pl.melds[meldIndex];
+  // 已經是槓牌的不再加槓
+  if (!meld || meld.type !== 'pong') return;
+  const key = tileKey(meld.tiles[0]);
+  // 從手牌中取出第4張
+  let idx = -1;
+  for (let i = 0; i < pl.hand.length; i++) {
+    if (tileKey(pl.hand[i]) === key) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx < 0) return;
+  const tile = pl.hand.splice(idx, 1)[0];
+  meld.tiles.push(tile);
+  meld.type = 'kong';
+  meld.added = true;
+  // 加槓仍屬明牌，已經存在碰
+  S.anyOpenMeld = true;
+  S.kongCount++;
+  log(`💥 ${playerName(pid)} 加槓 ${keyToText(key)}`);
+  // 從王牌補牌
+  if (S.deadWall.length > 0) {
+    const newTile = S.deadWall.pop();
+    pl.hand.push(newTile);
+  } else if (S.wall.length > 0) {
+    const newTile = S.wall.pop();
+    pl.hand.push(newTile);
+  }
+  S.remain = S.wall.length;
+  // 標記槓上開花旗標
+  pl.rinshan = true;
+  renderAll();
+  // 槓後檢查是否自摸
+  const t = pl.hand[pl.hand.length - 1];
+  if (pid === 0) {
+    if (isWinningNow(pl.hand, pl.melds, t)) {
+      document.getElementById('btnHu').disabled = false;
+      log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
+    }
+    // 檢查是否可以報聽
+    if (!pl.declaredListen) {
+      const canListenNow = pl.hand.some(tile2 => {
+        const testHand = pl.hand.filter(u => u !== tile2);
+        return isListening(testHand, pl.melds);
+      });
+      if (canListenNow) showListenPanel();
+    }
+  } else {
+    // AI 加槓後檢查自摸
+    if (isWinningNow(pl.hand, pl.melds, t)) {
+      doWin(pid, -1, t, true);
+      return;
+    }
+    setTimeout(stepAI, 400);
+  }
+}
+
 function doPong(pid, tile) {
   const pl = S.players[pid];
   const k = tileKey(tile);
@@ -1240,6 +1355,8 @@ function doPong(pid, tile) {
     }
   }
   pl.melds.push({ type: 'pong', tiles });
+  // 做碰屬於明牌，設定已出現明吃碰槓
+  S.anyOpenMeld = true;
   log(`🔥 ${playerName(pid)} 碰了 ${keyToText(k)}`);
   S.turn = pid;
   S.lastDiscard = null;
@@ -1259,6 +1376,8 @@ function doKong(pid, tile) {
     }
   }
   pl.melds.push({ type: 'kong', tiles });
+  // 明槓屬於明牌，記錄已開碰吃槓
+  S.anyOpenMeld = true;
   S.kongCount++; // 槓牌次數+1，海底多保留1張
   log(`💥 ${playerName(pid)} 槓了 ${keyToText(k)}，從王牌補牌`);
   
@@ -1288,6 +1407,9 @@ function discard(p, tile) {
   S.players[p].discards.push(tile);
   S.lastDiscard = { tile, from: p };
   log(`🎴 ${playerName(p)} 打出 ${keyToText(tileKey(tile))}`);
+
+  // 打出牌後，非槓補牌的自摸旗標重置
+  S.players[p].rinshan = false;
   renderAll();
   
   // 檢查其他玩家是否可以胡、碰、槓、吃（碰槓優先）
@@ -1408,8 +1530,18 @@ function showListenPanel() {
   document.getElementById('listenYes').onclick = () => {
     const me = S.players[0];
     if (!me.declaredListen) {
+      // 標記已報聽
       me.declaredListen = true;
-      log('🔔 你宣告聽牌！胡牌時多 1 台');
+      // 檢查天聽/地聽
+      updateTianDiTing(0);
+      // 記錄日誌，根據天聽/地聽或一般聽牌顯示不同訊息
+      if (me.tianTing) {
+        log('🔔 你宣告天聽！胡牌時多 ' + RULES.scoring.HeavenReady + ' 台');
+      } else if (me.diTing) {
+        log('🔔 你宣告地聽！胡牌時多 ' + RULES.scoring.EarthReady + ' 台');
+      } else {
+        log('🔔 你宣告聽牌！胡牌時多 1 台');
+      }
     }
     hideReactionPanel();
     renderAll();
@@ -1476,6 +1608,13 @@ function doWin(winner, from, tile, selfDraw) {
   }
   
   renderAll();
+
+  // 清除槓上開花及搶槓旗標
+  S.players[winner].rinshan = false;
+  S.robKong = false;
+
+  // 清除槓上開花旗標
+  S.players[winner].rinshan = false;
   
   for (let i = 0; i < 4; i++) {
     if (S.players[i].points <= 0) {
@@ -1516,14 +1655,29 @@ function calcFan(winner, winTile, selfDraw) {
   
   // 花牌台數已移除
   
-  // 報聽台數
-  if (pl.declaredListen) {
+  // 天聽/地聽或普通報聽台數
+  // 天聽或地聽不與一般聽牌重複計台
+  if (pl.tianTing) {
+    fan += RULES.scoring.HeavenReady;
+  } else if (pl.diTing) {
+    fan += RULES.scoring.EarthReady;
+  } else if (pl.declaredListen) {
     fan += 1;
   }
   
   if (selfDraw) {
     const menqing = pl.melds.length === 0;
     fan += menqing ? RULES.scoring.MenqingSelfDraw : RULES.scoring.SelfDraw;
+  }
+
+  // 搶槓胡牌加台
+  if (S.robKong) {
+    fan += RULES.scoring.RobKong;
+  }
+
+  // 槓上開花加台：若是自摸且來自槓後補牌
+  if (selfDraw && pl.rinshan) {
+    fan += RULES.scoring.Rinshan;
   }
   
   if (S.rules.gold.enabled) {
@@ -1622,10 +1776,26 @@ function stepAI() {
   drawTile(p);
   if (S.phase === 'end') return;
   renderAll();
+  // AI 檢查加槓
+  const aks = canAddedKong(p);
+  if (aks.length > 0) {
+    // 檢查搶槓
+    const cand = aks[0];
+    const key = cand.key;
+    const tile = me.hand.find(t => tileKey(t) === key);
+    for (let pid = 0; pid < 4; pid++) {
+      if (pid !== p && canWinOn(pid, tile)) {
+        S.robKong = true;
+        doWin(pid, p, tile, false);
+        return;
+      }
+    }
+    doAddedKong(p, cand.meldIndex);
+    return;
+  }
   // AI 檢查暗槓
   const cks = canConcealedKong(p);
   if (cks.length > 0) {
-    // AI 選擇第一組暗槓
     doConcealedKong(p, cks[0]);
     return;
   }
@@ -1656,17 +1826,22 @@ document.getElementById('btnListen').onclick = () => {
     log('⚠️ 你已經報聽了');
     return;
   }
-  // 僅當總牌數為17時才能報聽
+  // 檢查是否可聽牌：依據目前手牌張數選擇不同檢查方式
   const total = me.hand.length + me.melds.reduce((s, m) => s + m.tiles.length, 0);
-  if (total !== 17) {
-    log('⚠️ 目前無法報聽（需摸牌後才可）');
-    return;
+  let canListen = false;
+  if (total === 17) {
+    // 17 張：打出其中一張後是否聽牌
+    canListen = me.hand.some(tile => {
+      const testHand = me.hand.filter(t => t !== tile);
+      return isListening(testHand, me.melds);
+    });
+  } else if (total === 16) {
+    // 16 張：手牌本身是否聽牌
+    canListen = isListening(me.hand, me.melds);
+  } else {
+    // 其他張數不允許報聽
+    canListen = false;
   }
-  // 檢查是否可聽牌
-  const canListen = me.hand.some(tile => {
-    const testHand = me.hand.filter(t => t !== tile);
-    return isListening(testHand, me.melds);
-  });
   if (!canListen) {
     log('⚠️ 你還沒有聽牌，無法報聽');
     return;
@@ -1678,11 +1853,34 @@ document.getElementById('btnListen').onclick = () => {
 // 玩家執行暗槓（手牌四張相同）
 document.getElementById('btnKong').onclick = () => {
   if (S.turn !== 0 || S.phase === 'end' || S.lastDiscard !== null) return;
-  const keys = canConcealedKong(0);
-  if (keys.length === 0) return;
-  // 若有多個暗槓選項，取第一個；亦可擴充讓玩家選擇
-  const key = keys[0];
-  doConcealedKong(0, key);
+  const added = canAddedKong(0);
+  const concealed = canConcealedKong(0);
+  const me = S.players[0];
+  // 優先處理加槓
+  if (added.length > 0) {
+    const cand = added[0];
+    const key = cand.key;
+    // 找出手牌中的第四張
+    const tile = me.hand.find(t => tileKey(t) === key);
+    // 檢查是否有玩家可以搶槓
+    for (let pid = 1; pid < 4; pid++) {
+      if (canWinOn(pid, tile)) {
+        // 搶槓胡牌
+        S.robKong = true;
+        doWin(pid, 0, tile, false);
+        return;
+      }
+    }
+    // 無人搶槓，執行加槓
+    doAddedKong(0, cand.meldIndex);
+    return;
+  }
+  // 若沒有加槓則檢查暗槓
+  if (concealed.length > 0) {
+    const key = concealed[0];
+    doConcealedKong(0, key);
+    return;
+  }
 };
 
 document.getElementById('newGameBtn').onclick = () => {
@@ -1800,25 +1998,30 @@ function renderAll() {
   
   // 聽牌按鈕：只有輪到玩家、未報聽且確實達到聽牌條件時才啟用。
   const me = S.players[0];
-  let canListenNow = false;
+  let canListenBtn = false;
   if (S.turn === 0 && !me.declaredListen && S.phase !== 'end') {
-    // 僅當總牌數為17（剛摸牌或莊家開局）時檢查聽牌。
     const totalTilesMe = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+    // 16 張手牌情況：檢查是否已經聽牌（加任一牌即胡）
+    if (totalTilesMe === 16) {
+      canListenBtn = isListening(me.hand, me.melds);
+    }
+    // 17 張手牌情況：檢查打出其中一張後是否聽牌
     if (totalTilesMe === 17) {
-      // 檢查打出任一手牌後是否只差一張即可胡牌
-      canListenNow = me.hand.some(tile => {
+      const canListenAfterDiscard = me.hand.some(tile => {
         const testHand = me.hand.filter(t => t !== tile);
         return isListening(testHand, me.melds);
       });
+      if (canListenAfterDiscard) canListenBtn = true;
     }
   }
-  document.getElementById('btnListen').disabled = !canListenNow;
+  document.getElementById('btnListen').disabled = !canListenBtn;
 
   // 暗槓按鈕：輪到玩家，無棄牌反應，且手牌中存在四張相同牌時啟用
   const btnKong = document.getElementById('btnKong');
-  if (S.turn === 0 && S.phase !== 'end' && S.lastDiscard === null) {
-    const keys = canConcealedKong(0);
-    btnKong.disabled = keys.length === 0;
+  if (S.turn === 0 && S.phase !== 'end' && S.waitReact === null) {
+    const cks = canConcealedKong(0);
+    const aks = canAddedKong(0);
+    btnKong.disabled = (cks.length === 0 && aks.length === 0);
   } else {
     btnKong.disabled = true;
   }
