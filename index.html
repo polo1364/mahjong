@@ -1863,8 +1863,8 @@ function stepNext() {
     const expectedFull = base + kongCount;
     const expectedEmpty = (base - 1) + kongCount;
 
-    if (totalTiles === expectedFull) {
-      // 玩家已經持有完整張數，不需摸牌，請出牌
+    if (totalTiles >= expectedFull) {
+      // 玩家已經持有完整張數或超過，不需摸牌，請出牌
       log('👉 請選擇要打出的牌');
       renderAll();
       // 檢查是否可報聽並尚未宣告，若可則顯示報聽面板
@@ -1875,8 +1875,8 @@ function stepNext() {
         });
         if (canListenNow) showListenPanel();
       }
-    } else if (totalTiles === expectedEmpty) {
-      // 需要摸牌
+    } else {
+      // 總牌數不足，視為需要摸牌
       drawTile(0);
       const t = me.hand[me.hand.length - 1];
       if (isWinningNow(me.hand, me.melds, t)) {
@@ -1892,10 +1892,6 @@ function stepNext() {
         });
         if (canListenNow) showListenPanel();
       }
-    } else {
-      // 異常狀況，記錄錯誤
-      log(`⚠️ 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
-      renderAll();
     }
   } else {
     setTimeout(stepAI, 600);
@@ -1911,11 +1907,11 @@ function stepAI() {
   const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
   const expectedFull = 17 + kongCount;
   const expectedEmpty = 16 + kongCount;
-  if (totalTiles === expectedEmpty) {
-    // 需要摸牌
+  if (totalTiles <= expectedEmpty) {
+    // 總牌數不足，摸牌
     drawTile(p);
     if (S.phase === 'end') return;
-  } else if (totalTiles !== expectedFull) {
+  } else if (totalTiles > expectedFull) {
     log(`⚠️ AI 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
   }
   renderAll();
