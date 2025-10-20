@@ -1134,9 +1134,10 @@ function canChow(pid, tile) {
   const pl = S.players[pid];
   const k = tileKey(tile);
   
-  // 只能吃上家的牌
-  const prevPlayer = (S.turn + 3) % 4;
-  if (pid !== prevPlayer + 1 && !(prevPlayer === 3 && pid === 0)) return [];
+  // 只能吃上家的牌：僅下一家可以吃（例如打牌者為 p，只有 (p+1)%4 可以吃）
+  // 當前 S.turn 仍為打牌者，在反應期間未變更
+  const nextPlayer = (S.turn + 1) % 4;
+  if (pid !== nextPlayer) return [];
   
   // 只能吃數字牌
   if (tile.suit !== SUIT_W && tile.suit !== SUIT_T && tile.suit !== SUIT_B) return [];
