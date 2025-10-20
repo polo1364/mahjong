@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台灣16張麻將（明星3缺1規則｜單機）</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:#0b1520;color:#e9f0f6;margin:0;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0e1b2a;border-bottom:1px solid #1e3149;position:sticky;top:0;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .pill{background:#132a42;border:1px solid #2b4766;border-radius:999px;padding:4px 10px;font-size:14px}
+  button, .tile{cursor:pointer}
+  #table{max-width:1100px;margin:16px auto;padding:0 12px}
+  #goldbar .tilekey{display:inline-block;margin-right:6px;padding:2px 6px;border-radius:6px;background:#2a445f;border:1px solid #4c6d8e}
+  .score{background:#0e1b2a;border:1px solid #223a55;border-radius:10px;padding:10px;margin-bottom:12px}
+  .score h3{margin:0 0 6px 0;font-size:16px}
+  .hand{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tile{border:1px solid #314e6c;background:#eef5ff;color:#182634;border-radius:8px;padding:6px 8px;min-width:36px;text-align:center}
+  .tile.ai{background:#dfe9f7}
+  .tile.dim{opacity:0.55}
+  .meld{background:#12314c;border:1px dashed #375879;border-radius:6px;padding:4px 6px;margin-right:6px}
+  .sec{margin:16px 0}
+  #log{background:#0e1b2a;border:1px solid #223a55;border-radius:8px;padding:8px;height:160px;overflow:auto;font-size:13px;white-space:pre-wrap}
+  #controls{display:flex;gap:8px;flex-wrap:wrap}
+  #controls button{background:#1d3a57;border:1px solid #2c557c;color:#e9f0f6;border-radius:8px;padding:8px 12px}
+  #controls button:disabled{opacity:.45}
+  .badge{padding:2px 6px;border-radius:6px;background:#253e5a;border:1px solid #36597f;font-size:12px}
+  .you{color:#ffd36f}
+  .dealer{border:2px solid #ffcf4e}
+  .danger{color:#ff8a8a}
+  .ok{color:#9cf39c}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <span class="pill">台灣 16 張｜明星 3 缺 1（單機）</span>
+    <label class="pill"><input id="goldSwitch" type="checkbox" checked> 啟用金牌</label>
+    <span class="pill">底 50／每台 100</span>
+    <span class="pill">起始 100,000</span>
+  </div>
+  <div class="row">
+    <button id="newGameBtn">開始新局</button>
+  </div>
+</header>
+
+<div id="table">
+  <div class="score" id="scoreboard"></div>
+  <div class="row sec" id="goldbar"></div>
+
+  <div class="sec">
+    <h3>局面</h3>
+    <div id="roundinfo" class="row"></div>
+  </div>
+
+  <div class="sec">
+    <h3>你的手牌 <span class="badge">點擊要打出的牌</span></h3>
+    <div id="yourHand" class="hand"></div>
+    <div id="yourMelds" class="row"></div>
+    <div id="controls" class="row">
+      <button id="btnDraw">摸牌</button>
+      <button id="btnHu" disabled>胡牌</button>
+      <button id="btnPass" disabled>過</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>其他玩家</h3>
+    <div id="others"></div>
+  </div>
+
+  <div class="sec">
+    <h3>戰況</h3>
+    <div id="log"></div>
+  </div>
+</div>
+
+<script>
+/* ========= 基本工具 ========= */
+const rng = (n)=>Math.floor(Math.random()*n);
+const clone = (o)=>JSON.parse(JSON.stringify(o));
+function log(msg){ const el = document.getElementById('log'); el.textContent += msg + "\\n"; el.scrollTop = el.scrollHeight; }
+
+/* ========= 牌型 ========= */
+const SUIT_W='W', SUIT_T='T', SUIT_B='B', SUIT_F='F', SUIT_D='D', SUIT_H='H'; // 萬/筒/條/風/箭/花
+const WINDS=['E','S','W','N']; const DRAGONS=['C','F','B']; // 中(C) 發(F) 白(B)
+const FLOWERS=['H1','H2','H3','H4','H5','H6','H7','H8']; // 春夏秋冬 梅蘭竹菊
+
+function tileKey(t){
+  if(t.suit===SUIT_W||t.suit===SUIT_T||t.suit===SUIT_B) return t.suit+String(t.rank);
+  if(t.suit===SUIT_F||t.suit===SUIT_D) return t.suit+t.name;
+  if(t.suit===SUIT_H) return t.name; // H1..H8
+  return '?';
+}
+function keyToText(k){
+  const s=k[0], v=k.slice(1);
+  if(s===SUIT_W) return v+'萬';
+  if(s===SUIT_T) return v+'筒';
+  if(s===SUIT_B) return v+'條';
+  if(s===SUIT_F){ const m={E:'東',S:'南',W:'西',N:'北'}; return m[v]||k; }
+  if(s===SUIT_D){ const m={C:'中',F:'發',B:'白'}; return m[v]||k; }
+  if(k.startsWith('H')){ const m={H1:'春',H2:'夏',H3:'秋',H4:'冬',H5:'梅',H6:'蘭',H7:'竹',H8:'菊'}; return m[k]||k; }
+  return k;
+}
+
+function generateTiles(){
+  const tiles=[];
+  const push4=(suit, rank)=>{ for(let i=0;i<4;i++) tiles.push({suit, rank, id:tiles.length}); };
+  for(let r=1;r<=9;r++){ push4(SUIT_W,r); push4(SUIT_T,r); push4(SUIT_B,r); }
+  WINDS.forEach(n=>{ for(let i=0;i<4;i++) tiles.push({suit:SUIT_F, name:n, id:tiles.length}); });
+  DRAGONS.forEach(n=>{ for(let i=0;i<4;i++) tiles.push({suit:SUIT_D, name:n, id:tiles.length}); });
+  FLOWERS.forEach(n=> tiles.push({suit:SUIT_H, name:n, id:tiles.length}));
+  return tiles;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=rng(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ========= 狀態 ========= */
+const RULES = {
+  handSize:16,
+  gold:{ enabled:true, initial:3, maxExtra:2, totalMax:5, perGold:1, winOnGold:3 },
+  scoring:{ SelfDraw:1, MenqingSelfDraw:3, AllPungs:2, SevenPairs:4, HalfFlush:3, PureOneSuit:5, Flower:1, Wind:1, RobKong:1, Rinshan:1, Haitei:1 },
+  points:{ base:50, perFan:100 },
+  initialPoints:100000
+};
+
+let S=null; // 全局狀態
+
+function startNewHand(){
+  const useGold = document.getElementById('goldSwitch').checked;
+  S = {
+    wall: shuffle(generateTiles()),
+    deadWall: [],
+    players: Array.from({length:4}, (_,i)=>({hand:[], melds:[], discards:[], flowers:[], points: (S?.players?.[i]?.points ?? RULES.initialPoints), declaredListen:false, isAI: i!==0})),
+    goldKeys: [],
+    kongAdded:0,
+    rules: clone(RULES),
+    turn: 0,
+    dealer: (S?.dealer ?? 0), // 固定東家，簡化：可加轉莊
+    round: (S?.round ?? 1),
+    lastDiscard:null,
+    waitReact:null,
+    winner:null,
+    fromPlayer:null,
+    winTile:null,
+    phase:'deal',
+    remain:0
+  };
+  S.rules.gold.enabled = useGold;
+
+  // 發牌：每人16，留王牌14（示意）
+  dealTiles();
+  if(S.rules.gold.enabled) initGoldTiles();
+  // 莊家摸一張
+  drawTile(S.dealer);
+  S.phase='play';
+  S.remain = S.wall.length;
+  renderAll();
+  log(`開局：莊家 東家（你是東家）。${S.rules.gold.enabled?'本局啟用金牌':''}`);
+  if(S.turn!==0) setTimeout(stepAI, 400);
+}
+
+function dealTiles(){
+  const dead=14;
+  while(S.wall.length>dead && S.players[0].hand.length<16){ for(let p=0;p<4;p++){ S.players[p].hand.push(S.wall.pop()); } }
+  S.deadWall = S.wall.splice(0, S.wall.length-dead);
+}
+function drawTile(p){
+  if(!S.wall.length){ log('牌山枯竭，流局'); S.phase='end'; return; }
+  const t = S.wall.pop();
+  const pl = S.players[p];
+  if(t.suit===SUIT_H){ pl.flowers.push(t); log(`${playerName(p)} 摸到花（${keyToText(tileKey(t))}），補牌`); drawTile(p); return; }
+  pl.hand.push(t);
+  S.remain = S.wall.length;
+  if(p===0) document.getElementById('btnDraw').disabled = true;
+}
+function initGoldTiles(){
+  const candidates = [];
+  // 非花
+  for(let r=1;r<=9;r++){ candidates.push('W'+r,'T'+r,'B'+r); }
+  WINDS.forEach(n=>candidates.push('F'+n));
+  DRAGONS.forEach(n=>candidates.push('D'+n));
+  // 隨機取不重覆3個
+  while(S.goldKeys.length<3){ const k=candidates[rng(candidates.length)]; if(!S.goldKeys.includes(k)) S.goldKeys.push(k); }
+}
+
+function playerName(i){ return ['東(你)','南','西','北'][i]; }
+
+/* ========= 胡牌判定（一般型 + 七對） ========= */
+function isWinningNow(hand, melds, winTile){
+  const tiles = hand.slice().sort((a,b)=> tileSortKey(a)-tileSortKey(b));
+  // 七對
+  if(isSevenPairs(tiles)) return true;
+  // 一般型：5 面子 + 1 對將（等價：去一對，餘數可分成 5 組順/刻）
+  return canStandardWin(tiles);
+}
+function isSevenPairs(tiles){
+  if((tiles.length % 3)!==2) return false;
+  const m = countByKey(tiles);
+  const vals = Object.values(m);
+  return vals.filter(x=>x===2).length===7 && vals.every(x=>x===2 || x===0);
+}
+function canStandardWin(tiles){
+  const counts = countByKey(tiles);
+  for(const k in counts){
+    if(counts[k]>=2){
+      counts[k]-=2;
+      if(canSplitMelds(counts, 5)) return true;
+      counts[k]+=2;
+    }
+  }
+  return false;
+}
+function canSplitMelds(counts, need){
+  if(need===0) return Object.values(counts).every(v=>v===0);
+  let first=null;
+  for(const k in counts){ if(counts[k]>0){ first=k; break; } }
+  if(!first) return need===0;
+  // 刻子
+  if(counts[first]>=3){
+    counts[first]-=3;
+    if(canSplitMelds(counts, need-1)) return true;
+    counts[first]+=3;
+  }
+  // 順子（僅序數）
+  const s=first[0]; const v=parseInt(first.slice(1));
+  if((s===SUIT_W||s===SUIT_T||s===SUIT_B) && v<=7){
+    const k2=s+(v+1), k3=s+(v+2);
+    if((counts[k2]||0)>0 && (counts[k3]||0)>0){
+      counts[first]--; counts[k2]--; counts[k3]--;
+      if(canSplitMelds(counts, need-1)) return true;
+      counts[first]++; counts[k2]++; counts[k3]++;
+    }
+  }
+  return false;
+}
+function countByKey(tiles){
+  const m={}; for(const t of tiles){ const k=tileKey(t); m[k]=(m[k]||0)+1; } return m;
+}
+function tileSortKey(t){
+  const order={W:0,T:1,B:2,F:3,D:4,H:5}; const o=order[t.suit];
+  const v = (t.suit===SUIT_W||t.suit===SUIT_T||t.suit===SUIT_B)? t.rank : ({E:1,S:2,W:3,N:4,C:5,F:6,B:7}[t.name]||0);
+  return o*100+v;
+}
+
+/* ========= 聰明 AI：向聽/受聽 + 風險 + 小型 rollouts ========= */
+function shantenAfterRemove(hand){
+  function approxShanten14(tiles){
+    if(isWinningNow(tiles,[],null)) return 0;
+    const m=countByKey(tiles);
+    let pairs=0, triples=0, singles=0;
+    for(const k in m){ const c=m[k]; if(c>=3) triples++; else if(c===2) pairs++; else singles++; }
+    let est = Math.max(0, 5 - (pairs + triples));
+    est += Math.ceil(singles/4)*0.5;
+    return est;
+  }
+  let best=99;
+  const n=hand.length;
+  for(let i=-1;i<n;i++) for(let j=i+1;j<n;j++){
+    const take=hand.filter((_,k)=>k!==i && k!==j);
+    best=Math.min(best, approxShanten14(take));
+  }
+  const m=countByKey(hand); let pairs=0; for(const k in m){ pairs+=Math.floor(m[k]/2); }
+  const sevenNeed=Math.max(0, 7-pairs);
+  return Math.min(best, sevenNeed);
+}
+function ukeireEstimate(hand, visible){
+  const base = shantenAfterRemove(hand);
+  const remain = remainingCounts(visible);
+  let total=0;
+  for(const k in remain){
+    if(remain[k]<=0) continue;
+    const t = keyToTile(k);
+    const after = hand.concat([t]);
+    if(shantenAfterRemove(after) < base) total += remain[k];
+  }
+  return total;
+}
+function remainingCounts(visible){
+  const base={};
+  for(let r=1;r<=9;r++){ base['W'+r]=4;base['T'+r]=4;base['B'+r]=4; }
+  WINDS.forEach(n=>base['F'+n]=4); DRAGONS.forEach(n=>base['D'+n]=4);
+  FLOWERS.forEach(h=>base[h]=1);
+  const use=(key)=>{ if(base[key]>0) base[key]--; };
+  for(const p of S.players){
+    p.discards.forEach(t=>use(tileKey(t)));
+    p.melds.forEach(m=> m.tiles.forEach(t=>use(tileKey(t))));
+    p.flowers.forEach(h=>use(tileKey(h)));
+  }
+  S.players[0].hand.forEach(t=>use(tileKey(t)));
+  return base;
+}
+function keyToTile(k){
+  const s=k[0], v=k.slice(1);
+  if(s==='W'||s==='T'||s==='B') return {suit:s, rank:parseInt(v), id: -1};
+  if(s==='F') return {suit:SUIT_F, name:v, id:-1};
+  if(s==='D') return {suit:SUIT_D, name:v, id:-1};
+  if(k.startsWith('H')) return {suit:SUIT_H, name:k, id:-1};
+  return {suit:'?', id:-1};
+}
+function riskOf(tile){
+  if(tile.suit===SUIT_F||tile.suit===SUIT_D) return 0.4;
+  if(tile.rank===1||tile.rank===9) return 0.65;
+  return 1.0;
+}
+function evFanEstimate(hand){
+  let fan=0;
+  const keys = hand.map(tileKey);
+  if(S.rules.gold.enabled){
+    const goldCnt = keys.filter(k=>S.goldKeys.includes(k)).length;
+    fan += goldCnt * S.rules.gold.perGold;
+  }
+  const c={W:0,T:0,B:0}, honors=keys.filter(k=>k[0]==='F'||k[0]==='D').length;
+  keys.forEach(k=>{ if(c[k[0]]!=null) c[k[0]]++; });
+  const maxSuit = Math.max(c.W,c.T,c.B);
+  if(maxSuit>=9) fan += 2;
+  if(honors>=4) fan += 1;
+  return fan;
+}
+function aiChooseDiscard(pid){
+  const me = S.players[pid];
+  const visible = []; S.players.forEach(p=>visible.push(...p.discards, ...p.flowers));
+  let cands = me.hand.map(t=>{
+    const after = me.hand.filter(x=>x!==t);
+    const sh = shantenAfterRemove(after);
+    const uke = ukeireEstimate(after, visible);
+    const ev = evFanEstimate(after);
+    const risk = riskOf(t);
+    const score = (-120*sh) + (1.6*uke) + (1.2*ev) + (-2.0*risk);
+    return {tile:t, score};
+  });
+  cands.sort((a,b)=>b.score-a.score);
+  const topK = cands.slice(0, Math.min(3, cands.length));
+  for(const c of topK){
+    const delta = rolloutScoreForDiscard(pid, c.tile, 16);
+    c.score += 0.003*delta;
+  }
+  cands.sort((a,b)=>b.score-a.score);
+  return cands[0].tile;
+}
+function rolloutScoreForDiscard(pid, tile, trials){
+  let sum=0;
+  for(let i=0;i<trials;i++){
+    const sim = shallowCloneStateForRoll();
+    const idx = sim.players[pid].hand.findIndex(x=>tileKey(x)===tileKey(tile));
+    if(idx>=0) sim.players[pid].hand.splice(idx,1);
+    let steps=0; let winner=-1;
+    while(sim.wall.length && steps<40){
+      const p = sim.turn;
+      const t = sim.wall.pop(); if(!t) break;
+      if(t.suit===SUIT_H){ sim.players[p].flowers.push(t); continue; }
+      sim.players[p].hand.push(t);
+      if(isWinningNow(sim.players[p].hand, sim.players[p].melds, t)){ winner=p; break; }
+      const out = sim.players[p].hand[rng(sim.players[p].hand.length)];
+      const id = sim.players[p].hand.indexOf(out); sim.players[p].hand.splice(id,1);
+      sim.players[p].discards.push(out);
+      sim.turn=(sim.turn+1)%4; steps++;
+    }
+    if(winner===pid) sum+=300; else if(winner===-1) sum+=0; else sum-=200;
+  }
+  return sum;
+}
+function shallowCloneStateForRoll(){
+  const c = {
+    wall: S.wall.slice(), players: S.players.map(p=>({hand:p.hand.slice(), melds:[], discards:p.discards.slice(), flowers:p.flowers.slice()})),
+    turn:S.turn, rules:S.rules, goldKeys:S.goldKeys.slice()
+  };
+  return c;
+}
+
+/* ========= 出牌 / 反應 / 結算 ========= */
+function discard(p, tile){
+  const hand=S.players[p].hand; const i=hand.indexOf(tile);
+  if(i<0) return;
+  hand.splice(i,1);
+  S.players[p].discards.push(tile);
+  S.lastDiscard={tile, from:p};
+  renderAll();
+  // 胡 >（碰/吃）簡化：只實作胡
+  for(let k=1;k<=3;k++){
+    const pid=(p+k)%4; if(pid===p) continue;
+    const canWin = canWinOn(pid, tile);
+    if(canWin){ doWin(pid, p, tile, false); return; }
+  }
+  S.turn=(S.turn+1)%4;
+  stepNext();
+}
+function canWinOn(pid, tile){
+  const pl=S.players[pid]; const tmp=pl.hand.concat([tile]);
+  return isWinningNow(tmp, pl.melds, tile);
+}
+function doWin(winner, from, tile, selfDraw){
+  S.winner=winner; S.fromPlayer=from; S.winTile=tile; S.phase='end';
+  const fan = calcFan(winner, tile, selfDraw);
+  const delta = RULES.points.base + fan*RULES.points.perFan;
+  if(selfDraw){
+    for(let i=0;i<4;i++) if(i!==winner){ S.players[i].points -= delta; }
+    S.players[winner].points += delta*3;
+    log(`${playerName(winner)} 自摸 ${keyToText(tileKey(tile))}（${fan}台）→ 每家付 ${delta}`);
+  }else{
+    S.players[from].points -= delta*3;
+    S.players[winner].points += delta*3;
+    log(`${playerName(winner)} 點胡 ${playerName(from)}（${keyToText(tileKey(tile))}，${fan}台）→ 放槍者付 ${delta*3}`);
+  }
+  renderAll();
+  for(let i=0;i<4;i++){
+    if(S.players[i].points<=0){
+      log(`⚠️ ${playerName(i)} 破產，遊戲結束。`);
+      endGame(true);
+      return;
+    }
+  }
+  setTimeout(()=>{ log('—— 開下一局 ——'); startNewHand(); }, 1600);
+}
+function calcFan(winner, winTile, selfDraw){
+  const pl = S.players[winner];
+  const allTiles = pl.hand.concat(pl.melds.flatMap(m=>m.tiles), pl.flowers);
+  let fan=0;
+  if(isSevenPairs(pl.hand.concat([winTile]))) fan += RULES.scoring.SevenPairs;
+  const kinds = countByKey(pl.hand.concat([winTile]));
+  const allTrip = isAllPungsPossible(kinds); if(allTrip) fan+=RULES.scoring.AllPungs;
+  const suitCnt = {W:0,T:0,B:0}; let honors=0;
+  for(const t of allTiles){ const k=tileKey(t)[0]; if(suitCnt[k]!=null) suitCnt[k]++; else if(k==='F'||k==='D') honors++; }
+  const nz = Object.values(suitCnt).filter(x=>x>0).length;
+  if(nz===1) fan += RULES.scoring.PureOneSuit;
+  else if(nz===2 && honors>0) fan += RULES.scoring.HalfFlush;
+  fan += pl.flowers.length * RULES.scoring.Flower;
+  if(selfDraw){
+    const menqing = pl.melds.length===0;
+    fan += menqing? RULES.scoring.MenqingSelfDraw : RULES.scoring.SelfDraw;
+  }
+  if(S.rules.gold.enabled){
+    const keys = allTiles.map(tileKey);
+    const goldOwned = keys.filter(k=>S.goldKeys.includes(k)).length;
+    fan += goldOwned * S.rules.gold.perGold;
+    if(S.goldKeys.includes(tileKey(winTile))) fan += S.rules.gold.winOnGold;
+  }
+  return fan;
+}
+function isAllPungsPossible(counts){
+  for(const k in counts){
+    if(counts[k]>=2){
+      counts[k]-=2;
+      let ok=true;
+      for(const kk in counts){ if(counts[kk]%3!==0){ ok=false; break; } }
+      counts[k]+=2;
+      if(ok) return true;
+    }
+  }
+  return false;
+}
+
+/* ========= 回合推進 ========= */
+function stepNext(){
+  renderAll();
+  if(S.turn===0){
+    document.getElementById('btnDraw').disabled = false;
+  }else{
+    setTimeout(stepAI, 400);
+  }
+}
+function stepAI(){
+  if(S.phase==='end') return;
+  const p=S.turn, me=S.players[p];
+  drawTile(p);
+  if(S.phase==='end') return;
+  const t=me.hand[me.hand.length-1];
+  if(isWinningNow(me.hand, me.melds, t)){
+    doWin(p, -1, t, true);
+    return;
+  }
+  const out = aiChooseDiscard(p);
+  discard(p, out);
+}
+
+/* ========= UI 操作 ========= */
+document.getElementById('btnDraw').onclick=()=>{
+  if(S.turn!==0) return;
+  drawTile(0); renderAll();
+  const me=S.players[0], t=me.hand[me.hand.length-1];
+  if(isWinningNow(me.hand, me.melds, t)){
+    document.getElementById('btnHu').disabled=false;
+    log('你可以自摸（按「胡牌」）或繼續出牌');
+  }else{
+    document.getElementById('btnHu').disabled=true;
+  }
+};
+document.getElementById('btnHu').onclick=()=>{
+  const me=S.players[0], t=me.hand[me.hand.length-1];
+  if(!isWinningNow(me.hand, me.melds, t)) return;
+  doWin(0, -1, t, true);
+};
+document.getElementById('btnPass').onclick=()=>{  };
+
+document.getElementById('newGameBtn').onclick=()=>{
+  S={players:Array.from({length:4},()=>({points:RULES.initialPoints}))};
+  startNewHand();
+};
+
+function onClickYourTile(idx){
+  if(S.turn!==0) return;
+  const me=S.players[0];
+  const tile = me.hand[idx];
+  discard(0, tile);
+}
+
+/* ========= 繪製 ========= */
+function renderAll(){
+  const goldEl = document.getElementById('goldbar');
+  goldEl.innerHTML = (S.rules.gold.enabled?('本局金牌： '+S.goldKeys.map(k=>`<span class="tilekey">${keyToText(k)}</span>`).join('')):'金牌已關閉');
+
+  const sc = document.getElementById('scoreboard');
+  sc.innerHTML = ['東(你)','南','西','北'].map((n,i)=>{
+    const p=S.players[i];
+    const cls = (i===S.dealer?'dealer':'');
+    const bankrupt = p.points<=0 ? '<span class="danger">（破產）</span>' : '';
+    return `<div class="row" style="justify-content:space-between">
+      <div><span class="${cls}">${n}</span></div>
+      <div style="font-weight:700">${p.points.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('roundinfo').innerHTML =
+    `<span class="pill">剩餘牌：${S.wall.length}</span>
+     <span class="pill">輪到：${playerName(S.turn)}</span>
+     ${S.rules.gold.enabled?`<span class="pill">金牌數：${S.goldKeys.length}</span>`:''}`;
+
+  const you=S.players[0];
+  you.hand.sort((a,b)=> tileSortKey(a)-tileSortKey(b));
+  document.getElementById('yourHand').innerHTML = you.hand.map((t,idx)=>{
+    const k=tileKey(t); const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+    return `<div class="tile ${isGold?'':'dim'}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
+  }).join('');
+  document.getElementById('yourMelds').innerHTML =
+    (you.flowers.length? `<div class="meld">花：${you.flowers.map(h=>keyToText(tileKey(h))).join(' ')}</div>`:'');
+  document.getElementById('btnHu').disabled=true;
+  document.getElementById('btnDraw').disabled = (S.turn!==0);
+
+  const wrap = document.getElementById('others');
+  wrap.innerHTML = [1,2,3].map(i=>{
+    const p=S.players[i];
+    const handCount = p.hand.length;
+    const disc = p.discards.map(t=>keyToText(tileKey(t))).join(' ');
+    const flowers = p.flowers.length? `｜花：${p.flowers.map(h=>keyToText(tileKey(h))).join(' ')}`:'';
+    return `<div class="score">
+      <h3>${playerName(i)}</h3>
+      <div>手牌數：${handCount}｜捨牌：${disc} ${flowers}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ========= 啟動 ========= */
+startNewHand();
+</script>
+</body>
+</html>
