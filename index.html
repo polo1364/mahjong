@@ -827,46 +827,105 @@ button:disabled {
   animation: pulse 0.5s ease infinite;
 }
   /* ===== 四方位牌桌佈局 ===== */
-  /* 整個牌桌採用 CSS Grid 佈局，上下左右分別對應北、西、東、南家，中央為牌河 */
+  /* 整個牌桌採用 CSS Grid 佈局，棄牌區域逆時針排列：東(上)、北(左)、西(下)、南(右) */
   .players-grid {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto auto auto;
     grid-template-areas:
-      ". top ."
-      "left center right"
-      ". bottom .";
-    gap: 12px;
+      ". discard-top ."
+      "discard-left center discard-right"
+      ". discard-bottom .";
+    gap: 8px;
     margin-top: 16px;
   }
   
-  /* 中央牌河區域 */
+  /* 中央區域 */
   .center-discard {
     grid-area: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    background: rgba(10, 30, 20, 0.4);
+    justify-content: center;
+    background: rgba(10, 30, 20, 0.3);
     border: 2px solid #4a6d2c;
     border-radius: 8px;
-    padding: 10px;
-    min-height: 150px;
+    padding: 8px;
+    min-height: 120px;
   }
   
   .center-discard h4 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
+    margin: 0;
+    font-size: 13px;
     color: #ffd36f;
   }
   
-  .center-discard-content {
+  /* 棄牌區域基本樣式 */
+  .discard-area {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #2a4766;
+    border-radius: 6px;
+    padding: 6px;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 3px;
+    min-height: 60px;
+  }
+  
+  /* 上方棄牌區（東家） */
+  .discard-area.top {
+    grid-area: discard-top;
     justify-content: center;
     align-items: flex-start;
-    width: 100%;
+  }
+  
+  /* 左方棄牌區（北家） */
+  .discard-area.left {
+    grid-area: discard-left;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  /* 右方棄牌區（南家） */
+  .discard-area.right {
+    grid-area: discard-right;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  /* 下方棄牌區（西家） */
+  .discard-area.bottom {
+    grid-area: discard-bottom;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  
+  /* 玩家資訊區域 */
+  .players-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .player-info-card {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid #2a4766;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .player-info-card .info-name {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  
+  .player-info-card .info-melds,
+  .player-info-card .info-handcount {
+    font-size: 11px;
+    margin: 2px 0;
   }
 
   .player-area {
@@ -987,21 +1046,28 @@ button:disabled {
     <div id="log"></div>
   </div>
 
-  <!-- 使用四方位牌桌佈局：北、東、西、南（你的） -->
+  <!-- 使用四方位牌桌佈局：棄牌區逆時針排列 -->
   <div id="playersGrid" class="players-grid">
-    <!-- 北家（對家）顯示區 -->
-    <div id="playerArea2" class="player-area top"></div>
-    <!-- 西家（下家）顯示區 -->
-    <div id="playerArea3" class="player-area left"></div>
-    <!-- 中央牌河區域 -->
+    <!-- 上方棄牌區（東家） -->
+    <div id="discardArea1" class="discard-area top"></div>
+    <!-- 左方棄牌區（北家） -->
+    <div id="discardArea2" class="discard-area left"></div>
+    <!-- 中央資訊區域 -->
     <div class="center-discard">
-      <h4>🗑️ 牌河</h4>
-      <div id="centerDiscardContent" class="center-discard-content"></div>
+      <h4>🎴 牌桌</h4>
     </div>
-    <!-- 東家（上家）顯示區 -->
-    <div id="playerArea1" class="player-area right"></div>
-    <!-- 南家（自己）顯示區 -->
-    <div id="playerArea0" class="player-area bottom"></div>
+    <!-- 右方棄牌區（南家） -->
+    <div id="discardArea0" class="discard-area right"></div>
+    <!-- 下方棄牌區（西家） -->
+    <div id="discardArea3" class="discard-area bottom"></div>
+  </div>
+  
+  <!-- 玩家資訊區域（顯示名稱、副露、手牌數等） -->
+  <div class="players-info">
+    <div id="playerInfo0" class="player-info-card"></div>
+    <div id="playerInfo1" class="player-info-card"></div>
+    <div id="playerInfo2" class="player-info-card"></div>
+    <div id="playerInfo3" class="player-info-card"></div>
   </div>
 </div>
 
@@ -2999,22 +3065,33 @@ function renderAll() {
     btnKong.disabled = true;
   }
   
-  // 更新四方位玩家區域，顯示各家捨牌與副露
-  const area0 = document.getElementById('playerArea0');
-  const area1 = document.getElementById('playerArea1');
-  const area2 = document.getElementById('playerArea2');
-  const area3 = document.getElementById('playerArea3');
-  // 輔助函式：產生指定玩家的區塊 HTML
-  function buildPlayerAreaHTML(i) {
+  // 更新四方位棄牌區域
+  const discardArea0 = document.getElementById('discardArea0');
+  const discardArea1 = document.getElementById('discardArea1');
+  const discardArea2 = document.getElementById('discardArea2');
+  const discardArea3 = document.getElementById('discardArea3');
+  
+  // 更新玩家資訊卡片
+  const playerInfo0 = document.getElementById('playerInfo0');
+  const playerInfo1 = document.getElementById('playerInfo1');
+  const playerInfo2 = document.getElementById('playerInfo2');
+  const playerInfo3 = document.getElementById('playerInfo3');
+  // 輔助函式：產生棄牌區HTML
+  function buildDiscardHTML(i) {
     const p = S.players[i];
-    const name = playerName(i);
-    const dealerTag = (i === S.dealer) ? '<span class="dealer-badge">莊</span>' : '';
-    // 捨牌內容
-    const discHTML = p.discards.map((t) => {
+    return p.discards.map((t) => {
       const k = tileKey(t);
       const suitClass = `suit-${t.suit}`;
       return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
-    }).join(' ') || '無';
+    }).join('');
+  }
+  
+  // 輔助函式：產生玩家資訊HTML
+  function buildPlayerInfoHTML(i) {
+    const p = S.players[i];
+    const name = playerName(i);
+    const dealerTag = (i === S.dealer) ? '<span class="dealer-badge">莊</span>' : '';
+    
     // 副露
     let meldHTML = '';
     if (p.melds.length > 0) {
@@ -3041,83 +3118,33 @@ function renderAll() {
         return `${label}：${tilesStr}`;
       }).join('、');
     }
-    // 不顯示其他玩家的等牌提示。僅玩家本人區域會顯示。
+    
+    // 等牌提示（僅玩家0）
     let waitLine = '';
-    return `<div class="player-header"><strong>${name}${dealerTag}</strong></div>` +
-      `<div class="player-discard">🗑 捨牌：${discHTML}</div>` +
-      (meldHTML ? `<div class="player-meld">副露：${meldHTML}</div>` : '') +
-      `<div class="player-handcount">🎴 手牌數：${p.hand.length}</div>` +
+    if (i === 0 && Array.isArray(p.waitKeys) && p.waitKeys.length > 0) {
+      const texts = p.waitKeys.map(key => keyToText(key)).join(' ');
+      waitLine = `<div class="info-wait">👂 等牌：${texts}</div>`;
+    }
+    
+    return `<div class="info-name">${name}${dealerTag}</div>` +
+      (meldHTML ? `<div class="info-melds">副露：${meldHTML}</div>` : '') +
+      `<div class="info-handcount">🎴 手牌數：${p.hand.length}</div>` +
       waitLine;
   }
-  // 指定每個區域的內容：0為自己，1右、2上、3左
-  area1.innerHTML = buildPlayerAreaHTML(1);
-  area2.innerHTML = buildPlayerAreaHTML(2);
-  area3.innerHTML = buildPlayerAreaHTML(3);
-  // 自己區域顯示捨牌與副露，手牌由下方專門區顯示
-  (function() {
-    const p = S.players[0];
-    const selfName = playerName(0);
-    const dealerTagSelf = (0 === S.dealer) ? '<span class="dealer-badge">莊</span>' : '';
-    const discHTMLSelf = p.discards.map((t) => {
-      const k = tileKey(t);
-      const suitClass = `suit-${t.suit}`;
-      return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
-    }).join(' ') || '無';
-    let meldHTMLSelf = '';
-    if (p.melds.length > 0) {
-      meldHTMLSelf = p.melds.map(m => {
-        let label = '';
-        if (m.type === 'pong') label = '碰';
-        if (m.type === 'kong') label = m.concealed ? '暗槓' : '槓';
-        if (m.type === 'chow') label = '吃';
-        let tilesForDisp;
-        if (m.type === 'chow' && typeof m.centerIdx === 'number') {
-          const arr = m.tiles.slice();
-          const center = arr.splice(m.centerIdx, 1)[0];
-          const lower = arr[0];
-          const higher = arr[1];
-          tilesForDisp = [lower, center, higher];
-        } else {
-          tilesForDisp = m.tiles;
-        }
-        const tilesStr = tilesForDisp.map(t => {
-          const key = tileKey(t);
-          const suitClass = `suit-${t.suit}`;
-          return `<span class="tile small ${suitClass}">${keyToText(key)}</span>`;
-        }).join('');
-        return `${label}：${tilesStr}`;
-      }).join('、');
-    }
-    // 等待牌提示
-    // 等待牌提示：只要處於聽牌狀態且有候選牌，即顯示
-    let waitLineSelf = '';
-    if (Array.isArray(p.waitKeys) && p.waitKeys.length > 0) {
-      const texts = p.waitKeys.map(key => keyToText(key)).join(' ');
-      waitLineSelf = `<div class="player-wait">👂 等牌：${texts}</div>`;
-    }
-    area0.innerHTML = `<div class="player-header"><strong>${selfName}${dealerTagSelf}</strong></div>` +
-      `<div class="player-discard">🗑 捨牌：${discHTMLSelf}</div>` +
-      (meldHTMLSelf ? `<div class="player-meld">副露：${meldHTMLSelf}</div>` : '') +
-      `<div class="player-handcount">🎴 手牌數：${p.hand.length}</div>` +
-      waitLineSelf;
-  })();
   
-  // 更新中央牌河區域：集中顯示所有玩家的棄牌
-  const centerDiscardEl = document.getElementById('centerDiscardContent');
-  if (centerDiscardEl) {
-    let allDiscards = [];
-    for (let i = 0; i < 4; i++) {
-      const p = S.players[i];
-      if (p.discard && p.discard.length > 0) {
-        p.discard.forEach(t => {
-          const k = tileKey(t);
-          const suitClass = `suit-${t.suit}`;
-          allDiscards.push(`<span class="tile small ${suitClass}">${keyToText(k)}</span>`);
-        });
-      }
-    }
-    centerDiscardEl.innerHTML = allDiscards.join('');
-  }
+  // 更新棄牌區域
+  if (discardArea0) discardArea0.innerHTML = buildDiscardHTML(0);
+  if (discardArea1) discardArea1.innerHTML = buildDiscardHTML(1);
+  if (discardArea2) discardArea2.innerHTML = buildDiscardHTML(2);
+  if (discardArea3) discardArea3.innerHTML = buildDiscardHTML(3);
+  
+  // 更新玩家資訊
+  if (playerInfo0) playerInfo0.innerHTML = buildPlayerInfoHTML(0);
+  if (playerInfo1) playerInfo1.innerHTML = buildPlayerInfoHTML(1);
+  if (playerInfo2) playerInfo2.innerHTML = buildPlayerInfoHTML(2);
+  if (playerInfo3) playerInfo3.innerHTML = buildPlayerInfoHTML(3);
+  
+
 }
 
 function showFinalScore() {
