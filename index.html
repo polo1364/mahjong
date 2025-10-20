@@ -968,8 +968,11 @@ function updateTianDiTing(pid) {
 /* ========= 胡牌判定 ========= */
 function isWinningNow(hand, melds, winTile) {
   const tiles = hand.slice().sort((a, b) => tileSortKey(a) - tileSortKey(b));
-  if (isSevenPairs(tiles)) return true;
-  return canStandardWin(tiles);
+  // 若沒有任何副露，且手牌長度為16張，可檢查七對
+  if (melds.length === 0 && isSevenPairs(tiles)) return true;
+  // 副露數量代表已經完成的組數，還需要的組數 = 5 - 副露數
+  const neededSets = Math.max(0, 5 - melds.length);
+  return canStandardWin(tiles, neededSets);
 }
 
 // 檢查是否聽牌（只差一張牌就能胡）
@@ -998,12 +1001,12 @@ function isSevenPairs(tiles) {
   return vals.filter(x => x === 2).length === 8 && vals.every(x => x === 2 || x === 0);
 }
 
-function canStandardWin(tiles) {
+function canStandardWin(tiles, need = 5) {
   const counts = countByKey(tiles);
   for (const k in counts) {
     if (counts[k] >= 2) {
       counts[k] -= 2;
-      if (canSplitMelds(counts, 5)) return true;
+      if (canSplitMelds(counts, need)) return true;
       counts[k] += 2;
     }
   }
@@ -1976,12 +1979,22 @@ function renderAll() {
   }
   
   const sc = document.getElementById('scoreboard');
+  // 組合每家玩家資訊，顯示名稱、積分和是否已報聽（含天聽、地聽標記）
   sc.innerHTML = '<div class="score">' + ['東(你)', '南', '西', '北'].map((n, i) => {
     const p = S.players[i];
     const cls = (i === S.dealer ? 'dealer' : '');
     const bankrupt = p.points <= 0 ? '<span class="danger">（破產）</span>' : '';
+    // 聽牌標記：天聽、地聽優先，其次普通聽牌
+    let listenBadge = '';
+    if (p.tianTing) {
+      listenBadge = '<span class="badge ok">天聽</span>';
+    } else if (p.diTing) {
+      listenBadge = '<span class="badge ok">地聽</span>';
+    } else if (p.declaredListen) {
+      listenBadge = '<span class="badge ok">聽</span>';
+    }
     return `<div class="player-info ${cls}">
-      <div class="player-name">${n} ${bankrupt}</div>
+      <div class="player-name">${n} ${bankrupt} ${listenBadge}</div>
       <div class="player-points">${p.points.toLocaleString()}</div>
     </div>`;
   }).join('') + '</div>';
