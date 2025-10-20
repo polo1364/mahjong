@@ -635,6 +635,7 @@ function startNewHand() {
 
 function dealTiles() {
   const dead = 14;
+  // 先發16張給每個玩家
   while (S.wall.length > dead && S.players[0].hand.length < 16) {
     for (let p = 0; p < 4; p++) {
       if (S.wall.length > dead) {
@@ -642,7 +643,54 @@ function dealTiles() {
       }
     }
   }
+  // 設定王牌區
   S.deadWall = S.wall.splice(0, Math.max(0, S.wall.length - dead));
+  
+  // 處理發牌時的花牌：從手牌中移除花牌並補牌
+  for (let p = 0; p < 4; p++) {
+    processFlowersInHand(p);
+  }
+}
+
+function processFlowersInHand(p) {
+  const pl = S.players[p];
+  let hasFlower = true;
+  
+  while (hasFlower) {
+    hasFlower = false;
+    for (let i = pl.hand.length - 1; i >= 0; i--) {
+      if (pl.hand[i].suit === SUIT_H) {
+        const flower = pl.hand.splice(i, 1)[0];
+        pl.flowers.push(flower);
+        log(`🌸 ${playerName(p)} 拿到花（${keyToText(tileKey(flower))}），從王牌補牌`);
+        
+        // 從王牌尾端補牌
+        if (S.deadWall.length > 0) {
+          const补牌 = S.deadWall.pop();
+          if (补牌.suit === SUIT_H) {
+            // 補到的也是花牌，繼續處理
+            pl.flowers.push(补牌);
+            log(`🌸 ${playerName(p)} 補牌又摸到花（${keyToText(tileKey(补牌))}），再補牌`);
+            hasFlower = true;
+          } else {
+            pl.hand.push(补牌);
+          }
+        } else if (S.wall.length > 0) {
+          // 王牌用完，從牌山補
+          const补牌 = S.wall.pop();
+          if (补牌.suit === SUIT_H) {
+            pl.flowers.push(补牌);
+            log(`🌸 ${playerName(p)} 補牌又摸到花（${keyToText(tileKey(补牌))}），再補牌`);
+            hasFlower = true;
+          } else {
+            pl.hand.push(补牌);
+          }
+        }
+        hasFlower = true;
+        break;
+      }
+    }
+  }
 }
 
 function drawTile(p) {
@@ -660,13 +708,56 @@ function drawTile(p) {
   const pl = S.players[p];
   if (t.suit === SUIT_H) {
     pl.flowers.push(t);
-    log(`🌸 ${playerName(p)} 摸到花（${keyToText(tileKey(t))}），補牌`);
-    drawTile(p);
+    log(`🌸 ${playerName(p)} 摸到花（${keyToText(tileKey(t))}），從王牌補牌`);
+    // 摸到花牌，從王牌補牌
+    if (S.deadWall.length > 0) {
+      const补牌 = S.deadWall.pop();
+      if (补牌.suit === SUIT_H) {
+        // 補到的也是花牌
+        pl.flowers.push(补牌);
+        log(`🌸 ${playerName(p)} 補牌又摸到花（${keyToText(tileKey(补牌))}），再從王牌補牌`);
+        drawFlowerReplacement(p);
+      } else {
+        pl.hand.push(补牌);
+        S.remain = S.wall.length;
+      }
+    } else {
+      // 王牌用完，從牌山補
+      drawFlowerReplacement(p);
+    }
     return;
   }
   pl.hand.push(t);
   S.remain = S.wall.length;
   if (p === 0) document.getElementById('btnDraw').disabled = true;
+}
+
+function drawFlowerReplacement(p) {
+  // 遞迴補花牌
+  if (!S.wall.length && !S.deadWall.length) {
+    log('⚠️ 無牌可補');
+    return;
+  }
+  
+  const pl = S.players[p];
+  let tile;
+  
+  if (S.deadWall.length > 0) {
+    tile = S.deadWall.pop();
+  } else if (S.wall.length > 0) {
+    tile = S.wall.pop();
+  } else {
+    return;
+  }
+  
+  if (tile.suit === SUIT_H) {
+    pl.flowers.push(tile);
+    log(`🌸 ${playerName(p)} 補牌又摸到花（${keyToText(tileKey(tile))}），繼續補牌`);
+    drawFlowerReplacement(p);
+  } else {
+    pl.hand.push(tile);
+    S.remain = S.wall.length;
+  }
 }
 
 function initGoldTiles() {
@@ -872,8 +963,32 @@ function doKong(pid, tile) {
     }
   }
   pl.melds.push({ type: 'kong', tiles });
-  log(`💥 ${playerName(pid)} 槓了 ${keyToText(k)}`);
-  drawTile(pid);
+  log(`💥 ${playerName(pid)} 槓了 ${keyToText(k)}，從王牌補牌`);
+  
+  // 槓牌後從王牌補牌
+  if (S.deadWall.length > 0) {
+    const补牌 = S.deadWall.pop();
+    if (补牌.suit === SUIT_H) {
+      pl.flowers.push(补牌);
+      log(`🌸 ${playerName(pid)} 補牌摸到花（${keyToText(tileKey(补牌))}），繼續從王牌補牌`);
+      drawFlowerReplacement(pid);
+    } else {
+      pl.hand.push(补牌);
+      S.remain = S.wall.length;
+    }
+  } else if (S.wall.length > 0) {
+    // 王牌用完，從牌山補
+    const补牌 = S.wall.pop();
+    if (补牌.suit === SUIT_H) {
+      pl.flowers.push(补牌);
+      log(`🌸 ${playerName(pid)} 補牌摸到花（${keyToText(tileKey(补牌))}），繼續補牌`);
+      drawFlowerReplacement(pid);
+    } else {
+      pl.hand.push(补牌);
+      S.remain = S.wall.length;
+    }
+  }
+  
   S.turn = pid;
   S.lastDiscard = null;
   S.waitReact = null;
