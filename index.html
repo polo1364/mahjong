@@ -513,6 +513,16 @@ button:disabled {
   margin-left: 12px;
   border: 3px solid #ffd36f;
   box-shadow: 0 0 12px rgba(255, 211, 111, 0.6), 0 2px 4px rgba(0,0,0,0.15);
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.4);
+  }
 }
 
 /* 佔位格：用於顯示摸牌與下排之間的空格 */
@@ -532,6 +542,13 @@ button:disabled {
   box-shadow: none;
   margin: 1px;
   cursor: default;
+}
+
+/* 副露區塊樣式 */
+.meld {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
 }
 
 /* 動畫效果 */
@@ -1209,7 +1226,9 @@ function doChow(pid, tile, pattern) {
   // 排序牌組
   tiles.sort((a, b) => a.rank - b.rank);
   
-  pl.melds.push({ type: 'chow', tiles });
+  // 紀錄吃的中心牌索引：吃的牌在排序後的位置
+  const centerIdx = tiles.findIndex(t => t === tile);
+  pl.melds.push({ type: 'chow', tiles, centerIdx });
   // 吃牌屬於明牌
   S.anyOpenMeld = true;
   log(`🍜 ${playerName(pid)} 吃了 ${tiles.map(t => keyToText(tileKey(t))).join(' ')}`);
@@ -2129,14 +2148,34 @@ function renderAll() {
   
   let meldsHTML = '';
   if (you.melds.length > 0) {
-    meldsHTML += you.melds.map(m => {
-      let type = '碰';
-      if (m.type === 'kong') type = m.concealed ? '暗槓' : '槓';
-      else if (m.type === 'chow') type = '吃';
-      return `<div class="meld">${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}</div>`;
+    meldsHTML = you.melds.map(m => {
+      // 定義標籤
+      let label = '';
+      if (m.type === 'pong') label = '碰';
+      if (m.type === 'kong') label = m.concealed ? '暗槓' : '槓';
+      if (m.type === 'chow') label = '吃';
+      // 調整吃牌順序：將被吃的牌放置中間
+      let tilesForDisp;
+      if (m.type === 'chow' && typeof m.centerIdx === 'number') {
+        const arr = m.tiles.slice();
+        // 從複本陣列中抽出中心牌
+        const center = arr.splice(m.centerIdx, 1)[0];
+        const lower = arr[0];
+        const higher = arr[1];
+        tilesForDisp = [lower, center, higher];
+      } else {
+        tilesForDisp = m.tiles;
+      }
+      const tilesHTML = tilesForDisp.map(t => {
+        const k = tileKey(t);
+        const suitClass = `suit-${t.suit}`;
+        // 玩家自己的副露使用正常尺寸的牌面
+        return `<span class="tile ${suitClass}">${keyToText(k)}</span>`;
+      }).join(' ');
+      return `<span class="meld">${label}：${tilesHTML}</span>`;
     }).join('');
   }
-  // 花牌顯示已移除
+  // 更新你的副露區
   document.getElementById('yourMelds').innerHTML = meldsHTML;
   
   // Reset the self-draw button state. It will be enabled below if the player
@@ -2203,10 +2242,27 @@ function renderAll() {
     let extras = '';
     if (p.melds.length > 0) {
       extras += '｜' + p.melds.map(m => {
-        let type = '碰';
-        if (m.type === 'kong') type = m.concealed ? '暗槓' : '槓';
-        else if (m.type === 'chow') type = '吃';
-        return `${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}`;
+        let label = '';
+        if (m.type === 'pong') label = '碰';
+        if (m.type === 'kong') label = m.concealed ? '暗槓' : '槓';
+        if (m.type === 'chow') label = '吃';
+        // 調整吃牌順序
+        let tilesForDisp;
+        if (m.type === 'chow' && typeof m.centerIdx === 'number') {
+          const arr = m.tiles.slice();
+          const center = arr.splice(m.centerIdx, 1)[0];
+          const lower = arr[0];
+          const higher = arr[1];
+          tilesForDisp = [lower, center, higher];
+        } else {
+          tilesForDisp = m.tiles;
+        }
+        const tilesHTML = tilesForDisp.map(t => {
+          const k = tileKey(t);
+          const suitClass = `suit-${t.suit}`;
+          return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
+        }).join('');
+        return `${label}：${tilesHTML}`;
       }).join('、');
     }
     // 花牌顯示已移除
