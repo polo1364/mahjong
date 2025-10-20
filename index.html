@@ -171,6 +171,38 @@ button:disabled {
   padding: 8px 6px;
 }
 
+/* 不同花色的牌面顏色 */
+.tile.suit-W {
+  background: linear-gradient(180deg, #ffe5e5 0%, #ffcccc 100%);
+  border-color: #cc6666;
+  color: #cc0000;
+}
+
+.tile.suit-T {
+  background: linear-gradient(180deg, #e5f0ff 0%, #cce0ff 100%);
+  border-color: #6699cc;
+  color: #0066cc;
+}
+
+.tile.suit-B {
+  background: linear-gradient(180deg, #e5ffe5 0%, #ccffcc 100%);
+  border-color: #66cc66;
+  color: #009900;
+}
+
+.tile.suit-F, .tile.suit-D {
+  background: linear-gradient(180deg, #fff5e5 0%, #ffe5cc 100%);
+  border-color: #cc9966;
+  color: #cc6600;
+  font-weight: 800;
+}
+
+.tile.suit-H {
+  background: linear-gradient(180deg, #ffe5ff 0%, #ffccff 100%);
+  border-color: #cc66cc;
+  color: #cc00cc;
+}
+
 .hand {
   display: flex;
   gap: 8px;
@@ -484,8 +516,10 @@ button:disabled {
     <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
     <div id="controls" class="row">
       <button id="btnHu" disabled>🎉 胡牌</button>
+      <button id="btnChow" disabled>🍜 吃</button>
       <button id="btnPong" disabled>🔥 碰</button>
       <button id="btnKong" disabled>💥 槓</button>
+      <button id="btnListen" disabled>🔔 聽</button>
       <button id="btnPass" disabled>⏭️ 過</button>
     </div>
   </div>
@@ -517,15 +551,14 @@ function log(msg) {
 }
 
 /* ========= 牌型定義 ========= */
-const SUIT_W = 'W', SUIT_T = 'T', SUIT_B = 'B', SUIT_F = 'F', SUIT_D = 'D', SUIT_H = 'H';
+const SUIT_W = 'W', SUIT_T = 'T', SUIT_B = 'B', SUIT_F = 'F', SUIT_D = 'D';
 const WINDS = ['E', 'S', 'W', 'N'];
 const DRAGONS = ['C', 'F', 'B'];
-const FLOWERS = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8'];
+// 花牌已移除
 
 function tileKey(t) {
   if (t.suit === SUIT_W || t.suit === SUIT_T || t.suit === SUIT_B) return t.suit + String(t.rank);
   if (t.suit === SUIT_F || t.suit === SUIT_D) return t.suit + t.name;
-  if (t.suit === SUIT_H) return t.name;
   return '?';
 }
 
@@ -541,10 +574,6 @@ function keyToText(k) {
   if (s === SUIT_D) {
     const m = { C: '中', F: '發', B: '白' };
     return m[v] || k;
-  }
-  if (k.startsWith('H')) {
-    const m = { H1: '春', H2: '夏', H3: '秋', H4: '冬', H5: '梅', H6: '蘭', H7: '竹', H8: '菊' };
-    return m[k] || k;
   }
   return k;
 }
@@ -565,7 +594,7 @@ function generateTiles() {
   DRAGONS.forEach(n => {
     for (let i = 0; i < 4; i++) tiles.push({ suit: SUIT_D, name: n, id: tiles.length });
   });
-  FLOWERS.forEach(n => tiles.push({ suit: SUIT_H, name: n, id: tiles.length }));
+  // 花牌已移除，總牌數136張
   return tiles;
 }
 
@@ -641,7 +670,6 @@ function startNewHand(isFirstGame = false) {
       hand: [],
       melds: [],
       discards: [],
-      flowers: [],
       points: (S?.players?.[i]?.points ?? RULES.initialPoints),
       declaredListen: false,
       isAI: i !== 0
@@ -695,17 +723,14 @@ function dealTiles() {
     S.players[S.dealer].hand.push(S.wall.pop());
   }
   
-  // 設定王牌區：從牌山尾端取最後14張作為王牌
+  // 設定王牌區：從牌山尾端取最徎16張作為王牌
   const deadWallSize = Math.min(dead, S.wall.length);
   S.deadWall = S.wall.splice(-deadWallSize, deadWallSize);
-  
-  // 處理發牌時的花牌：從手牌中移除花牌並補牌
-  for (let p = 0; p < 4; p++) {
-    processFlowersInHand(p);
-  }
 }
 
-function processFlowersInHand(p) {
+// 花牌處理函數已完全移除
+
+function processFlowersInHand_DELETED(p) {
   const pl = S.players[p];
   let hasFlower = true;
   
@@ -762,7 +787,7 @@ function drawTile(p) {
   }
   const t = S.wall.pop();
   const pl = S.players[p];
-  if (t.suit === SUIT_H) {
+  if (false) { // 花牌處理已移除
     pl.flowers.push(t);
     log(`🌸 ${playerName(p)} 摸到花（${keyToText(tileKey(t))}），從王牌補牌`);
     renderAll();
@@ -790,7 +815,7 @@ function drawTile(p) {
   S.remain = S.wall.length;
 }
 
-function drawFlowerReplacement(p) {
+function drawFlowerReplacement_DELETED(p) {
   // 遞迴補花牌
   if (!S.wall.length && !S.deadWall.length) {
     log('⚠️ 無牌可補');
@@ -844,6 +869,25 @@ function isWinningNow(hand, melds, winTile) {
   const tiles = hand.slice().sort((a, b) => tileSortKey(a) - tileSortKey(b));
   if (isSevenPairs(tiles)) return true;
   return canStandardWin(tiles);
+}
+
+// 檢查是否聽牌（只差一張牌就能胡）
+function isListening(hand, melds) {
+  // 檢查是否只差一張牌就能胡
+  // 遍歷所有可能的牌，看是否能胡
+  const allPossibleTiles = [];
+  for (let suit of [SUIT_W, SUIT_T, SUIT_B]) {
+    for (let rank = 1; rank <= 9; rank++) {
+      allPossibleTiles.push({ suit, rank, id: -1 });
+    }
+  }
+  WINDS.forEach(name => allPossibleTiles.push({ suit: SUIT_F, name, id: -1 }));
+  DRAGONS.forEach(name => allPossibleTiles.push({ suit: SUIT_D, name, id: -1 }));
+  
+  return allPossibleTiles.some(tile => {
+    const testHand = hand.concat([tile]);
+    return isWinningNow(testHand, melds, tile);
+  });
 }
 
 function isSevenPairs(tiles) {
@@ -976,11 +1020,80 @@ function keyToTile(k) {
   if (s === 'W' || s === 'T' || s === 'B') return { suit: s, rank: parseInt(v), id: -1 };
   if (s === 'F') return { suit: SUIT_F, name: v, id: -1 };
   if (s === 'D') return { suit: SUIT_D, name: v, id: -1 };
-  if (k.startsWith('H')) return { suit: SUIT_H, name: k, id: -1 };
   return { suit: '?', id: -1 };
 }
 
-/* ========= 碰牌與槓牌邏輯 ========= */
+/* ========= 吃牌、碰牌與槓牌邏輯 ========= */
+
+// 吃牌：只能吃上家的牌，且只能吃數字牌（萬筒條）
+function canChow(pid, tile) {
+  const pl = S.players[pid];
+  const k = tileKey(tile);
+  
+  // 只能吃上家的牌
+  const prevPlayer = (S.turn + 3) % 4;
+  if (pid !== prevPlayer + 1 && !(prevPlayer === 3 && pid === 0)) return [];
+  
+  // 只能吃數字牌
+  if (tile.suit !== SUIT_W && tile.suit !== SUIT_T && tile.suit !== SUIT_B) return [];
+  
+  const rank = tile.rank;
+  const suit = tile.suit;
+  const patterns = [];
+  
+  // 檢查三種吃牌型態：上吃、中吃、下吃
+  // 上吃：吃的牌 + 後面兩張 (例：吃 1，手牌有 2,3)
+  if (rank <= 7) {
+    const has1 = pl.hand.some(t => t.suit === suit && t.rank === rank + 1);
+    const has2 = pl.hand.some(t => t.suit === suit && t.rank === rank + 2);
+    if (has1 && has2) patterns.push([rank, rank + 1, rank + 2]);
+  }
+  
+  // 中吃：吃的牌在中間 (例：吃 2，手牌有 1,3)
+  if (rank >= 2 && rank <= 8) {
+    const has1 = pl.hand.some(t => t.suit === suit && t.rank === rank - 1);
+    const has2 = pl.hand.some(t => t.suit === suit && t.rank === rank + 1);
+    if (has1 && has2) patterns.push([rank - 1, rank, rank + 1]);
+  }
+  
+  // 下吃：吃的牌 + 前面兩張 (例：吃 3，手牌有 1,2)
+  if (rank >= 3) {
+    const has1 = pl.hand.some(t => t.suit === suit && t.rank === rank - 2);
+    const has2 = pl.hand.some(t => t.suit === suit && t.rank === rank - 1);
+    if (has1 && has2) patterns.push([rank - 2, rank - 1, rank]);
+  }
+  
+  return patterns;
+}
+
+function doChow(pid, tile, pattern) {
+  const pl = S.players[pid];
+  const suit = tile.suit;
+  const tiles = [tile];
+  
+  // 從手牌中移除對應的牌
+  pattern.forEach(rank => {
+    if (rank !== tile.rank) {
+      const idx = pl.hand.findIndex(t => t.suit === suit && t.rank === rank);
+      if (idx >= 0) {
+        tiles.push(pl.hand.splice(idx, 1)[0]);
+      }
+    }
+  });
+  
+  // 排序牌組
+  tiles.sort((a, b) => a.rank - b.rank);
+  
+  pl.melds.push({ type: 'chow', tiles });
+  log(`🍜 ${playerName(pid)} 吃了 ${tiles.map(t => keyToText(tileKey(t))).join(' ')}`);
+  
+  S.turn = pid;
+  S.lastDiscard = null;
+  S.waitReact = null;
+  hideReactionPanel();
+  renderAll();
+}
+
 function canPong(pid, tile) {
   const pl = S.players[pid];
   const k = tileKey(tile);
@@ -1030,27 +1143,13 @@ function doKong(pid, tile) {
   
   // 槓牌後從王牌補牌
   if (S.deadWall.length > 0) {
-    const补牌 = S.deadWall.pop();
-    if (补牌.suit === SUIT_H) {
-      pl.flowers.push(补牌);
-      log(`🌸 ${playerName(pid)} 補牌摸到花（${keyToText(tileKey(补牌))}），繼續從王牌補牌`);
-      drawFlowerReplacement(pid);
-    } else {
-      pl.hand.push(补牌);
-      S.remain = S.wall.length;
-    }
+    const newTile = S.deadWall.pop();
+    pl.hand.push(newTile);
   } else if (S.wall.length > 0) {
-    // 王牌用完，從牌山補
-    const补牌 = S.wall.pop();
-    if (补牌.suit === SUIT_H) {
-      pl.flowers.push(补牌);
-      log(`🌸 ${playerName(pid)} 補牌摸到花（${keyToText(tileKey(补牌))}），繼續補牌`);
-      drawFlowerReplacement(pid);
-    } else {
-      pl.hand.push(补牌);
-      S.remain = S.wall.length;
-    }
+    const newTile = S.wall.pop();
+    pl.hand.push(newTile);
   }
+  S.remain = S.wall.length;
   
   S.turn = pid;
   S.lastDiscard = null;
@@ -1070,7 +1169,7 @@ function discard(p, tile) {
   log(`🎴 ${playerName(p)} 打出 ${keyToText(tileKey(tile))}`);
   renderAll();
   
-  // 檢查其他玩家是否可以胡、碰、槓
+  // 檢查其他玩家是否可以胡、碰、槓、吃（碰槓優先）
   let reactions = [];
   for (let k = 1; k <= 3; k++) {
     const pid = (p + k) % 4;
@@ -1082,6 +1181,12 @@ function discard(p, tile) {
       reactions.push({ pid, type: 'kong', tile });
     } else if (canPong(pid, tile)) {
       reactions.push({ pid, type: 'pong', tile });
+    } else {
+      // 吃牌優先度最低，只有不能碰槓時才能吃
+      const chowPatterns = canChow(pid, tile);
+      if (chowPatterns.length > 0) {
+        reactions.push({ pid, type: 'chow', tile, patterns: chowPatterns });
+      }
     }
   }
   
@@ -1111,6 +1216,8 @@ function showReactionPanel(reactions) {
       html += '<button id="reactPong">🔥 碰</button>';
     } else if (r.type === 'kong') {
       html += '<button id="reactKong">💥 槓</button>';
+    } else if (r.type === 'chow') {
+      html += '<button id="reactChow">🍜 吃</button>';
     }
   });
   
@@ -1139,6 +1246,14 @@ function showReactionPanel(reactions) {
     document.getElementById('reactKong').onclick = () => {
       const r = reactions.find(x => x.type === 'kong');
       doKong(r.pid, r.tile);
+    };
+  }
+  
+  if (document.getElementById('reactChow')) {
+    document.getElementById('reactChow').onclick = () => {
+      const r = reactions.find(x => x.type === 'chow');
+      // 如果有多種吃法，預設選第一種（可以後續優化為讓玩家選擇）
+      doChow(r.pid, r.tile, r.patterns[0]);
     };
   }
   
@@ -1229,7 +1344,7 @@ function doWin(winner, from, tile, selfDraw) {
 
 function calcFan(winner, winTile, selfDraw) {
   const pl = S.players[winner];
-  const allTiles = pl.hand.concat(pl.melds.flatMap(m => m.tiles), pl.flowers);
+  const allTiles = pl.hand.concat(pl.melds.flatMap(m => m.tiles));
   let fan = 0;
   
   if (isSevenPairs(pl.hand.concat([winTile]))) fan += RULES.scoring.SevenPairs;
@@ -1250,7 +1365,12 @@ function calcFan(winner, winTile, selfDraw) {
   if (nz === 1) fan += RULES.scoring.PureOneSuit;
   else if (nz === 2 && honors > 0) fan += RULES.scoring.HalfFlush;
   
-  fan += pl.flowers.length * RULES.scoring.Flower;
+  // 花牌台數已移除
+  
+  // 報聽台數
+  if (pl.declaredListen) {
+    fan += 1;
+  }
   
   if (selfDraw) {
     const menqing = pl.melds.length === 0;
@@ -1338,6 +1458,30 @@ document.getElementById('btnHu').onclick = () => {
   doWin(0, -1, t, true);
 };
 
+document.getElementById('btnListen').onclick = () => {
+  const me = S.players[0];
+  if (me.declaredListen) {
+    log('⚠️ 你已經報聽了');
+    return;
+  }
+  
+  // 檢查是否聽牌（打出任一張牌後能胡）
+  const canListen = me.hand.some(tile => {
+    const testHand = me.hand.filter(t => t !== tile);
+    return isListening(testHand, me.melds);
+  });
+  
+  if (!canListen) {
+    log('⚠️ 你還沒有聽牌，無法報聽');
+    return;
+  }
+  
+  me.declaredListen = true;
+  log('🔔 你宣告聽牌！胡牌時多 1 台');
+  document.getElementById('btnListen').disabled = true;
+  renderAll();
+};
+
 document.getElementById('newGameBtn').onclick = () => {
   S = { players: Array.from({ length: 4 }, () => ({ points: RULES.initialPoints })) };
   document.getElementById('log').textContent = '';
@@ -1384,22 +1528,31 @@ function renderAll() {
   document.getElementById('yourHand').innerHTML = you.hand.map((t, idx) => {
     const k = tileKey(t);
     const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
-    return `<div class="tile ${isGold ? 'gold' : 'dim'}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
+    const suitClass = `suit-${t.suit}`;
+    return `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
   }).join('');
   
   let meldsHTML = '';
   if (you.melds.length > 0) {
     meldsHTML += you.melds.map(m => {
-      const type = m.type === 'pong' ? '碰' : '槓';
+      let type = '碰';
+      if (m.type === 'kong') type = '槓';
+      else if (m.type === 'chow') type = '吃';
       return `<div class="meld">${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}</div>`;
     }).join('');
   }
-  if (you.flowers.length > 0) {
-    meldsHTML += `<div class="meld">🌸 花：${you.flowers.map(h => keyToText(tileKey(h))).join(' ')}</div>`;
-  }
+  // 花牌顯示已移除
   document.getElementById('yourMelds').innerHTML = meldsHTML;
   
   document.getElementById('btnHu').disabled = true;
+  
+  // 聽牌按鈕：輪到玩家且未報聽時啟用
+  const me = S.players[0];
+  if (S.turn === 0 && !me.declaredListen && S.phase !== 'end') {
+    document.getElementById('btnListen').disabled = false;
+  } else {
+    document.getElementById('btnListen').disabled = true;
+  }
   
   const wrap = document.getElementById('others');
   wrap.innerHTML = [1, 2, 3].map(i => {
@@ -1409,13 +1562,13 @@ function renderAll() {
     let extras = '';
     if (p.melds.length > 0) {
       extras += '｜' + p.melds.map(m => {
-        const type = m.type === 'pong' ? '碰' : '槓';
+        let type = '碰';
+        if (m.type === 'kong') type = '槓';
+        else if (m.type === 'chow') type = '吃';
         return `${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}`;
       }).join('、');
     }
-    if (p.flowers.length > 0) {
-      extras += `｜🌸 花：${p.flowers.map(h => keyToText(tileKey(h))).join(' ')}`;
-    }
+    // 花牌顯示已移除
     return `<div class="score">
       <h3>${playerName(i)}</h3>
       <div>🎴 手牌數：${handCount}｜捨牌：${disc || '無'} ${extras}</div>
