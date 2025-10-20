@@ -402,11 +402,12 @@ button:disabled {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, #1a2838 0%, #0e1b2a 100%);
-  border: 3px solid #ffd36f;
-  border-radius: 16px;
+  background: rgba(26, 40, 56, 0.95);
+  border: 2px solid #2a4766;
+  border-radius: 12px;
   padding: 24px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
   z-index: 200;
   min-width: 280px;
   text-align: center;
@@ -429,7 +430,7 @@ button:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.4);
   z-index: 199;
 }
 
@@ -850,14 +851,43 @@ button:disabled {
     background: rgba(10, 30, 20, 0.3);
     border: 2px solid #4a6d2c;
     border-radius: 8px;
-    padding: 8px;
-    min-height: 120px;
+    padding: 10px;
+    min-height: 140px;
+    gap: 8px;
   }
   
   .center-discard h4 {
     margin: 0;
-    font-size: 13px;
+    font-size: 14px;
     color: #ffd36f;
+    font-weight: 700;
+  }
+  
+  .center-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  
+  .center-round {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffd36f;
+    background: rgba(255, 211, 111, 0.15);
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+  
+  .center-gold {
+    font-size: 11px;
+    color: #9cf39c;
+  }
+  
+  .center-remain {
+    font-size: 11px;
+    color: #e9f0f6;
   }
   
   /* 棄牌區域基本樣式 */
@@ -920,12 +950,36 @@ button:disabled {
     font-weight: 700;
     font-size: 13px;
     margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .player-info-card .info-points {
+    font-size: 12px;
+    color: #9cf39c;
+    font-weight: 600;
   }
   
   .player-info-card .info-melds,
   .player-info-card .info-handcount {
     font-size: 11px;
     margin: 2px 0;
+  }
+  
+  /* 你的手牌區域 */
+  .your-hand-section {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #2a4766;
+    border-radius: 8px;
+  }
+  
+  .your-hand-section h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
   }
 
   .player-area {
@@ -1026,23 +1080,9 @@ button:disabled {
     <div id="roundinfo" class="row"></div>
   </div>
 
-  <div class="sec">
-    <h3>🎴 你的手牌 <span class="badge">點擊要打出的牌</span></h3>
-    <div id="yourHand" class="hand"></div>
-    <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
-    <div id="controls" class="row">
-      <button id="btnHu" disabled>🎉 胡牌</button>
-      <button id="btnChow" disabled>🍜 吃</button>
-      <button id="btnPong" disabled>🔥 碰</button>
-      <button id="btnKong" disabled>💥 槓</button>
-      <button id="btnListen" disabled>🔔 聽</button>
-      <button id="btnPass" disabled>⏭️ 過</button>
-    </div>
-  </div>
-
   <!-- 將戰況記錄移到其他玩家上方 -->
   <div class="sec">
-    <h3>📜 戰況記錄</h3>
+    <h3>📏 戰況記錄</h3>
     <div id="log"></div>
   </div>
 
@@ -1055,6 +1095,11 @@ button:disabled {
     <!-- 中央資訊區域 -->
     <div class="center-discard">
       <h4>🎴 牌桌</h4>
+      <div class="center-info">
+        <div id="centerRound" class="center-round"></div>
+        <div id="centerGold" class="center-gold"></div>
+        <div id="centerRemain" class="center-remain"></div>
+      </div>
     </div>
     <!-- 右方棄牌區（南家） -->
     <div id="discardArea0" class="discard-area right"></div>
@@ -1068,6 +1113,21 @@ button:disabled {
     <div id="playerInfo1" class="player-info-card"></div>
     <div id="playerInfo2" class="player-info-card"></div>
     <div id="playerInfo3" class="player-info-card"></div>
+  </div>
+  
+  <!-- 你的手牌區域（移到牌桌下方） -->
+  <div class="sec your-hand-section">
+    <h3>🎴 你的手牌 <span class="badge">點擊要打出的牌</span></h3>
+    <div id="yourHand" class="hand"></div>
+    <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
+    <div id="controls" class="row">
+      <button id="btnHu" disabled>🎉 胡牌</button>
+      <button id="btnChow" disabled>🍜 吃</button>
+      <button id="btnPong" disabled>🔥 碰</button>
+      <button id="btnKong" disabled>💥 槓</button>
+      <button id="btnListen" disabled>🔔 聽</button>
+      <button id="btnPass" disabled>⏭️ 過</button>
+    </div>
   </div>
 </div>
 
@@ -2942,6 +3002,29 @@ function renderAll() {
     `<span class="pill">🎴 剩餘牌：${remainDrawable}</span>` +
     `<span class="pill">👤 輪到：${playerName(S.turn)}</span>`;
   
+  // 更新中央牌桌資訊
+  const centerRound = document.getElementById('centerRound');
+  const centerGold = document.getElementById('centerGold');
+  const centerRemain = document.getElementById('centerRemain');
+  
+  if (centerRound) {
+    centerRound.textContent = roundStr;
+  }
+  
+  if (centerGold) {
+    if (S.rules.gold.enabled && S.goldKeys && S.goldKeys.length > 0) {
+      const goldText = S.goldKeys.map(k => keyToText(k)).join(' ');
+      centerGold.innerHTML = `✨ 金牌：${goldText}`;
+      centerGold.style.display = 'block';
+    } else {
+      centerGold.style.display = 'none';
+    }
+  }
+  
+  if (centerRemain) {
+    centerRemain.textContent = `🎴 剩餘：${remainDrawable}張`;
+  }
+  
   const you = S.players[0];
   const kongCount = countKongs(you);
   const expectedFull = 17 + kongCount;
@@ -3091,6 +3174,7 @@ function renderAll() {
     const p = S.players[i];
     const name = playerName(i);
     const dealerTag = (i === S.dealer) ? '<span class="dealer-badge">莊</span>' : '';
+    const points = p.points.toLocaleString();
     
     // 副露
     let meldHTML = '';
@@ -3126,7 +3210,7 @@ function renderAll() {
       waitLine = `<div class="info-wait">👂 等牌：${texts}</div>`;
     }
     
-    return `<div class="info-name">${name}${dealerTag}</div>` +
+    return `<div class="info-name"><span>${name}${dealerTag}</span><span class="info-points">${points}</span></div>` +
       (meldHTML ? `<div class="info-melds">副露：${meldHTML}</div>` : '') +
       `<div class="info-handcount">🎴 手牌數：${p.hand.length}</div>` +
       waitLine;
