@@ -1169,6 +1169,66 @@ function canKong(pid, tile) {
   return cnt >= 3;
 }
 
+// 檢查是否可以進行暗槓：手牌中有四張相同牌
+function canConcealedKong(pid) {
+  const pl = S.players[pid];
+  const counts = countByKey(pl.hand);
+  return Object.keys(counts).filter(k => counts[k] >= 4);
+}
+
+// 執行暗槓
+function doConcealedKong(pid, key) {
+  const pl = S.players[pid];
+  // 從手牌中取出四張相同的牌
+  const tiles = [];
+  for (let i = pl.hand.length - 1; i >= 0; i--) {
+    const t = pl.hand[i];
+    if (tileKey(t) === key) {
+      tiles.push(pl.hand.splice(i, 1)[0]);
+      if (tiles.length === 4) break;
+    }
+  }
+  // 將此組加入副露，標記為暗槓
+  pl.melds.push({ type: 'kong', tiles: tiles, concealed: true });
+  S.kongCount++; // 槓牌次數+1，海底多保留1張
+  log(`💥 ${playerName(pid)} 暗槓 ${keyToText(key)}`);
+  // 暗槓後從王牌補牌
+  if (S.deadWall.length > 0) {
+    const newTile = S.deadWall.pop();
+    pl.hand.push(newTile);
+  } else if (S.wall.length > 0) {
+    const newTile = S.wall.pop();
+    pl.hand.push(newTile);
+  }
+  S.remain = S.wall.length;
+  renderAll();
+  // 檢查槓後是否可以自摸
+  const t = pl.hand[pl.hand.length - 1];
+  if (pid === 0) {
+    // 玩家暗槓後檢查是否自摸
+    if (isWinningNow(pl.hand, pl.melds, t)) {
+      document.getElementById('btnHu').disabled = false;
+      log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
+    }
+    // 檢查是否可以報聽
+    if (!pl.declaredListen) {
+      const canListenNow = pl.hand.some(tile => {
+        const testHand = pl.hand.filter(u => u !== tile);
+        return isListening(testHand, pl.melds);
+      });
+      if (canListenNow) showListenPanel();
+    }
+  } else {
+    // AI暗槓後，直接檢查自摸
+    if (isWinningNow(pl.hand, pl.melds, t)) {
+      doWin(pid, -1, t, true);
+      return;
+    }
+    // AI繼續行動
+    setTimeout(stepAI, 400);
+  }
+}
+
 function doPong(pid, tile) {
   const pl = S.players[pid];
   const k = tileKey(tile);
@@ -1562,6 +1622,13 @@ function stepAI() {
   drawTile(p);
   if (S.phase === 'end') return;
   renderAll();
+  // AI 檢查暗槓
+  const cks = canConcealedKong(p);
+  if (cks.length > 0) {
+    // AI 選擇第一組暗槓
+    doConcealedKong(p, cks[0]);
+    return;
+  }
   
   const t = me.hand[me.hand.length - 1];
   if (isWinningNow(me.hand, me.melds, t)) {
@@ -1606,6 +1673,16 @@ document.getElementById('btnListen').onclick = () => {
   }
   // 顯示報聽確認面板
   showListenPanel();
+};
+
+// 玩家執行暗槓（手牌四張相同）
+document.getElementById('btnKong').onclick = () => {
+  if (S.turn !== 0 || S.phase === 'end' || S.lastDiscard !== null) return;
+  const keys = canConcealedKong(0);
+  if (keys.length === 0) return;
+  // 若有多個暗槓選項，取第一個；亦可擴充讓玩家選擇
+  const key = keys[0];
+  doConcealedKong(0, key);
 };
 
 document.getElementById('newGameBtn').onclick = () => {
@@ -1694,7 +1771,7 @@ function renderAll() {
   if (you.melds.length > 0) {
     meldsHTML += you.melds.map(m => {
       let type = '碰';
-      if (m.type === 'kong') type = '槓';
+      if (m.type === 'kong') type = m.concealed ? '暗槓' : '槓';
       else if (m.type === 'chow') type = '吃';
       return `<div class="meld">${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}</div>`;
     }).join('');
@@ -1736,6 +1813,15 @@ function renderAll() {
     }
   }
   document.getElementById('btnListen').disabled = !canListenNow;
+
+  // 暗槓按鈕：輪到玩家，無棄牌反應，且手牌中存在四張相同牌時啟用
+  const btnKong = document.getElementById('btnKong');
+  if (S.turn === 0 && S.phase !== 'end' && S.lastDiscard === null) {
+    const keys = canConcealedKong(0);
+    btnKong.disabled = keys.length === 0;
+  } else {
+    btnKong.disabled = true;
+  }
   
   const wrap = document.getElementById('others');
   wrap.innerHTML = [1, 2, 3].map(i => {
@@ -1746,7 +1832,7 @@ function renderAll() {
     if (p.melds.length > 0) {
       extras += '｜' + p.melds.map(m => {
         let type = '碰';
-        if (m.type === 'kong') type = '槓';
+        if (m.type === 'kong') type = m.concealed ? '暗槓' : '槓';
         else if (m.type === 'chow') type = '吃';
         return `${type}：${m.tiles.map(t => keyToText(tileKey(t))).join(' ')}`;
       }).join('、');
