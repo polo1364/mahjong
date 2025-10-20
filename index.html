@@ -515,6 +515,25 @@ button:disabled {
   box-shadow: 0 0 12px rgba(255, 211, 111, 0.6), 0 2px 4px rgba(0,0,0,0.15);
 }
 
+/* 佔位格：用於顯示摸牌與下排之間的空格 */
+.tile.placeholder {
+  visibility: hidden;
+  min-width: 42px;
+  padding: 8px 6px;
+  border: 2px solid transparent;
+}
+
+/* 小型牌面：用於其他玩家的捨牌顯示 */
+.tile.small {
+  min-width: 28px;
+  padding: 4px 2px;
+  font-size: 12px;
+  border-width: 1px;
+  box-shadow: none;
+  margin: 1px;
+  cursor: default;
+}
+
 /* 動畫效果 */
 @keyframes slideIn {
   from {
@@ -583,14 +602,15 @@ button:disabled {
     </div>
   </div>
 
-  <div class="sec">
-    <h3>👥 其他玩家</h3>
-    <div id="others"></div>
-  </div>
-
+  <!-- 將戰況記錄移到其他玩家上方 -->
   <div class="sec">
     <h3>📜 戰況記錄</h3>
     <div id="log"></div>
+  </div>
+
+  <div class="sec">
+    <h3>👥 其他玩家</h3>
+    <div id="others"></div>
   </div>
 </div>
 
@@ -2047,18 +2067,32 @@ function renderAll() {
      <span class="pill">👤 輪到：${playerName(S.turn)}</span>`;
   
   const you = S.players[0];
-  you.hand.sort((a, b) => tileSortKey(a) - tileSortKey(b));
-  
-  // 上排8張，下排剩餘的
-  const topRow = you.hand.slice(0, 8);
-  const bottomRow = you.hand.slice(8);
-  
+  const kongCount = countKongs(you);
+  const expectedFull = 17 + kongCount;
+  const hasDrawn = (you.hand.length === expectedFull);
+  // 構建帶原始索引的陣列
+  const origTiles = you.hand.map((t, idx) => ({ tile: t, index: idx }));
+  let displayRest = [];
+  let drawnObj = null;
+  if (hasDrawn) {
+    // 把最後一張視為剛摸的牌，不與其他牌一起排序
+    drawnObj = origTiles[origTiles.length - 1];
+    const rest = origTiles.slice(0, -1);
+    displayRest = rest.sort((a, b) => tileSortKey(a.tile) - tileSortKey(b.tile));
+  } else {
+    // 沒有摸牌狀態，將所有牌排序
+    displayRest = origTiles.slice().sort((a, b) => tileSortKey(a.tile) - tileSortKey(b.tile));
+  }
+  // 上排8張，下排其餘
+  const topRow = displayRest.slice(0, 8);
+  const bottomRow = displayRest.slice(8);
   let handHTML = '<div class="hand-container">';
-  
   // 上排
   if (topRow.length > 0) {
     handHTML += '<div class="hand-row">';
-    topRow.forEach((t, idx) => {
+    topRow.forEach(item => {
+      const t = item.tile;
+      const idx = item.index;
       const k = tileKey(t);
       const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
       const suitClass = `suit-${t.suit}`;
@@ -2066,25 +2100,31 @@ function renderAll() {
     });
     handHTML += '</div>';
   }
-  
   // 下排
-  if (bottomRow.length > 0) {
+  if (bottomRow.length > 0 || hasDrawn) {
     handHTML += '<div class="hand-row">';
-    bottomRow.forEach((t, idx) => {
+    bottomRow.forEach(item => {
+      const t = item.tile;
+      const idx = item.index;
       const k = tileKey(t);
       const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
       const suitClass = `suit-${t.suit}`;
-      const realIdx = 8 + idx;
-      // 最後一張牌用特殊樣式標記（摸的牌）
-      const isLastTile = (realIdx === you.hand.length - 1);
-      const drawnClass = isLastTile ? 'tile-drawn' : '';
-      handHTML += `<div class="tile ${suitClass} ${drawnClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${realIdx})">${keyToText(k)}</div>`;
+      handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
     });
+    // 若有摸牌狀態，在下排加上一個空格與摸到的牌
+    if (hasDrawn && drawnObj) {
+      // 空格
+      handHTML += `<div class="tile placeholder"></div>`;
+      const t = drawnObj.tile;
+      const idx = drawnObj.index;
+      const k = tileKey(t);
+      const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+      const suitClass = `suit-${t.suit}`;
+      handHTML += `<div class="tile tile-drawn ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
+    }
     handHTML += '</div>';
   }
-  
   handHTML += '</div>';
-  
   document.getElementById('yourHand').innerHTML = handHTML;
   
   let meldsHTML = '';
@@ -2154,7 +2194,12 @@ function renderAll() {
   wrap.innerHTML = [1, 2, 3].map(i => {
     const p = S.players[i];
     const handCount = p.hand.length;
-    const disc = p.discards.map(t => keyToText(tileKey(t))).join(' ');
+    // 將捨牌渲染為小牌面方便辨識
+    const disc = p.discards.map((t, di) => {
+      const k = tileKey(t);
+      const suitClass = `suit-${t.suit}`;
+      return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
+    }).join(' ');
     let extras = '';
     if (p.melds.length > 0) {
       extras += '｜' + p.melds.map(m => {
