@@ -20,395 +20,36 @@ body {
   overflow-x: hidden;
 }
 
-/* 手機橫屏檢測與全螢幕佈局 */
-body.mobile-landscape header,
-@media (max-height: 500px) and (orientation: landscape) {
-  header {
-    display: none !important;
-  }
-  
-  #table {
-    max-width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .sec:not(.game-area):not(#yourHandSection) {
-    display: none !important;
-  }
-  
-  #yourHandSection {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-  }
-  
-  #yourHandSection h3,
-  #yourHandSection .badge {
-    display: none !important;
-  }
-  
-  #scoreboard {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    font-size: 10px;
-    background: rgba(0,0,0,0.7);
-    padding: 4px 8px;
-    border-radius: 4px;
-    z-index: 50;
-    max-width: 200px;
-  }
-  
-  #controls {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;
-    gap: 4px;
-  }
-  
-  #controls button {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-  
-  .game-area {
-    flex: 1;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  
-  /* 四方位佈局 - 橫屏優化 */
-  .players-grid {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 120px 1fr 120px;
-    grid-template-rows: 80px 1fr 120px;
-    grid-template-areas:
-      ". top ."
-      "left center right"
-      ". bottom .";
-    gap: 4px;
-    padding: 4px;
-  }
-  
-  .player-area {
-    padding: 4px;
-    font-size: 10px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid #2a4766;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  
-  .player-area.top { 
-    grid-area: top;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .player-area.bottom { 
-    grid-area: bottom;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .player-area.left { 
-    grid-area: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .player-area.right { 
-    grid-area: right;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  /* 中央丟棄牌堆區域 */
-  .center-discard {
-    grid-area: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(10, 30, 20, 0.6);
-    border: 2px solid #4a6d2c;
-    border-radius: 8px;
-    padding: 8px;
-    overflow-y: auto;
-  }
-  
-  .center-discard h4 {
-    margin: 0 0 8px 0;
-    font-size: 12px;
-    color: #ffd36f;
-  }
-  
-  .center-discard-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-    justify-content: center;
-    max-height: 100%;
-    overflow-y: auto;
-  }
-  
-  .tile.small {
-    min-width: 20px;
-    padding: 3px 2px;
-    font-size: 10px;
-    border-width: 1px;
-  }
-  
-  .player-header {
-    font-weight: 700;
-    font-size: 11px;
-    margin-bottom: 4px;
-  }
-  
-  .player-discard, .player-meld, .player-handcount {
-    font-size: 9px;
-    margin: 2px 0;
-    line-height: 1.3;
-  }
-  
-  /* 你的手牌區域 - 橫屏優化 */
-  #yourHand {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 3px;
-    z-index: 40;
-    max-width: 90vw;
-    overflow-x: auto;
-    padding: 4px;
-    background: rgba(0,0,0,0.5);
-    border-radius: 6px;
-  }
-  
-  #yourMelds {
-    position: absolute;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 40;
-    font-size: 10px;
-  }
-  
-  .tile {
-    min-width: 28px;
-    padding: 5px 3px;
-    font-size: 12px;
-  }
-}
-
-body.mobile-landscape #table {
-  max-width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+header {
   display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-body.mobile-landscape .sec:not(.game-area):not(#yourHandSection) {
-  display: none !important;
-}
-
-body.mobile-landscape #yourHandSection {
-  display: block !important;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 60;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-}
-
-body.mobile-landscape #yourHandSection h3,
-body.mobile-landscape #yourHandSection .badge {
-  display: none !important;
-}
-
-body.mobile-landscape .game-area {
-  flex: 1;
-  display: flex !important;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #0e1b2a 0%, #1a2838 100%);
+  border-bottom: 2px solid #2a4766;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-body.mobile-landscape #scoreboard {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  font-size: 10px;
-  background: rgba(0,0,0,0.7);
-  padding: 4px 8px;
-  border-radius: 4px;
-  z-index: 50;
-  max-width: 200px;
-}
-
-body.mobile-landscape #controls {
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  gap: 4px;
-}
-
-body.mobile-landscape #controls button {
-  padding: 6px 10px;
-  font-size: 11px;
-}
-
-body.mobile-landscape #yourHand {
-  position: absolute;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
+.row {
   display: flex;
-  gap: 3px;
-  z-index: 40;
-  max-width: 90vw;
-  overflow-x: auto;
-  padding: 4px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-body.mobile-landscape #yourMelds {
-  position: absolute;
-  bottom: 90px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
-  font-size: 10px;
-}
-
-body.mobile-landscape .tile {
-  min-width: 28px;
-  padding: 5px 3px;
-  font-size: 12px;
-}
-
-body.mobile-landscape .player-area {
-  padding: 4px;
-  font-size: 10px;
-}
-
-body.mobile-landscape .player-header {
-  font-size: 11px;
-}
-
-body.mobile-landscape .player-discard,
-body.mobile-landscape .player-meld,
-body.mobile-landscape .player-handcount {
-  font-size: 9px;
-}
-
-body.mobile-landscape .tile.small {
-  min-width: 20px;
-  padding: 3px 2px;
-  font-size: 10px;
-}
-
-/* 桌面版保持原樣 */
-@media (min-width: 901px), (orientation: portrait) {
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: linear-gradient(180deg, #0e1b2a 0%, #1a2838 100%);
-    border-bottom: 2px solid #2a4766;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .pill {
-    background: linear-gradient(135deg, #1a3a5a 0%, #0f2438 100%);
-    border: 1px solid #2b4766;
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: 13px;
-    white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-
-  #table {
-    max-width: 1200px;
-    margin: 16px auto;
-    padding: 0 12px;
-  }
-
-  .players-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      "top top"
-      "left right"
-      "bottom bottom";
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .player-area {
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid #2a4766;
-    border-radius: 6px;
-    color: #e9f0f6;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .player-area.top { grid-area: top; }
-  .player-area.bottom { grid-area: bottom; }
-  .player-area.left { grid-area: left; }
-  .player-area.right { grid-area: right; }
+.pill {
+  background: linear-gradient(135deg, #1a3a5a 0%, #0f2438 100%);
+  border: 1px solid #2b4766;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 button {
@@ -448,6 +89,12 @@ button:disabled {
 
 #newGameBtn:hover {
   background: linear-gradient(135deg, #e4b584 0%, #c8995e 100%);
+}
+
+#table {
+  max-width: 1200px;
+  margin: 16px auto;
+  padding: 0 12px;
 }
 
 .score {
@@ -504,6 +151,7 @@ button:disabled {
   background: linear-gradient(180deg, #ffd700 0%, #ffed4e 100%);
   border-color: #d4af37;
   box-shadow: 0 3px 8px rgba(255, 215, 0, 0.4), inset 0 1px 2px rgba(255,255,255,0.6);
+  /* 停止閃爍動畫，維持靜態金邊 */
   animation: none;
 }
 
@@ -524,6 +172,7 @@ button:disabled {
   padding: 8px 6px;
 }
 
+/* 不同花色的牌面顏色 */
 .tile.suit-W {
   background: linear-gradient(180deg, #ffe5e5 0%, #ffcccc 100%);
   border-color: #cc6666;
@@ -553,6 +202,14 @@ button:disabled {
   background: linear-gradient(180deg, #ffe5ff 0%, #ffccff 100%);
   border-color: #cc66cc;
   color: #cc00cc;
+}
+
+.hand {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 12px 0;
 }
 
 .meld {
@@ -631,11 +288,13 @@ button:disabled {
 }
 
 .dealer {
+  /* 使莊家標示更顯眼：加粗邊框與柔和金光背景 */
   border: 4px solid #ffcf4e !important;
   box-shadow: 0 0 16px rgba(255, 207, 78, 0.7);
   background: rgba(255, 207, 78, 0.08);
 }
 
+/* 用於局面資訊中顯示當前風圈的膠囊樣式，將字體加粗加大以醒目顯示 */
 .round-pill {
   background: linear-gradient(135deg, #2a4766 0%, #1a3756 100%);
   border: 2px solid #3a5776;
@@ -648,6 +307,7 @@ button:disabled {
   margin-right: 6px;
 }
 
+/* 標示莊家用的小徽章 */
 .dealer-badge {
   display: inline-block;
   margin-left: 4px;
@@ -661,6 +321,7 @@ button:disabled {
   box-shadow: 0 2px 4px rgba(255, 207, 78, 0.4);
 }
 
+/* 調整你的副露區顯示，讓吃碰槓不會遮擋手牌 */
 #yourMelds {
   display: flex;
   flex-wrap: wrap;
@@ -715,6 +376,7 @@ button:disabled {
   font-size: 15px;
 }
 
+/* 聽牌提示樣式：僅顯示於玩家自己區塊，採用較大字體和醒目顏色 */
 .player-wait {
   font-size: 20px;
   font-weight: 700;
@@ -722,6 +384,8 @@ button:disabled {
   margin-top: 4px;
 }
 
+/* Dice icon displayed next to the dealer's name to indicate the number of consecutive dealer hands (連莊).
+   Unicode characters ⚀-⚅ are used. */
 .dice {
   font-size: 18px;
   margin-left: 4px;
@@ -769,6 +433,288 @@ button:disabled {
   z-index: 199;
 }
 
+/* 手機響應式設計 */
+@media (max-width: 768px) {
+  header {
+    padding: 8px 10px;
+  }
+  
+  .pill {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  #table {
+    padding: 0 6px;
+    margin: 8px auto;
+  }
+  
+  .tile {
+    min-width: 32px;
+    padding: 6px 4px;
+    font-size: 13px;
+  }
+  
+  .tile.ai {
+    min-width: 28px;
+    padding: 5px 3px;
+    font-size: 11px;
+  }
+  
+  .tile.small {
+    min-width: 22px;
+    padding: 3px 2px;
+    font-size: 10px;
+  }
+  
+  .tile-drawn {
+    margin-left: 8px;
+  }
+  
+  .hand {
+    gap: 3px;
+  }
+  
+  .sec h3 {
+    font-size: 14px;
+  }
+  
+  #log {
+    height: 120px;
+    font-size: 11px;
+  }
+  
+  .score {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .player-info {
+    padding: 6px;
+    font-size: 13px;
+  }
+  
+  .player-name {
+    font-size: 13px;
+  }
+  
+  .player-points {
+    font-size: 14px;
+  }
+  
+  /* 四方位牌桌佈局優化 */
+  .players-grid {
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .player-area {
+    padding: 6px;
+    font-size: 11px;
+  }
+  
+  .player-header {
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  
+  .player-discard,
+  .player-meld,
+  .player-handcount {
+    font-size: 10px;
+    margin: 2px 0;
+  }
+  
+  /* 中央牌河區域優化 */
+  .center-discard {
+    padding: 6px;
+    border-width: 1px;
+  }
+  
+  .center-discard h4 {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  
+  .center-discard-content {
+    gap: 2px;
+  }
+  
+  #controls {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .dealer-badge {
+    font-size: 11px;
+    padding: 0 4px;
+  }
+  
+  .round-pill {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 6px 8px;
+  }
+  
+  .pill {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+  
+  button {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  #table {
+    padding: 0 4px;
+    margin: 6px auto;
+  }
+  
+  .tile {
+    min-width: 28px;
+    padding: 5px 3px;
+    font-size: 12px;
+  }
+  
+  .tile-drawn {
+    margin-left: 6px;
+  }
+  
+  .tile.ai {
+    min-width: 24px;
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  
+  .tile.small {
+    min-width: 18px;
+    padding: 2px 1px;
+    font-size: 9px;
+  }
+  
+  .hand {
+    gap: 2px;
+  }
+  
+  .hand-row {
+    gap: 2px;
+  }
+  
+  .hand-container {
+    gap: 2px;
+  }
+  
+  #controls {
+    gap: 4px;
+  }
+  
+  .sec h3 {
+    font-size: 13px;
+  }
+  
+  #log {
+    height: 80px;
+    font-size: 10px;
+  }
+  
+  .score {
+    padding: 5px;
+    margin-bottom: 6px;
+  }
+  
+  .player-info {
+    padding: 4px;
+    font-size: 11px;
+  }
+  
+  .player-name {
+    font-size: 11px;
+  }
+  
+  .player-points {
+    font-size: 12px;
+  }
+  
+  .players-grid {
+    gap: 6px;
+    margin-top: 8px;
+  }
+  
+  .player-area {
+    padding: 4px;
+    font-size: 10px;
+  }
+  
+  .player-header {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  
+  .player-discard,
+  .player-meld,
+  .player-handcount {
+    font-size: 9px;
+    margin: 1px 0;
+    line-height: 1.2;
+  }
+  
+  .center-discard {
+    padding: 4px;
+  }
+  
+  .center-discard h4 {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+  
+  .center-discard-content {
+    gap: 1px;
+  }
+  
+  .meld {
+    margin-right: 3px;
+    padding: 4px 6px;
+  }
+  
+  .badge {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+  
+  .dealer-badge {
+    font-size: 10px;
+    padding: 0 3px;
+  }
+  
+  .round-pill {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+  
+  .tile.placeholder {
+    min-width: 28px;
+    padding: 5px 3px;
+  }
+}
+
+/* 手牌容器樣式 */
+/* 單行手牌：全部手牌排成一行，如手牌過長則自動換行但保持同一容器 */
 .hand-container {
   display: flex;
   flex-direction: row;
@@ -786,10 +732,30 @@ button:disabled {
   justify-content: center;
 }
 
+.tile {
+  min-width: 42px;
+  padding: 8px 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  user-select: none;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
 .tile-drawn {
   margin-left: 12px;
   border: 3px solid #ffd36f;
   box-shadow: 0 0 12px rgba(255, 211, 111, 0.6), 0 2px 4px rgba(0,0,0,0.15);
+  /* 停止閃爍效果 */
   animation: none;
 }
 
@@ -802,6 +768,7 @@ button:disabled {
   }
 }
 
+/* 佔位格：用於顯示摸牌與下排之間的空格 */
 .tile.placeholder {
   visibility: hidden;
   min-width: 42px;
@@ -809,6 +776,7 @@ button:disabled {
   border: 2px solid transparent;
 }
 
+/* 小型牌面：用於其他玩家的捨牌顯示 */
 .tile.small {
   min-width: 28px;
   padding: 4px 2px;
@@ -819,6 +787,14 @@ button:disabled {
   cursor: default;
 }
 
+/* 副露區塊樣式 */
+.meld {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+/* 動畫效果 */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -830,6 +806,11 @@ button:disabled {
   }
 }
 
+.tile {
+  /* 停用每次重新渲染時的滑入動畫，避免整副牌頻繁刷新的閃爍感 */
+  animation: none;
+}
+
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
@@ -839,6 +820,108 @@ button:disabled {
   }
 }
 
+.tile:hover {
+  animation: pulse 0.5s ease infinite;
+}
+  /* ===== 四方位牌桌佈局 ===== */
+  /* 整個牌桌採用 CSS Grid 佈局，上下左右分別對應北、西、東、南家，中央為牌河 */
+  .players-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      ". top ."
+      "left center right"
+      ". bottom .";
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  /* 中央牌河區域 */
+  .center-discard {
+    grid-area: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: rgba(10, 30, 20, 0.4);
+    border: 2px solid #4a6d2c;
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 150px;
+  }
+  
+  .center-discard h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #ffd36f;
+  }
+  
+  .center-discard-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .player-area {
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid #2a4766;
+    border-radius: 6px;
+    color: #e9f0f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 區域定位 */
+  .player-area.top { grid-area: top; }
+  .player-area.bottom { grid-area: bottom; }
+  .player-area.left { grid-area: left; }
+  .player-area.right { grid-area: right; }
+
+  /* 北家顯示區（對家）牌面較小，橫向顯示，置中 */
+  .player-area.top .tile.small { margin: 0 2px; }
+
+  /* 左右家區塊讓內容貼齊邊緣 */
+  .player-area.left, .player-area.right {
+    align-items: flex-start;
+  }
+
+  /* 捨牌與副露在其他家顯示為小行 */
+  .player-discard, .player-meld { margin-top: 4px; }
+
+/*
+ * 手牌容器與排列：為了滿足「16 張一行」的需求，不再分上下排，而是使用單行 flex 排列。
+ * 若寬度不足，自動出現橫向卷軸；同時禁止垂直捲動。這些樣式放置於結尾處便於覆寫先前定義。
+ */
+.hand-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.hand-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  justify-content: center;
+}
+/* 佔位符號，用於摸牌分隔，隱藏不可點擊 */
+.tile.placeholder {
+  visibility: hidden;
+  pointer-events: none;
+}
+/* 新摸進的牌的專用樣式，稍微加強邊框與光影辨識 */
+.tile.tile-drawn {
+  border-color: #ffcf4e;
+  box-shadow: 0 0 8px rgba(255, 207, 78, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* ========== 戰況紀錄樣式改進 ========== */
+/* 讓小牌在紀錄中清晰可辨，並留出些許間距 */
 #log .tile.small {
   display: inline-block;
   margin: 0 2px;
@@ -848,7 +931,7 @@ button:disabled {
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-
+/* 高亮顯示玩家自己的紀錄行 */
 #log .my-log {
   font-size: 13px;
   font-weight: 700;
@@ -881,7 +964,7 @@ button:disabled {
     <div id="roundinfo" class="row"></div>
   </div>
 
-  <div class="sec" id="yourHandSection">
+  <div class="sec">
     <h3>🎴 你的手牌 <span class="badge">點擊要打出的牌</span></h3>
     <div id="yourHand" class="hand"></div>
     <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
@@ -895,22 +978,27 @@ button:disabled {
     </div>
   </div>
 
+  <!-- 將戰況記錄移到其他玩家上方 -->
   <div class="sec">
     <h3>📜 戰況記錄</h3>
     <div id="log"></div>
   </div>
 
-  <div class="sec game-area">
-    <div id="playersGrid" class="players-grid">
-      <div id="playerArea2" class="player-area top"></div>
-      <div id="playerArea3" class="player-area left"></div>
-      <div class="center-discard">
-        <h4>🗑️ 牌河</h4>
-        <div id="centerDiscardContent" class="center-discard-content"></div>
-      </div>
-      <div id="playerArea1" class="player-area right"></div>
-      <div id="playerArea0" class="player-area bottom"></div>
+  <!-- 使用四方位牌桌佈局：北、東、西、南（你的） -->
+  <div id="playersGrid" class="players-grid">
+    <!-- 北家（對家）顯示區 -->
+    <div id="playerArea2" class="player-area top"></div>
+    <!-- 西家（下家）顯示區 -->
+    <div id="playerArea3" class="player-area left"></div>
+    <!-- 中央牌河區域 -->
+    <div class="center-discard">
+      <h4>🗑️ 牌河</h4>
+      <div id="centerDiscardContent" class="center-discard-content"></div>
     </div>
+    <!-- 東家（上家）顯示區 -->
+    <div id="playerArea1" class="player-area right"></div>
+    <!-- 南家（自己）顯示區 -->
+    <div id="playerArea0" class="player-area bottom"></div>
   </div>
 </div>
 
@@ -918,28 +1006,6 @@ button:disabled {
 <div id="overlay" class="overlay" style="display: none;"></div>
 
 <script>
-// 手機橫屏檢測
-function checkMobileLandscape() {
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const isLandscape = window.innerWidth > window.innerHeight;
-  const isSmallHeight = window.innerHeight < 500;
-  
-  if ((isMobile && isLandscape) || (isLandscape && isSmallHeight)) {
-    document.body.classList.add('mobile-landscape');
-  } else {
-    document.body.classList.remove('mobile-landscape');
-  }
-}
-
-// 初始化檢測
-checkMobileLandscape();
-
-// 視窗大小改變時重新檢測
-window.addEventListener('resize', checkMobileLandscape);
-window.addEventListener('orientationchange', () => {
-  setTimeout(checkMobileLandscape, 100);
-});
-
 /* ========= 基本工具 ========= */
 const rng = (n) => Math.floor(Math.random() * n);
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -3033,20 +3099,21 @@ function renderAll() {
       waitLineSelf;
   })();
   
-  // 更新中央牌河顯示（所有玩家的捨牌集中顯示）
+  // 更新中央牌河區域：集中顯示所有玩家的棄牌
   const centerDiscardEl = document.getElementById('centerDiscardContent');
   if (centerDiscardEl) {
     let allDiscards = [];
     for (let i = 0; i < 4; i++) {
-      S.players[i].discards.forEach(t => {
-        allDiscards.push({ tile: t, player: i });
-      });
+      const p = S.players[i];
+      if (p.discard && p.discard.length > 0) {
+        p.discard.forEach(t => {
+          const k = tileKey(t);
+          const suitClass = `suit-${t.suit}`;
+          allDiscards.push(`<span class="tile small ${suitClass}">${keyToText(k)}</span>`);
+        });
+      }
     }
-    centerDiscardEl.innerHTML = allDiscards.map(item => {
-      const k = tileKey(item.tile);
-      const suitClass = `suit-${item.tile.suit}`;
-      return `<span class="tile small ${suitClass}">${keyToText(k)}</span>`;
-    }).join(' ');
+    centerDiscardEl.innerHTML = allDiscards.join('');
   }
 }
 
@@ -3072,3 +3139,4 @@ startNewHand(true);
 </script>
 </body>
 </html>
+
