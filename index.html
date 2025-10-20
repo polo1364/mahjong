@@ -614,10 +614,13 @@ button:disabled {
   
   .hand-row {
     gap: 2px;
+    flex-wrap: wrap !important;
+    max-width: 100%;
   }
   
   .hand-container {
     gap: 2px;
+    overflow-x: visible !important;
   }
   
   #controls {
@@ -900,12 +903,12 @@ button:disabled {
  */
 .hand-container {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: visible;
+  overflow-y: visible;
 }
 .hand-row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
 }
