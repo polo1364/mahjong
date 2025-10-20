@@ -1410,20 +1410,35 @@ function stepNext() {
   renderAll();
   if (S.phase === 'end') return;
   if (S.turn === 0) {
-    // 輪到玩家，自動摸牌
+    // 輪到玩家
     const me = S.players[0];
-    // 莊家開局有17張牌，不需摸牌
-    if (S.turn === S.dealer && me.hand.length === 17) {
-      log('👉 莊家持有17張牌，請直接出牌');
+    const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+    
+    // 判斷是否需要摸牌：
+    // 1. 莊家開局有17張，不摸牌
+    // 2. 碰牌/吃牌/槓牌後，手牌+副露=16張，不摸牌（需要先出牌）
+    // 3. 其他情況，摸牌至17張
+    
+    // 總牌數 = 手牌 + 副露牌數
+    // 總牌数17張 → 不摸牌（剛摸過或莊家開局）
+    // 總牌数16張 → 摸牌（出牌後或碰牌後出牌）
+    
+    if (totalTiles === 17) {
+      // 總牌数17張，不需摸牌，請出牌
+      log('👉 請選擇要打出的牌');
       renderAll();
-    } else {
-      // 自動摸牌
+    } else if (totalTiles === 16) {
+      // 總牌数16張，需要摸牌
       drawTile(0);
       const t = me.hand[me.hand.length - 1];
       if (isWinningNow(me.hand, me.melds, t)) {
         document.getElementById('btnHu').disabled = false;
         log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
       }
+      renderAll();
+    } else {
+      // 異常狀況，記錄錯誤
+      log(`⚠️ 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組`);
       renderAll();
     }
   } else {
