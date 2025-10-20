@@ -16,18 +16,13 @@ body {
   color: #e9f0f6;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* 手機橫屏檢測與全螢幕佈局 */
-@media (max-width: 900px) and (orientation: landscape) {
-  body {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-  }
-  
+body.mobile-landscape header,
+@media (max-height: 500px) and (orientation: landscape) {
   header {
     display: none !important;
   }
@@ -41,7 +36,23 @@ body {
     flex-direction: column;
   }
   
-  .sec:not(.game-area) {
+  .sec:not(.game-area):not(#yourHandSection) {
+    display: none !important;
+  }
+  
+  #yourHandSection {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+  
+  #yourHandSection h3,
+  #yourHandSection .badge {
     display: none !important;
   }
   
@@ -209,6 +220,126 @@ body {
     padding: 5px 3px;
     font-size: 12px;
   }
+}
+
+body.mobile-landscape #table {
+  max-width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+body.mobile-landscape .sec:not(.game-area):not(#yourHandSection) {
+  display: none !important;
+}
+
+body.mobile-landscape #yourHandSection {
+  display: block !important;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+body.mobile-landscape #yourHandSection h3,
+body.mobile-landscape #yourHandSection .badge {
+  display: none !important;
+}
+
+body.mobile-landscape .game-area {
+  flex: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+body.mobile-landscape #scoreboard {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 10px;
+  background: rgba(0,0,0,0.7);
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 50;
+  max-width: 200px;
+}
+
+body.mobile-landscape #controls {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  gap: 4px;
+}
+
+body.mobile-landscape #controls button {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+body.mobile-landscape #yourHand {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3px;
+  z-index: 40;
+  max-width: 90vw;
+  overflow-x: auto;
+  padding: 4px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px;
+}
+
+body.mobile-landscape #yourMelds {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  font-size: 10px;
+}
+
+body.mobile-landscape .tile {
+  min-width: 28px;
+  padding: 5px 3px;
+  font-size: 12px;
+}
+
+body.mobile-landscape .player-area {
+  padding: 4px;
+  font-size: 10px;
+}
+
+body.mobile-landscape .player-header {
+  font-size: 11px;
+}
+
+body.mobile-landscape .player-discard,
+body.mobile-landscape .player-meld,
+body.mobile-landscape .player-handcount {
+  font-size: 9px;
+}
+
+body.mobile-landscape .tile.small {
+  min-width: 20px;
+  padding: 3px 2px;
+  font-size: 10px;
 }
 
 /* 桌面版保持原樣 */
@@ -750,7 +881,7 @@ button:disabled {
     <div id="roundinfo" class="row"></div>
   </div>
 
-  <div class="sec">
+  <div class="sec" id="yourHandSection">
     <h3>🎴 你的手牌 <span class="badge">點擊要打出的牌</span></h3>
     <div id="yourHand" class="hand"></div>
     <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
@@ -787,6 +918,28 @@ button:disabled {
 <div id="overlay" class="overlay" style="display: none;"></div>
 
 <script>
+// 手機橫屏檢測
+function checkMobileLandscape() {
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isLandscape = window.innerWidth > window.innerHeight;
+  const isSmallHeight = window.innerHeight < 500;
+  
+  if ((isMobile && isLandscape) || (isLandscape && isSmallHeight)) {
+    document.body.classList.add('mobile-landscape');
+  } else {
+    document.body.classList.remove('mobile-landscape');
+  }
+}
+
+// 初始化檢測
+checkMobileLandscape();
+
+// 視窗大小改變時重新檢測
+window.addEventListener('resize', checkMobileLandscape);
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkMobileLandscape, 100);
+});
+
 /* ========= 基本工具 ========= */
 const rng = (n) => Math.floor(Math.random() * n);
 const clone = (o) => JSON.parse(JSON.stringify(o));
