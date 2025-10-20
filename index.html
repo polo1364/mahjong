@@ -337,6 +337,13 @@ button:disabled {
   font-size: 15px;
 }
 
+/* Dice icon displayed next to the dealer's name to indicate the number of consecutive dealer hands (連莊).
+   Unicode characters ⚀-⚅ are used. */
+.dice {
+  font-size: 18px;
+  margin-left: 4px;
+}
+
 .player-points {
   font-weight: 700;
   font-size: 16px;
@@ -753,6 +760,10 @@ const RULES = {
 };
 
 let S = null;
+// Global variables to track the dealer's consecutive wins (連莊). When the same player
+// remains the dealer across hands, we increment dealerStreak. This streak is
+// displayed as a dice icon next to the dealer's name on the scoreboard.
+let dealerStreak = 0;
 
 function startNewHand(isFirstGame = false) {
   const useGold = document.getElementById('goldSwitch').checked;
@@ -787,6 +798,19 @@ function startNewHand(isFirstGame = false) {
     }
     log(`🔁 莊家輪替至${['東家(你)', '南家', '西家', '北家'][newDealer]}`);
   }
+
+  // Update dealerStreak: if the dealer remains the same as the previous hand, increment
+  // the streak. Otherwise reset it. This logic should run before S is reset below.
+  if (isFirstGame || !S) {
+    // Starting a new game: no consecutive dealer from a previous hand.
+    dealerStreak = 0;
+  } else {
+    if (newDealer === S.dealer) {
+      dealerStreak = (dealerStreak || 0) + 1;
+    } else {
+      dealerStreak = 0;
+    }
+  }
   
   S = {
     wall: shuffle(generateTiles()),
@@ -811,6 +835,8 @@ function startNewHand(isFirstGame = false) {
     turn: newDealer,
     dealer: newDealer,
     round: newRound,
+    // Record the current dealer streak in the game state so the UI can display it.
+    dealerStreak: dealerStreak,
     lastDiscard: null,
     waitReact: null,
     winner: null,
@@ -822,7 +848,10 @@ function startNewHand(isFirstGame = false) {
     drawCount: 0,
     // 是否已有玩家做出明吃碰槓，若有則地聽不再成立
     anyOpenMeld: false,
-    robKong: false
+    robKong: false,
+    // 用於判斷摸牌邏輯：紀錄上一個動作及其執行者
+    lastAction: null,
+    lastActor: null
   };
   S.rules.gold.enabled = useGold;
 
@@ -953,6 +982,10 @@ function drawTile(p) {
   }
   pl.hand.push(t);
   S.remain = S.wall.length;
+
+  // 更新最後動作與執行者，方便之後判斷是否需要再摸牌
+  S.lastAction = 'draw';
+  S.lastActor = p;
 }
 
 function drawFlowerReplacement_DELETED(p) {
@@ -1031,7 +1064,9 @@ function isWinningNow(hand, melds, winTile) {
   const tiles = hand.slice().sort((a, b) => tileSortKey(a) - tileSortKey(b));
   // 若沒有任何副露，且手牌長度為16張，可檢查七對
   if (melds.length === 0 && isSevenPairs(tiles)) return true;
-  // 副露數量代表已經完成的組數，還需要的組數 = 5 - 副露數
+  // 在 16 張麻將中，一手牌由 5 組面子和一對將牌組成（總計 17 張）。
+  // 每個面子可為順子、刻子或槓；副露數量代表已經完成的組數。
+  // 尚需完成的組數 = 5 - 副露數（至少 0）。
   const neededSets = Math.max(0, 5 - melds.length);
   return canStandardWin(tiles, neededSets);
 }
@@ -1194,6 +1229,9 @@ function keyToTile(k) {
 function canChow(pid, tile) {
   const pl = S.players[pid];
   const k = tileKey(tile);
+
+  // 最多允許5組副露（16張麻將需要 5 組面子＋1 對將牌）
+  if (pl.melds.length >= 5) return [];
   
   // 只能吃上家的牌：僅下一家可以吃（例如打牌者為 p，只有 (p+1)%4 可以吃）
   // 當前 S.turn 仍為打牌者，在反應期間未變更
@@ -1279,10 +1317,17 @@ function doChow(pid, tile, pattern) {
       }
     }
   }
+
+  // 更新最後動作與執行者：吃牌後下一步應出牌，不再摸牌
+  S.lastAction = 'chow';
+  S.lastActor = pid;
 }
 
 function canPong(pid, tile) {
   const pl = S.players[pid];
+
+  // 若已經有5組副露，則不允許再碰
+  if (pl.melds.length >= 5) return false;
   const k = tileKey(tile);
   const cnt = pl.hand.filter(t => tileKey(t) === k).length;
   return cnt >= 2;
@@ -1290,6 +1335,11 @@ function canPong(pid, tile) {
 
 function canKong(pid, tile) {
   const pl = S.players[pid];
+  // 不允許同一家擁有超過三個槓
+  if (countKongs(pl) >= 3) return false;
+
+  // 若已有5組副露，則不可再槓（新槓會增加一副露）
+  if (pl.melds.length >= 5) return false;
   const k = tileKey(tile);
   const cnt = pl.hand.filter(t => tileKey(t) === k).length;
   return cnt >= 3;
@@ -1298,6 +1348,11 @@ function canKong(pid, tile) {
 // 檢查是否可以進行暗槓：手牌中有四張相同牌
 function canConcealedKong(pid) {
   const pl = S.players[pid];
+  // 當前槓數已達上限3組時，不允許再暗槓
+  if (countKongs(pl) >= 3) return [];
+
+  // 若已有5組副露，則不允許再暗槓（新暗槓會增加一副露）
+  if (pl.melds.length >= 5) return [];
   const counts = countByKey(pl.hand);
   return Object.keys(counts).filter(k => counts[k] >= 4);
 }
@@ -1306,6 +1361,8 @@ function canConcealedKong(pid) {
 function canAddedKong(pid) {
   const pl = S.players[pid];
   const res = [];
+  // 如果已經有三個槓，則不再允許加槓
+  if (countKongs(pl) >= 3) return res;
   pl.melds.forEach((m, idx) => {
     if (m.type === 'pong') {
       const k = tileKey(m.tiles[0]);
@@ -1370,6 +1427,10 @@ function doConcealedKong(pid, key) {
     // AI繼續行動
     setTimeout(stepAI, 400);
   }
+
+  // 更新最後動作與執行者：暗槓後已補牌，不再立即摸牌
+  S.lastAction = 'concealedKong';
+  S.lastActor = pid;
 }
 
 // 執行加槓：將已碰的三張牌補為四張
@@ -1431,10 +1492,15 @@ function doAddedKong(pid, meldIndex) {
     }
     setTimeout(stepAI, 400);
   }
+
+  // 更新最後動作與執行者：加槓後已補牌，不再立即摸牌
+  S.lastAction = 'addedKong';
+  S.lastActor = pid;
 }
 
 function doPong(pid, tile) {
   const pl = S.players[pid];
+
   const k = tileKey(tile);
   const tiles = [tile];
   for (let i = 0; i < 2; i++) {
@@ -1443,6 +1509,10 @@ function doPong(pid, tile) {
       tiles.push(pl.hand.splice(idx, 1)[0]);
     }
   }
+
+  // 更新最後動作與執行者：碰牌後下一步應出牌，不再摸牌
+  S.lastAction = 'pong';
+  S.lastActor = pid;
   pl.melds.push({ type: 'pong', tiles });
   // 做碰屬於明牌，設定已出現明吃碰槓
   S.anyOpenMeld = true;
@@ -1473,6 +1543,9 @@ function doPong(pid, tile) {
 
 function doKong(pid, tile) {
   const pl = S.players[pid];
+
+
+  // 已移除4組副露限制的早期返回，限制已由 canKong 控制
   const k = tileKey(tile);
   const tiles = [tile];
   for (let i = 0; i < 3; i++) {
@@ -1496,7 +1569,9 @@ function doKong(pid, tile) {
     pl.hand.push(newTile);
   }
   S.remain = S.wall.length;
-  
+  // 更新最後動作與執行者：明槓後已補牌，不再立即摸牌
+  S.lastAction = 'kong';
+  S.lastActor = pid;
   S.turn = pid;
   S.lastDiscard = null;
   S.waitReact = null;
@@ -1536,6 +1611,10 @@ function discard(p, tile) {
   hand.splice(i, 1);
   S.players[p].discards.push(tile);
   S.lastDiscard = { tile, from: p };
+
+  // 更新最後動作與執行者為出牌
+  S.lastAction = 'discard';
+  S.lastActor = p;
   log(`🎴 ${playerName(p)} 打出 ${keyToText(tileKey(tile))}`);
 
   // 打出牌後，非槓補牌的自摸旗標重置
@@ -1745,6 +1824,7 @@ function handleAIReaction(reactions) {
 
 function canWinOn(pid, tile) {
   const pl = S.players[pid];
+  // 判斷他家打出的牌是否能胡牌，不限制副露組數（副露上限由其他邏輯控制）
   const tmp = pl.hand.concat([tile]);
   return isWinningNow(tmp, pl.melds, tile);
 }
@@ -1879,28 +1959,14 @@ function stepNext() {
   if (S.turn === 0) {
     // 輪到玩家
     const me = S.players[0];
-    // 計算玩家已擁有的槓組數
+    // 依總牌數（手牌＋副露）決定是否需要摸牌
     const kongCount = countKongs(me);
     const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
-    // 基本上，玩家在摸牌後應持有 base+槓數 張牌；出牌後為 base-1+槓數 張牌
-    const base = 17;
-    const expectedFull = base + kongCount;
-    const expectedEmpty = (base - 1) + kongCount;
+    const expectedFull = 17 + kongCount;
+    const expectedEmpty = 16 + kongCount;
 
-    if (totalTiles >= expectedFull) {
-      // 玩家已經持有完整張數或超過，不需摸牌，請出牌
-      log('👉 請選擇要打出的牌');
-      renderAll();
-      // 檢查是否可報聽並尚未宣告，若可則顯示報聽面板
-      if (!me.declaredListen) {
-        const canListenNow = me.hand.some(tile => {
-          const testHand = me.hand.filter(t => t !== tile);
-          return isListening(testHand, me.melds);
-        });
-        if (canListenNow) showListenPanel();
-      }
-    } else {
-      // 總牌數不足，視為需要摸牌
+    if (totalTiles <= expectedEmpty) {
+      // 持有張數不足，必須摸牌
       drawTile(0);
       const t = me.hand[me.hand.length - 1];
       if (isWinningNow(me.hand, me.melds, t)) {
@@ -1908,14 +1974,36 @@ function stepNext() {
         log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
       }
       renderAll();
-      // 檢查摸牌後是否可以報聽
+      // 檢查是否可報聽
       if (!me.declaredListen) {
         const canListenNow = me.hand.some(tile => {
-          const testHand = me.hand.filter(t => t !== tile);
+          const testHand = me.hand.filter(tt => tt !== tile);
           return isListening(testHand, me.melds);
         });
         if (canListenNow) showListenPanel();
       }
+    } else {
+      // 無需摸牌，直接出牌；若剛補牌或摸牌，仍檢查是否自摸
+      if (me.hand.length > 0) {
+        const last = me.hand[me.hand.length - 1];
+        if (isWinningNow(me.hand, me.melds, last)) {
+          document.getElementById('btnHu').disabled = false;
+          log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
+        }
+      }
+      log('👉 請選擇要打出的牌');
+      renderAll();
+      if (!me.declaredListen) {
+        const canListenNow = me.hand.some(tile => {
+          const testHand = me.hand.filter(tt => tt !== tile);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) showListenPanel();
+      }
+    }
+    // 若牌數異常，仍記錄警告，但不影響摸牌邏輯
+    if (totalTiles < expectedEmpty || totalTiles > expectedFull) {
+      log(`⚠️ 玩家異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
     }
   } else {
     setTimeout(stepAI, 600);
@@ -1926,25 +2014,27 @@ function stepAI() {
   if (S.phase === 'end') return;
   const p = S.turn;
   const me = S.players[p];
-  // 根據槓數判斷是否需要摸牌
+  // 依總牌數決定是否需要摸牌
   const kongCount = countKongs(me);
   const totalTiles = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
   const expectedFull = 17 + kongCount;
   const expectedEmpty = 16 + kongCount;
   if (totalTiles <= expectedEmpty) {
-    // 總牌數不足，摸牌
     drawTile(p);
     if (S.phase === 'end') return;
-  } else if (totalTiles > expectedFull) {
-    log(`⚠️ AI 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
   }
   renderAll();
-  // 檢查自摸：優先於槓牌行為
+  // 檢查自摸（摸牌或補牌後）：優先於槓牌行為
   const lastTile = me.hand[me.hand.length - 1];
   if (isWinningNow(me.hand, me.melds, lastTile)) {
     doWin(p, -1, lastTile, true);
     return;
   }
+  // 若牌數異常，紀錄警告（但不影響摸牌邏輯）
+  if (totalTiles < expectedEmpty || totalTiles > expectedFull) {
+    log(`⚠️ AI 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組，槓數=${kongCount}`);
+  }
+
   // AI 檢查加槓
   const aks = canAddedKong(p);
   if (aks.length > 0) {
@@ -2057,6 +2147,8 @@ document.getElementById('btnKong').onclick = () => {
 document.getElementById('newGameBtn').onclick = () => {
   S = { players: Array.from({ length: 4 }, () => ({ points: RULES.initialPoints })) };
   document.getElementById('log').textContent = '';
+  // When starting a brand new game, reset the dealer streak counter.
+  dealerStreak = 0;
   startNewHand(true);
 };
 
@@ -2078,12 +2170,13 @@ function renderAll() {
   }
   
   const sc = document.getElementById('scoreboard');
-  // 組合每家玩家資訊，顯示名稱、積分和是否已報聽（含天聽、地聽標記）
+  // Compose each player's information: name, points, listen state and dealer streak indicator
+  const diceSymbols = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
   sc.innerHTML = '<div class="score">' + ['東(你)', '南', '西', '北'].map((n, i) => {
     const p = S.players[i];
     const cls = (i === S.dealer ? 'dealer' : '');
     const bankrupt = p.points <= 0 ? '<span class="danger">（破產）</span>' : '';
-    // 聽牌標記：天聽、地聽優先，其次普通聽牌
+    // Listen badge: priority is 天聽, then 地聽, then ordinary 聽
     let listenBadge = '';
     if (p.tianTing) {
       listenBadge = '<span class="badge ok">天聽</span>';
@@ -2092,8 +2185,14 @@ function renderAll() {
     } else if (p.declaredListen) {
       listenBadge = '<span class="badge ok">聽</span>';
     }
+    // Dealer streak dice: if this player is the current dealer and has a streak, show the appropriate dice icon
+    let diceBadge = '';
+    if (i === S.dealer && S.dealerStreak && S.dealerStreak > 0) {
+      const idx = Math.min(S.dealerStreak, diceSymbols.length) - 1;
+      diceBadge = `<span class="dice">${diceSymbols[idx]}</span>`;
+    }
     return `<div class="player-info ${cls}">
-      <div class="player-name">${n} ${bankrupt} ${listenBadge}</div>
+      <div class="player-name">${n} ${diceBadge} ${bankrupt} ${listenBadge}</div>
       <div class="player-points">${p.points.toLocaleString()}</div>
     </div>`;
   }).join('') + '</div>';
