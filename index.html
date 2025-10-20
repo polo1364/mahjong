@@ -1517,6 +1517,40 @@ function showReactionPanel(reactions) {
   const panel = document.getElementById('reactionPanel');
   const overlay = document.getElementById('overlay');
   
+  // 檢查是否存在吃牌且有多種吃法。若有，讓玩家選擇具體吃法
+  const chowReact = reactions.find(r => r.type === 'chow');
+  if (chowReact && chowReact.patterns && chowReact.patterns.length > 1) {
+    // 多種吃法：顯示每種吃法的按鈕
+    let html = '<div class="reaction-panel"><h3>🍜 選擇吃法</h3><div class="row">';
+    chowReact.patterns.forEach((pat, idx) => {
+      // pattern 為三張牌的 rank 陣列；為避免排序改變原陣列，複製後排序再顯示
+      const patText = [...pat].sort((a, b) => a - b).join(' ');
+      html += `<button class="chowOpt" data-idx="${idx}">🍜 ${patText}</button>`;
+    });
+    html += '</div><div class="row"><button id="reactPass">⏭️ 過</button></div></div>';
+    panel.innerHTML = html;
+    panel.style.display = 'block';
+    overlay.style.display = 'block';
+    // 綁定每個吃法按鈕的事件
+    const opts = panel.querySelectorAll('.chowOpt');
+    opts.forEach(btn => {
+      const idx = parseInt(btn.getAttribute('data-idx'));
+      btn.onclick = () => {
+        // 根據選擇的模式執行吃牌
+        doChow(chowReact.pid, chowReact.tile, chowReact.patterns[idx]);
+      };
+    });
+    // 過
+    document.getElementById('reactPass').onclick = () => {
+      hideReactionPanel();
+      S.turn = (S.lastDiscard.from + 1) % 4;
+      S.lastDiscard = null;
+      S.waitReact = null;
+      stepNext();
+    };
+    return;
+  }
+
   let html = '<div class="reaction-panel"><h3>⚡ 可以進行的動作</h3><div class="row">';
   
   reactions.forEach(r => {
@@ -1562,7 +1596,7 @@ function showReactionPanel(reactions) {
   if (document.getElementById('reactChow')) {
     document.getElementById('reactChow').onclick = () => {
       const r = reactions.find(x => x.type === 'chow');
-      // 如果有多種吃法，預設選第一種（可以後續優化為讓玩家選擇）
+      // 只有一種吃法時直接執行
       doChow(r.pid, r.tile, r.patterns[0]);
     };
   }
