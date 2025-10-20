@@ -1332,6 +1332,34 @@ function hideReactionPanel() {
   document.getElementById('overlay').style.display = 'none';
 }
 
+// 顯示報聽選擇面板：當玩家可以宣告聽牌時，彈出此面板讓玩家選擇是否報聽
+function showListenPanel() {
+  const panel = document.getElementById('reactionPanel');
+  const overlay = document.getElementById('overlay');
+  let html = '<div class="reaction-panel">';
+  html += '<h3>🔔 是否報聽？</h3>';
+  html += '<div class="row">';
+  html += '<button id="listenYes">🔔 聽牌</button>';
+  html += '<button id="listenNo">⏭️ 不聽</button>';
+  html += '</div></div>';
+  panel.innerHTML = html;
+  panel.style.display = 'block';
+  overlay.style.display = 'block';
+  document.getElementById('listenYes').onclick = () => {
+    const me = S.players[0];
+    if (!me.declaredListen) {
+      me.declaredListen = true;
+      log('🔔 你宣告聽牌！胡牌時多 1 台');
+    }
+    hideReactionPanel();
+    renderAll();
+  };
+  document.getElementById('listenNo').onclick = () => {
+    hideReactionPanel();
+    // 玩家選擇不報聽，維持原狀繼續遊戲
+  };
+}
+
 function handleAIReaction(reactions) {
   const huReact = reactions.find(r => r.type === 'hu');
   if (huReact) {
@@ -1485,11 +1513,21 @@ function stepNext() {
     // 總牌数16張 → 摸牌（出牌後或碰牌後出牌）
     
     if (totalTiles === 17) {
-      // 總牌数17張，不需摸牌，請出牌
+      // 總牌數17張，不需摸牌，請出牌
       log('👉 請選擇要打出的牌');
       renderAll();
+      // 檢查是否可報聽並尚未宣告，若可則顯示報聽面板
+      if (!me.declaredListen) {
+        const canListenNow = me.hand.some(tile => {
+          const testHand = me.hand.filter(t => t !== tile);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) {
+          showListenPanel();
+        }
+      }
     } else if (totalTiles === 16) {
-      // 總牌数16張，需要摸牌
+      // 總牌數16張，需要摸牌
       drawTile(0);
       const t = me.hand[me.hand.length - 1];
       if (isWinningNow(me.hand, me.melds, t)) {
@@ -1497,6 +1535,16 @@ function stepNext() {
         log('✨ 你可以自摸（按「胡牌」）或繼續出牌');
       }
       renderAll();
+      // 檢查摸牌後是否可以報聽
+      if (!me.declaredListen) {
+        const canListenNow = me.hand.some(tile => {
+          const testHand = me.hand.filter(t => t !== tile);
+          return isListening(testHand, me.melds);
+        });
+        if (canListenNow) {
+          showListenPanel();
+        }
+      }
     } else {
       // 異常狀況，記錄錯誤
       log(`⚠️ 異常：總牌數=${totalTiles}，手牌=${me.hand.length}，副露=${me.melds.length}組`);
@@ -1536,26 +1584,28 @@ document.getElementById('btnHu').onclick = () => {
 
 document.getElementById('btnListen').onclick = () => {
   const me = S.players[0];
+  // 如果已報聽，直接提醒
   if (me.declaredListen) {
     log('⚠️ 你已經報聽了');
     return;
   }
-  
-  // 檢查是否聽牌（打出任一張牌後能胡）
+  // 僅當總牌數為17時才能報聽
+  const total = me.hand.length + me.melds.reduce((s, m) => s + m.tiles.length, 0);
+  if (total !== 17) {
+    log('⚠️ 目前無法報聽（需摸牌後才可）');
+    return;
+  }
+  // 檢查是否可聽牌
   const canListen = me.hand.some(tile => {
     const testHand = me.hand.filter(t => t !== tile);
     return isListening(testHand, me.melds);
   });
-  
   if (!canListen) {
     log('⚠️ 你還沒有聽牌，無法報聽');
     return;
   }
-  
-  me.declaredListen = true;
-  log('🔔 你宣告聽牌！胡牌時多 1 台');
-  document.getElementById('btnListen').disabled = true;
-  renderAll();
+  // 顯示報聽確認面板
+  showListenPanel();
 };
 
 document.getElementById('newGameBtn').onclick = () => {
@@ -1671,13 +1721,21 @@ function renderAll() {
     }
   }
   
-  // 聽牌按鈕：輪到玩家且未報聽時啟用
+  // 聽牌按鈕：只有輪到玩家、未報聽且確實達到聽牌條件時才啟用。
   const me = S.players[0];
+  let canListenNow = false;
   if (S.turn === 0 && !me.declaredListen && S.phase !== 'end') {
-    document.getElementById('btnListen').disabled = false;
-  } else {
-    document.getElementById('btnListen').disabled = true;
+    // 僅當總牌數為17（剛摸牌或莊家開局）時檢查聽牌。
+    const totalTilesMe = me.hand.length + me.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+    if (totalTilesMe === 17) {
+      // 檢查打出任一手牌後是否只差一張即可胡牌
+      canListenNow = me.hand.some(tile => {
+        const testHand = me.hand.filter(t => t !== tile);
+        return isListening(testHand, me.melds);
+      });
+    }
   }
+  document.getElementById('btnListen').disabled = !canListenNow;
   
   const wrap = document.getElementById('others');
   wrap.innerHTML = [1, 2, 3].map(i => {
