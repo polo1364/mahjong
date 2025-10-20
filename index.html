@@ -390,6 +390,16 @@ button:disabled {
     padding: 4px 8px;
   }
   
+  .tile {
+    min-width: 38px;
+    padding: 7px 5px;
+    font-size: 14px;
+  }
+  
+  .tile-drawn {
+    margin-left: 10px;
+  }
+  
   button {
     padding: 8px 12px;
     font-size: 13px;
@@ -431,9 +441,17 @@ button:disabled {
 
 @media (max-width: 480px) {
   .tile {
-    min-width: 34px;
+    min-width: 32px;
     padding: 6px 4px;
     font-size: 13px;
+  }
+  
+  .tile-drawn {
+    margin-left: 8px;
+  }
+  
+  .hand-row {
+    gap: 4px;
   }
   
   .tile.ai {
@@ -454,6 +472,47 @@ button:disabled {
     padding: 6px 10px;
     font-size: 12px;
   }
+}
+
+/* 手牌容器樣式 */
+.hand-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.hand-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tile {
+  min-width: 42px;
+  padding: 8px 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  user-select: none;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+.tile-drawn {
+  margin-left: 12px;
+  border: 3px solid #ffd36f;
+  box-shadow: 0 0 12px rgba(255, 211, 111, 0.6), 0 2px 4px rgba(0,0,0,0.15);
 }
 
 /* 動畫效果 */
@@ -1540,12 +1599,49 @@ function renderAll() {
   
   const you = S.players[0];
   you.hand.sort((a, b) => tileSortKey(a) - tileSortKey(b));
-  document.getElementById('yourHand').innerHTML = you.hand.map((t, idx) => {
+  
+  // 分離最後一張牌（摸的牌）和其他牌
+  const handTiles = you.hand.slice(0, -1); // 前16張或前15張
+  const drawnTile = you.hand.length > 0 ? you.hand[you.hand.length - 1] : null; // 最後一張（摸的牌）
+  
+  // 上排8張，下排剩餘的
+  const topRow = handTiles.slice(0, 8);
+  const bottomRow = handTiles.slice(8);
+  
+  let handHTML = '<div class="hand-container">';
+  
+  // 上排
+  handHTML += '<div class="hand-row">';
+  topRow.forEach((t, idx) => {
     const k = tileKey(t);
     const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
     const suitClass = `suit-${t.suit}`;
-    return `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
-  }).join('');
+    handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${idx})">${keyToText(k)}</div>`;
+  });
+  handHTML += '</div>';
+  
+  // 下排 + 摸的牌
+  handHTML += '<div class="hand-row">';
+  bottomRow.forEach((t, idx) => {
+    const k = tileKey(t);
+    const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+    const suitClass = `suit-${t.suit}`;
+    const realIdx = 8 + idx;
+    handHTML += `<div class="tile ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${realIdx})">${keyToText(k)}</div>`;
+  });
+  
+  // 摸的牌放在右側，用特殊樣式標記
+  if (drawnTile) {
+    const k = tileKey(drawnTile);
+    const isGold = S.rules.gold.enabled && S.goldKeys.includes(k);
+    const suitClass = `suit-${drawnTile.suit}`;
+    const drawnIdx = you.hand.length - 1;
+    handHTML += `<div class="tile tile-drawn ${suitClass} ${isGold ? 'gold' : ''}" onclick="onClickYourTile(${drawnIdx})">${keyToText(k)}</div>`;
+  }
+  
+  handHTML += '</div></div>';
+  
+  document.getElementById('yourHand').innerHTML = handHTML;
   
   let meldsHTML = '';
   if (you.melds.length > 0) {
