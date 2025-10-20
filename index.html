@@ -1072,18 +1072,11 @@ button:disabled {
 </header>
 
 <div id="table">
-  <div id="scoreboard"></div>
-  <div class="row sec" id="goldbar"></div>
-
-  <div class="sec">
-    <h3>📊 局面資訊</h3>
+  <!-- 隱藏的元素，保留以防JavaScript錯誤 -->
+  <div id="scoreboard" style="display: none;"></div>
+  <div class="row sec" id="goldbar" style="display: none;"></div>
+  <div class="sec" style="display: none;">
     <div id="roundinfo" class="row"></div>
-  </div>
-
-  <!-- 將戰況記錄移到其他玩家上方 -->
-  <div class="sec">
-    <h3>📏 戰況記錄</h3>
-    <div id="log"></div>
   </div>
 
   <!-- 使用四方位牌桌佈局：棄牌區逆時針排列 -->
@@ -1115,12 +1108,17 @@ button:disabled {
     <div id="playerInfo3" class="player-info-card"></div>
   </div>
   
+  <!-- 戰況記錄移到四方位牌桌下方 -->
+  <div class="sec">
+    <h3>📏 戰況記錄</h3>
+    <div id="log"></div>
+  </div>
+  
   <!-- 你的手牌區域（移到牌桌下方） -->
   <div class="sec your-hand-section">
     <h3>🎴 你的手牌 <span class="badge">點擊要打出的牌</span></h3>
-    <div id="yourHand" class="hand"></div>
-    <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
-    <div id="controls" class="row">
+    <!-- 操作按鈕移到手牌上方 -->
+    <div id="controls" class="row" style="margin-bottom: 12px;">
       <button id="btnHu" disabled>🎉 胡牌</button>
       <button id="btnChow" disabled>🍜 吃</button>
       <button id="btnPong" disabled>🔥 碰</button>
@@ -1128,6 +1126,8 @@ button:disabled {
       <button id="btnListen" disabled>🔔 聽</button>
       <button id="btnPass" disabled>⏭️ 過</button>
     </div>
+    <div id="yourHand" class="hand"></div>
+    <div id="yourMelds" class="row" style="justify-content: center; margin-top: 8px;"></div>
   </div>
 </div>
 
