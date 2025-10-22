@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>麻將單機</title>
+<title>大瑞科技 - 麻將單機</title>
 <style>
 * {
   box-sizing: border-box;
@@ -12,8 +12,8 @@
 
 body {
   font-family: system-ui, -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  background: linear-gradient(135deg, #0a1628 0%, #1a2f4a 100%);
-  color: #e9f0f6;
+  background: linear-gradient(135deg, #001a3d 0%, #003D7A 100%);
+  color: #ffffff;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -25,9 +25,9 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(180deg, #0e1b2a 0%, #1a2838 100%);
-  border-bottom: 2px solid #2a4766;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  background: linear-gradient(180deg, #003D7A 0%, #002855 100%);
+  border-bottom: 3px solid #0066CC;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -43,20 +43,20 @@ header {
 }
 
 .pill {
-  background: linear-gradient(135deg, #1a3a5a 0%, #0f2438 100%);
-  border: 1px solid #2b4766;
+  background: linear-gradient(135deg, #003D7A 0%, #002855 100%);
+  border: 2px solid #0066CC;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 13px;
   white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 button {
   cursor: pointer;
-  background: linear-gradient(135deg, #2d5a8a 0%, #1d3a57 100%);
-  border: 1px solid #3c6d9c;
-  color: #e9f0f6;
+  background: linear-gradient(135deg, #0066CC 0%, #003D7A 100%);
+  border: 2px solid #0088FF;
+  color: #ffffff;
   border-radius: 8px;
   padding: 10px 16px;
   font-size: 14px;
@@ -66,9 +66,9 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3d6a9a 0%, #2d4a67 100%);
+  background: linear-gradient(135deg, #0088FF 0%, #0066CC 100%);
   transform: translateY(-1px);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 5px 12px rgba(0,102,204,0.5);
 }
 
 button:active:not(:disabled) {
@@ -82,13 +82,14 @@ button:disabled {
 }
 
 #newGameBtn {
-  background: linear-gradient(135deg, #d4a574 0%, #b8894e 100%);
-  border-color: #e0b888;
-  color: #1a1a1a;
+  background: linear-gradient(135deg, #8BC34A 0%, #689F38 100%);
+  border-color: #9CCC65;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 #newGameBtn:hover {
-  background: linear-gradient(135deg, #e4b584 0%, #c8995e 100%);
+  background: linear-gradient(135deg, #9CCC65 0%, #7CB342 100%);
 }
 
 #table {
@@ -98,18 +99,19 @@ button:disabled {
 }
 
 .score {
-  background: linear-gradient(135deg, #0e1b2a 0%, #1a2838 100%);
-  border: 1px solid #2a4766;
+  background: linear-gradient(135deg, #002855 0%, #001a3d 100%);
+  border: 2px solid #0066CC;
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 .score h3 {
   margin: 0 0 8px 0;
   font-size: 16px;
-  color: #ffd36f;
+  color: #8BC34A;
+  font-weight: 700;
 }
 
 .hand {
@@ -213,12 +215,12 @@ button:disabled {
 }
 
 .meld {
-  background: linear-gradient(135deg, #1a3a5a 0%, #0f2438 100%);
-  border: 2px dashed #4a6d8c;
+  background: linear-gradient(135deg, #003D7A 0%, #002855 100%);
+  border: 2px dashed #0066CC;
   border-radius: 8px;
   padding: 6px 10px;
   margin-right: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .sec {
@@ -226,44 +228,16 @@ button:disabled {
 }
 
 .sec h3 {
-  color: #ffd36f;
+  color: #8BC34A;
   margin: 0 0 10px 0;
   font-size: 18px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-#log {
-  background: linear-gradient(135deg, #0a1520 0%, #0e1b2a 100%);
-  border: 1px solid #2a4766;
-  border-radius: 10px;
-  padding: 12px;
-  height: 180px;
-  overflow-y: auto;
-  font-size: 13px;
-  white-space: pre-wrap;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
-  line-height: 1.6;
-}
-
-#log::-webkit-scrollbar {
-  width: 8px;
-}
-
-#log::-webkit-scrollbar-track {
-  background: #0a1520;
-  border-radius: 4px;
-}
-
-#log::-webkit-scrollbar-thumb {
-  background: #2a4766;
-  border-radius: 4px;
-}
-
-#log::-webkit-scrollbar-thumb:hover {
-  background: #3a5776;
-}
+/* log 樣式已移到 center-log */
 
 #controls {
   display: flex;
@@ -276,29 +250,29 @@ button:disabled {
 .badge {
   padding: 4px 10px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #2a4766 0%, #1a3756 100%);
-  border: 1px solid #3a5776;
+  background: linear-gradient(135deg, #003D7A 0%, #002855 100%);
+  border: 2px solid #0066CC;
   font-size: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .you {
-  color: #ffd36f;
+  color: #8BC34A;
   font-weight: 700;
 }
 
 .dealer {
   /* 使莊家標示更顯眼：加粗邊框與柔和金光背景 */
-  border: 4px solid #ffcf4e !important;
-  box-shadow: 0 0 16px rgba(255, 207, 78, 0.7);
-  background: rgba(255, 207, 78, 0.08);
+  border: 4px solid #FFC107 !important;
+  box-shadow: 0 0 16px rgba(255, 193, 7, 0.7);
+  background: rgba(255, 193, 7, 0.08);
 }
 
 /* 用於局面資訊中顯示當前風圈的膠囊樣式，將字體加粗加大以醒目顯示 */
 .round-pill {
-  background: linear-gradient(135deg, #2a4766 0%, #1a3756 100%);
-  border: 2px solid #3a5776;
-  color: #ffd36f;
+  background: linear-gradient(135deg, #0066CC 0%, #003D7A 100%);
+  border: 2px solid #0088FF;
+  color: #ffffff;
   font-weight: 700;
   font-size: 16px;
   padding: 6px 14px;
@@ -312,13 +286,13 @@ button:disabled {
   display: inline-block;
   margin-left: 4px;
   padding: 0 6px;
-  background: linear-gradient(180deg, #ffd36f 0%, #ffcd4b 100%);
-  color: #1a2634;
+  background: linear-gradient(180deg, #FFC107 0%, #FFA000 100%);
+  color: #ffffff;
   border-radius: 4px;
   font-weight: 700;
   font-size: 14px;
   line-height: 1.2;
-  box-shadow: 0 2px 4px rgba(255, 207, 78, 0.4);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.4);
 }
 
 /* 調整你的副露區顯示，讓吃碰槓不會遮擋手牌 */
@@ -336,16 +310,16 @@ button:disabled {
 }
 
 .ok {
-  color: #9cf39c;
+  color: #8BC34A;
   font-weight: 700;
 }
 
 #goldbar {
-  background: linear-gradient(135deg, #2a3a1a 0%, #1a2a0a 100%);
-  border: 2px solid #4a6d2c;
+  background: linear-gradient(135deg, #003D7A 0%, #002855 100%);
+  border: 2px solid #FFC107;
   border-radius: 10px;
   padding: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 #goldbar .tilekey {
@@ -366,7 +340,7 @@ button:disabled {
   gap: 8px;
   align-items: center;
   padding: 8px;
-  background: linear-gradient(135deg, #1a2838 0%, #0e1b2a 100%);
+  background: linear-gradient(135deg, #002855 0%, #001a3d 100%);
   border-radius: 8px;
   margin-bottom: 6px;
 }
@@ -380,7 +354,7 @@ button:disabled {
 .player-wait {
   font-size: 20px;
   font-weight: 700;
-  color: #ffd36f;
+  color: #8BC34A;
   margin-top: 4px;
 }
 
@@ -394,7 +368,7 @@ button:disabled {
 .player-points {
   font-weight: 700;
   font-size: 16px;
-  color: #9cf39c;
+  color: #8BC34A;
 }
 
 .reaction-panel {
@@ -402,12 +376,12 @@ button:disabled {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(26, 40, 56, 0.95);
-  border: 2px solid #2a4766;
+  background: transparent;
+  border: none;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
+  backdrop-filter: none;
   z-index: 200;
   min-width: 280px;
   text-align: center;
@@ -415,8 +389,9 @@ button:disabled {
 
 .reaction-panel h3 {
   margin: 0 0 16px 0;
-  color: #ffd36f;
+  color: #8BC34A;
   font-size: 20px;
+  font-weight: 700;
 }
 
 .reaction-panel .row {
@@ -430,8 +405,9 @@ button:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.4);
+  background: transparent;
   z-index: 199;
+  pointer-events: none;
 }
 
 /* 手機響應式設計 */
@@ -845,21 +821,69 @@ button:disabled {
   .center-discard {
     grid-area: center;
     display: flex;
+    flex-direction: row;
+    background: rgba(0, 40, 85, 0.3);
+    border: 3px solid #0066CC;
+    border-radius: 8px;
+    padding: 0;
+    min-height: 200px;
+    gap: 0;
+  }
+  
+  .center-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-right: 2px solid #0066CC;
+  }
+  
+  .center-right {
+    flex: 1;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(10, 30, 20, 0.3);
-    border: 2px solid #4a6d2c;
-    border-radius: 8px;
     padding: 10px;
-    min-height: 140px;
-    gap: 8px;
+  }
+  
+  .center-log {
+    flex: 1;
+    background: linear-gradient(135deg, #001428 0%, #002855 100%);
+    border: 2px solid #0066CC;
+    border-radius: 8px;
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 11px;
+    line-height: 1.6;
+    margin-top: 6px;
+    max-height: 180px;
+    word-wrap: break-word;
+  }
+  
+  .center-log::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .center-log::-webkit-scrollbar-track {
+    background: #001428;
+    border-radius: 3px;
+  }
+  
+  .center-log::-webkit-scrollbar-thumb {
+    background: #0066CC;
+    border-radius: 3px;
+  }
+  
+  .center-log::-webkit-scrollbar-thumb:hover {
+    background: #0088FF;
   }
   
   .center-discard h4 {
     margin: 0;
     font-size: 14px;
-    color: #ffd36f;
+    color: #8BC34A;
     font-weight: 700;
   }
   
@@ -874,15 +898,15 @@ button:disabled {
   .center-round {
     font-size: 16px;
     font-weight: 700;
-    color: #ffd36f;
-    background: rgba(255, 211, 111, 0.15);
+    color: #8BC34A;
+    background: rgba(139, 195, 74, 0.15);
     padding: 4px 12px;
-    border-radius: 12px;
+    border-radius: 8px;
   }
   
   .center-gold {
     font-size: 11px;
-    color: #9cf39c;
+    color: #8BC34A;
   }
   
   .center-remain {
@@ -1113,13 +1137,19 @@ button:disabled {
     <div id="discardArea1" class="discard-area top"></div>
     <!-- 左方棄牌區（北家） -->
     <div id="discardArea2" class="discard-area left"></div>
-    <!-- 中央資訊區域 -->
+    <!-- 中央區域：左半戰況記錄，右半牌局資訊 -->
     <div class="center-discard">
-      <h4>🎴 牌桌</h4>
-      <div class="center-info">
-        <div id="centerRound" class="center-round"></div>
-        <div id="centerGold" class="center-gold"></div>
-        <div id="centerRemain" class="center-remain"></div>
+      <div class="center-left">
+        <h4>📏 戰況記錄</h4>
+        <div id="log" class="center-log"></div>
+      </div>
+      <div class="center-right">
+        <h4>🎴 牌局資訊</h4>
+        <div class="center-info">
+          <div id="centerRound" class="center-round"></div>
+          <div id="centerGold" class="center-gold"></div>
+          <div id="centerRemain" class="center-remain"></div>
+        </div>
       </div>
     </div>
     <!-- 右方棄牌區（南家） -->
@@ -1136,11 +1166,7 @@ button:disabled {
     <div id="playerInfo3" class="player-info-card"></div>
   </div>
   
-  <!-- 戰況記錄移到四方位牌桌下方 -->
-  <div class="sec">
-    <h3>📏 戰況記錄</h3>
-    <div id="log"></div>
-  </div>
+  <!-- 戰況記錄已移到中央牌桌區域 -->
   
   <!-- 你的手牌區域（移到牌桌下方） -->
   <div class="sec your-hand-section">
@@ -1167,20 +1193,70 @@ button:disabled {
 const rng = (n) => Math.floor(Math.random() * n);
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
+// 音效系統
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq, duration, type = 'sine') {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.frequency.value = freq;
+  osc.type = type;
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// 特效系統
+function showEffect(text, color, size = '48px') {
+  const effect = document.createElement('div');
+  effect.textContent = text;
+  effect.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: ${size};
+    color: ${color};
+    font-weight: bold;
+    text-shadow: 0 0 20px ${color}, 0 0 40px ${color};
+    z-index: 9999;
+    pointer-events: none;
+    animation: effectPop 1s ease-out forwards;
+  `;
+  document.body.appendChild(effect);
+  setTimeout(() => effect.remove(), 1000);
+}
+
+// CSS 動畫
+if (!document.getElementById('effectStyle')) {
+  const style = document.createElement('style');
+  style.id = 'effectStyle';
+  style.textContent = `
+    @keyframes effectPop {
+      0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function log(msg) {
   const el = document.getElementById('log');
-  const time = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   // 建立新的紀錄行元素，透過 formatLogString 將牌名轉成小牌圖示
   const line = document.createElement('div');
   // 格式化訊息：將數字牌、風牌、三元牌轉成小牌樣式
   const formatted = formatLogString(msg);
-  line.innerHTML = `[${time}] ` + formatted;
+  line.innerHTML = formatted;
+  line.style.marginBottom = '4px';
   // 若訊息包含「你」，代表為玩家自身相關，套用高亮樣式
   if (/你/.test(msg)) {
     line.classList.add('my-log');
   }
   el.appendChild(line);
-  // 自動滾動到底部
+  // 自動捲動到底部
   el.scrollTop = el.scrollHeight;
 }
 
@@ -1569,6 +1645,8 @@ function drawTile(p) {
   // 記錄剛摸進的牌，方便聽牌後限制只能打該張
   pl.drawnTile = t;
   S.remain = S.wall.length;
+  // 摸牌音效
+  playSound(600, 0.1, 'sine');
 
   // 若是玩家摸牌，將摸到的牌記錄到戰況
   if (p === 0) {
@@ -2188,6 +2266,11 @@ function doKong(pid, tile) {
   S.anyOpenMeld = true;
   S.kongCount++; // 槓牌次數+1，海底多保留1張
   log(`💥 ${playerName(pid)} 槓了 ${keyToText(k)}，從王牌補牌`);
+  // 明槓特效與音效
+  if (pid === 0) {
+    showEffect('💥 槓', '#FF5722');
+    playSound(650, 0.3, 'sawtooth');
+  }
   
   // 槓牌後從王牌補牌
   if (S.deadWall.length > 0) {
@@ -2242,6 +2325,8 @@ function discard(p, tile) {
   S.players[p].drawnTile = null;
   S.players[p].discards.push(tile);
   S.lastDiscard = { tile, from: p };
+  // 丟牌音效
+  playSound(400, 0.1, 'square');
 
   // 更新最後動作與執行者為出牌
   S.lastAction = 'discard';
@@ -2321,7 +2406,23 @@ function showReactionPanel(reactions) {
   const panel = document.getElementById('reactionPanel');
   const overlay = document.getElementById('overlay');
   
-  // 檢查是否存在吃牌且有多種吃法。若有，讓玩家選擇具體吃法
+  // 新規則：如果已報聽，過濾掉吃、碰、明槓的選項
+  const me = S.players[0];
+  if (me.declaredListen) {
+    // 已聽牌，只保留胡牌選項，移除吃碰槓
+    reactions = reactions.filter(r => r.type === 'hu');
+    if (reactions.length === 0) {
+      // 沒有可用選項，自動過
+      hideReactionPanel();
+      S.turn = (S.lastDiscard.from + 1) % 4;
+      S.lastDiscard = null;
+      S.waitReact = null;
+      stepNext();
+      return;
+    }
+  }
+  
+  // 新增：如果同時有多種反應，顯示所有選項
   const chowReact = reactions.find(r => r.type === 'chow');
   if (chowReact && chowReact.patterns && chowReact.patterns.length > 1) {
     // 多種吃法：顯示每種吃法的按鈕
@@ -2435,8 +2536,9 @@ function showListenPanel() {
   document.getElementById('listenYes').onclick = () => {
     const me = S.players[0];
     if (!me.declaredListen) {
-      // 標記已報聽
+      // 標記已報聽但尚未鎖定
       me.declaredListen = true;
+      me.tingLocked = false; // 新增：標記聽牌尚未鎖定
       // 檢查天聽/地聽
       updateTianDiTing(0);
       // 計算聽牌時可以胡哪些牌，並提示
@@ -2450,6 +2552,7 @@ function showListenPanel() {
       } else {
         log('🔔 你宣告聽牌！胡牌時多 1 台');
       }
+      log('⚠️ 請丟一張手牌後鎖定聽牌');
       // 顯示等待牌提示
       if (waitKeys.length > 0) {
         // 將等待牌儲存於玩家狀態，以便在玩家區塊或記分板顯示
@@ -2879,9 +2982,10 @@ document.getElementById('btnListen').onclick = () => {
 // 玩家執行暗槓（手牌四張相同）
 document.getElementById('btnKong').onclick = () => {
   if (S.turn !== 0 || S.phase === 'end' || S.lastDiscard !== null) return;
+  const me = S.players[0];
+  // 聽牌後仍可以暗槓和加槓
   const added = canAddedKong(0);
   const concealed = canConcealedKong(0);
-  const me = S.players[0];
   // 優先處理加槓
   if (added.length > 0) {
     const cand = added[0];
@@ -2921,13 +3025,13 @@ document.getElementById('newGameBtn').onclick = () => {
 function onClickYourTile(idx) {
   if (S.turn !== 0 || S.phase === 'end') return;
   const me = S.players[0];
-  // 如果已報聽，只能打剛摸的那張牌（drawnTile）
-  if (me.declaredListen) {
+  // 新規則：如果已報聽且已鎖定，只能打剛摸的那張牌（drawnTile）
+  if (me.declaredListen && me.tingLocked) {
     // 如果記錄有剛摸的牌，則限制只能打該牌
     if (me.drawnTile) {
       const selected = me.hand[idx];
       if (selected !== me.drawnTile) {
-        log('⚠️ 已報聽，只能打剛摸的牌');
+        log('⚠️ 已鎖定聽牌，只能打剛摸的牌');
         return;
       }
     } else {
@@ -2939,7 +3043,7 @@ function onClickYourTile(idx) {
       if (hasDrawn) {
         const lastIdx = me.hand.length - 1;
         if (idx !== lastIdx) {
-          log('⚠️ 已報聽，只能打剛摸的牌');
+          log('⚠️ 已鎖定聽牌，只能打剛摸的牌');
           return;
         }
       }
@@ -2947,6 +3051,11 @@ function onClickYourTile(idx) {
   }
   const tile = me.hand[idx];
   discard(0, tile);
+  // 新規則：如果已報聽但尚未鎖定，丟牌後立即鎖定
+  if (me.declaredListen && !me.tingLocked) {
+    me.tingLocked = true;
+    log('🔒 聽牌已鎖定，之後只能打摸到的牌');
+  }
 }
 
 /* ========= UI 渲染 ========= */
@@ -3167,6 +3276,7 @@ function renderAll() {
   document.getElementById('btnListen').disabled = !canListenBtn;
 
   // 暗槓按鈕：輪到玩家，無棄牌反應，且手牌中存在四張相同牌時啟用
+  // 聽牌後仍可以暗槓和加槓（不會改變手牌結構）
   const btnKong = document.getElementById('btnKong');
   if (S.turn === 0 && S.phase !== 'end' && S.waitReact === null) {
     const cks = canConcealedKong(0);
