@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>麻將｜直式手機（單頁可遊玩・簡化引擎 v2）</title>
+<title>麻將｜直式手機（完整版＋音效特效）</title>
 <meta name="color-scheme" content="dark">
 <style>
 :root{
@@ -12,11 +12,8 @@
   --gap: 8px;
   --radius: 10px;
   --shadow: 0 4px 14px rgba(0,0,0,.18);
-  /* 這些尺寸會由 JS 依手牌寬度自動調整 */
-  --tileW: 26px;
-  --tileH: 35.1px;
-  --miniW: 22px;
-  --miniH: 30px;
+  --tileW: 26px; --tileH: 35px;
+  --miniW: 22px; --miniH: 30px;
   --font: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   --bg1: #062a55; --bg2:#0a3b75;
 }
@@ -32,6 +29,7 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
 .topbar{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
 .pill{background:#0b447f;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-size:12px}
 .btn{border-radius:999px;border:1px solid rgba(255,255,255,.16);padding:8px 12px;background:#f1b93f;color:#261a00;font-weight:800}
+.toggle{cursor:pointer}
 .dual{display:grid;grid-template-columns: 1fr 42%; gap: var(--gap)}
 @media (max-width:360px){ .dual{ grid-template-columns: 1fr 44%; } }
 .log{max-height:92px;overflow:auto;border-radius:8px;background:rgba(0,0,0,.18);padding:6px}
@@ -52,8 +50,11 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
   font-weight:800;font-size: calc(var(--tileW)*.4 + 8px);
   user-select:none;box-shadow:0 1px 0 rgba(0,0,0,.35),0 6px 10px rgba(0,0,0,.15);
   cursor:pointer; position:relative;
+  transition: transform .08s;
 }
-.tile.selected{ outline:3px solid #ffd05e; }
+.tile:active{ transform: translateY(-2px) scale(1.02); }
+.tile.selected{ outline:3px solid #ffd05e; animation: pulse 900ms ease-in-out infinite; }
+@keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(255,208,94,.6)} 70%{box-shadow:0 0 0 8px rgba(255,208,94,0)} 100%{box-shadow:0 0 0 0 rgba(255,208,94,0)} }
 .tile.w{color:#e14b4b}.tile.t{color:#1976d2}.tile.s{color:#2eb972}.tile.z{color:#e14b4b}.tile.f{color:#1aa563}.tile.b{color:#777}
 .players{display:grid;gap:6px}
 .player{display:grid;gap:4px;padding:6px 8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06)}
@@ -67,13 +68,27 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
 .mini{width:var(--miniW);height:var(--miniH);font-size: calc(var(--miniW)*.4 + 6px)}
 .small{font-size:11px;color:#9ec3ff}
 .hint{font-size:11px;color:#9ec3ff;margin-top:4px}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:99}
+.modal .panel{background:#0c3366;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px;max-width:92vw}
+.modal .title{font-weight:800;margin-bottom:8px}
+.optionRow{display:flex;gap:6px;flex-wrap:wrap}
+.opt{padding:8px 10px;border-radius:10px;background:#0e4fa1;border:1px solid rgba(255,255,255,.18);cursor:pointer}
+.opt:hover{filter:brightness(1.1)}
+/* FX overlay */
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:88}
+.firework{position:absolute;width:6px;height:6px;border-radius:50%;background:#ffd05e;box-shadow:0 0 10px 2px #ffd05e}
+.confetti{position:absolute;width:6px;height:10px;transform:rotate(15deg);}
 </style>
 </head>
 <body>
+<canvas id="fxLayer"></canvas>
 <main id="app">
   <section class="card topbar">
-    <div class="pill">台灣 16 張麻將（簡化引擎示範 v2）</div>
+    <div class="pill">台灣 16 張麻將（完整版示範）</div>
     <div class="pill">底 2000／每台 1000</div>
+    <div class="pill toggle" id="tgl-sound">🔊 音效：開</div>
+    <div class="pill toggle" id="tgl-fx">✨ 特效：開</div>
     <button class="btn" id="btn-new">開始新局</button>
   </section>
   <section class="dual">
@@ -104,7 +119,7 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
     <button class="abtn" id="act-chi" disabled>吃</button>
     <button class="abtn" id="act-peng" disabled>碰</button>
     <button class="abtn" id="act-gang" disabled>槓</button>
-    <button class="abtn" id="act-ting" disabled>聽</button>
+    <button class="abtn" id="act-ting">聽</button>
     <button class="abtn" id="act-pass" >過</button>
   </section>
   <section class="card">
@@ -115,30 +130,88 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
   <section class="players" id="players"></section>
 </main>
 
+<!-- 選擇面板 -->
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="title" id="modalTitle">選擇</div>
+    <div class="optionRow" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
-/* ========= 簡化引擎（可遊玩但非完整規則） ========= */
+// ====== SFX（WebAudio合成） ======
+let SOUND_ON = true, FX_ON = true;
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+function tone(freq=440, dur=0.08, type='sine', vol=0.2){
+  if(!SOUND_ON) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, AC.currentTime);
+  g.gain.value = 0; g.gain.linearRampToValueAtTime(vol, AC.currentTime+0.005);
+  g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+dur);
+  o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime+dur+0.02);
+}
+const SFX = {
+  click(){ tone(660,.05,'triangle',.12); },
+  draw(){ tone(320,.06,'square',.14); tone(240,.06,'square',.10); },
+  discard(){ tone(240,.07,'square',.12); },
+  meld(){ [420,520,620].forEach((f,i)=> setTimeout(()=>tone(f,.07,'triangle',.14), i*50)); },
+  hu(){ [520,660,820,980].forEach((f,i)=> setTimeout(()=>tone(f,.10,'sine',.2), i*90)); }
+};
+document.getElementById('tgl-sound').onclick = (e)=>{
+  SOUND_ON = !SOUND_ON; e.currentTarget.textContent = SOUND_ON ? '🔊 音效：開' : '🔈 音效：關';
+  try{ AC.resume(); }catch(_){}
+};
+document.getElementById('tgl-fx').onclick = (e)=>{
+  FX_ON = !FX_ON; e.currentTarget.textContent = FX_ON ? '✨ 特效：開' : '✨ 特效：關';
+};
+
+// 視覺特效（confetti + fireworks）
+const fxCanvas = document.getElementById('fxLayer');
+const ctx = fxCanvas.getContext('2d');
+function resizeFX(){ fxCanvas.width = innerWidth; fxCanvas.height = innerHeight; }
+window.addEventListener('resize', resizeFX); resizeFX();
+let confs = [];
+function spawnConfetti(n=100){
+  if(!FX_ON) return;
+  for(let i=0;i<n;i++){
+    confs.push({
+      x: Math.random()*fxCanvas.width, y: -10-Math.random()*100,
+      vy: 2+Math.random()*3, vx: (Math.random()-.5)*2,
+      c: `hsl(${Math.random()*360},90%,60%)`, s: 6+Math.random()*4, r: Math.random()*Math.PI
+    });
+  }
+}
+function fireworks(){
+  if(!FX_ON) return;
+  spawnConfetti(160);
+}
+function tickFX(){
+  ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  confs.forEach(p=>{
+    p.x += p.vx; p.y += p.vy; p.r += 0.1;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+    ctx.fillStyle = p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*1.4);
+    ctx.restore();
+  });
+  confs = confs.filter(p=> p.y < fxCanvas.height+20);
+  requestAnimationFrame(tickFX);
+}
+tickFX();
+
+// ===== 工具與 UI =====
 const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 const log = (who,msg)=>{
   const row = document.createElement('div');
   row.className='log-item';
   row.innerHTML = `<span class="tag">${who}</span><span>${msg}</span>`;
   const box = $('#log'); box.appendChild(row); box.scrollTop = box.scrollHeight;
 };
-const tilesAll = (()=>{
-  const arr = [];
-  const suits = [['萬','w'],['筒','t'],['條','s']];
-  for(const [s,_c] of suits){
-    for(let n=1;n<=9;n++){ for(let k=0;k<4;k++) arr.push(`${n}${s}`); }
-  }
-  const honors = ['東','南','西','北','中','發','白'];
-  honors.forEach(h=>{ for(let k=0;k<4;k++) arr.push(h); });
-  return arr; // 136 張
-})();
-function tClass(t){ if(/萬/.test(t))return 'w'; if(/筒/.test(t))return 't'; if(/條/.test(t))return 's';
+function tileClass(t){ if(/萬/.test(t))return 'w'; if(/筒/.test(t))return 't'; if(/條/.test(t))return 's';
   if(t==='中')return 'z'; if(t==='發')return 'f'; if(t==='白')return 'b'; return ''; }
 function tileEl(t, mini=false, clickable=false, onClick=null){
   const d = document.createElement('div');
-  d.className = 'tile '+tClass(t)+(mini?' mini':'');
+  d.className = 'tile '+tileClass(t)+(mini?' mini':'');
   d.textContent = t;
   if(clickable){ d.addEventListener('click', onClick, {passive:true}); }
   return d;
@@ -148,36 +221,40 @@ const order = ['東','南','西','北'];
 const nextSeat = s => order[(order.indexOf(s)+1)%4];
 const prevSeat = s => order[(order.indexOf(s)+3)%4];
 
+// ===== 牌池 =====
+const SUITS = [['萬','w'],['筒','t'],['條','s']];
+const HONORS = ['東','南','西','北','中','發','白'];
+const ALL_TILES = (()=>{
+  const arr = [];
+  for(const [s,_] of SUITS) for(let n=1;n<=9;n++) for(let k=0;k<4;k++) arr.push(`${n}${s}`);
+  HONORS.forEach(h=>{ for(let k=0;k<4;k++) arr.push(h); });
+  return arr;
+})();
+
+// ===== 狀態 =====
 const G = {
   deck:[], turn:'東', lastDiscard:null, lastDiscarter:null,
-  players:new Map(), // seat -> {name, score, hand:[], disc:[], melds:[], banker, remain}
-  needDraw:false, phase:'idle', timer:null
+  players:new Map(), // seat -> {name, score, hand:[], disc:[], melds:[], banker}
+  needDraw:false, phase:'idle', timer:null, gold:null,
+  passFlags:new Map(), // tile -> set of seats that passed（簡易過手鎖僅此局有效）
 };
 function setup(){
-  G.deck = shuffle(tilesAll.slice());
+  G.deck = shuffle(ALL_TILES.slice());
   G.turn = '東';
   G.lastDiscard = null; G.lastDiscarter=null;
+  G.gold = null;
   G.players = new Map();
-  order.forEach((s,i)=>{
-    G.players.set(s, { seat:s, name: s==='東'?'你': (s==='南'?'小美': (s==='西'?'阿芬':'建國')), score:100000, hand:[], disc:[], melds:[], banker:(s==='東'), remain:16 });
-  });
-  deal16();
-  G.phase='playing';
-  G.needDraw=false; // 東家 17 張，先打
-  renderAll();
-  log('系統','開局完成，莊家為 東。東家請出牌。');
-  enableActionsForYou();
-}
-function deal16(){
-  // 正確發牌：每家 16，東家 +1
   order.forEach(s=>{
-    const p = G.players.get(s);
-    for(let i=0;i<16;i++){ p.hand.push(G.deck.pop()); }
+    G.players.set(s, { seat:s, name: s==='東'?'你': (s==='南'?'小美': (s==='西'?'阿芬':'建國')), score:100000, hand:[], disc:[], melds:[], banker:(s==='東') });
   });
-  const east = G.players.get('東');
-  east.hand.push(G.deck.pop()); // 第 17 張
-  order.forEach(s=> G.players.get(s).remain = G.players.get(s).hand.length);
-  $('#R_left').textContent = String(G.deck.length);
+  // 發牌
+  order.forEach(s=>{ const p=G.players.get(s); for(let i=0;i<16;i++) p.hand.push(G.deck.pop()); });
+  G.players.get('東').hand.push(G.deck.pop());
+  G.needDraw=false;
+  G.phase='playing';
+  log('系統','開局完成，莊家為 東。東家請出牌。');
+  renderAll();
+  enableActionsForYou();
 }
 function sortHand(h){
   const rank = t=>{
@@ -192,12 +269,12 @@ function sortHand(h){
 }
 function fitTilesToHand(){
   const you = G.players.get('東');
-  const n = Math.max(you ? you.hand.length : 14, 14); // 至少預留 14
+  const n = Math.max(you ? you.hand.length : 14, 14);
   const gap = 4;
   const box = $('#hand');
   const cw = box.clientWidth || window.innerWidth - 16;
   let w = Math.floor((cw - (n-1)*gap) / n);
-  w = Math.max(18, Math.min(28, w)); // 上下限
+  w = Math.max(18, Math.min(26, w));
   const h = Math.round(w*1.35);
   const miniW = Math.round(w*0.86), miniH = Math.round(h*0.86);
   const root = document.documentElement.style;
@@ -238,43 +315,168 @@ function renderAll(){
     root.appendChild(wrap);
   });
   $('#R_left').textContent = String(G.deck.length);
-  // 動作提示
+  $('#R_gold').textContent = G.gold ? G.gold : '—';
   $('#hint').textContent = (G.turn==='東' ? (G.needDraw?'請摸牌（點下方「過」）':'請出牌（點手牌）') : `等待 ${G.players.get(G.turn).name} 出牌…`);
 }
 function enableActionsForYou(){
-  const toggle = (id, ena)=> $('#'+id).disabled = !ena;
-  toggle('act-chi', false);
-  toggle('act-ting', false);
-  toggle('act-hu', canSevenPairs(G.players.get('東').hand)); // 七對自摸
-  const last = G.lastDiscard, discarter = G.lastDiscarter;
+  const btn = id => $('#'+id);
+  const set = (id, ena)=> btn(id).disabled = !ena;
   const you = G.players.get('東');
-  let canPeng=false, canGang=false;
+  set('act-hu', canHuFull(you.hand));
+  const last = G.lastDiscard, discarter = G.lastDiscarter;
+  let canPeng=false, canMeldGang=false, canChi=false, canConceal=false, canAdd=false;
   if(last && discarter && discarter!== '東'){
     const cnt = you.hand.filter(x=>x===last).length;
     canPeng = cnt>=2;
-    canGang = cnt>=3;
+    canMeldGang = cnt>=3;
+    if(discarter===prevSeat('東')){ canChi = chiOptions(you.hand,last).length>0; }
   }
-  toggle('act-peng', canPeng);
-  toggle('act-gang', canGang);
-  toggle('act-pass', true);
+  if(G.turn==='東' && !G.needDraw){
+    const counts = countTiles(you.hand);
+    for(const [t,c] of counts) if(c===4) canConceal=true;
+    for(const m of you.melds) if(m.length===3 && m.every(x=>x===m[0]) && you.hand.includes(m[0])) canAdd=true;
+  }
+  set('act-chi', canChi);
+  set('act-peng', canPeng);
+  set('act-gang', canMeldGang || canConceal || canAdd);
+  set('act-ting', true);
+  set('act-pass', true);
 }
+
+/* === 出牌 === */
 function onYouTapTile(i){
   if(G.turn!=='東' || G.phase!=='playing') return;
   const you = G.players.get('東');
-  if(G.needDraw){
-    log('提示','需先摸牌（點「過」）');
-    return;
-  }
+  if(G.needDraw){ log('提示','需先摸牌（點「過」）'); return; }
   const t = you.hand.splice(i,1)[0];
-  you.remain = you.hand.length;
-  G.lastDiscard = t; G.lastDiscarter = '東';
   you.disc.push(t);
+  G.lastDiscard = t; G.lastDiscarter = '東';
   log('你','打出 '+t);
+  SFX.discard();
   G.turn = nextSeat(G.turn);
   G.needDraw = true;
   renderAll();
+  resolveClaimsAfterDiscard();
+}
+
+/* === 反應優先權：胡 > 槓 > 碰 > 吃 === */
+function resolveClaimsAfterDiscard(){
+  const tile = G.lastDiscard, by = G.lastDiscarter;
+  if(!tile) return scheduleAiChain();
+  const seats = order.filter(s=>s!==by); // 三家
+  // 依優先：胡
+  for(const s of seats){
+    const p = G.players.get(s);
+    if(canHuByDiscard(p, tile)){
+      if(s==='東'){ // 你可以胡
+        showOptions('可胡牌！', ['胡此張'], ()=> { onHuBy('東', tile, by); });
+        return;
+      }else{ // AI 胡
+        return setTimeout(()=>{ onHuBy(s,tile,by); }, 400);
+      }
+    }
+  }
+  // 槓（明槓）
+  for(const s of seats){
+    const p = G.players.get(s);
+    if(canMeldGang(p, tile)){
+      if(s==='東'){
+        showOptions('可明槓', ['槓 '+tile], ()=>{ onMeldGang('東',tile,by); });
+        return;
+      }else{
+        return setTimeout(()=>{ onMeldGang(s,tile,by); }, 400);
+      }
+    }
+  }
+  // 碰
+  for(const s of seats){
+    const p = G.players.get(s);
+    if(canPengBy(p, tile)){
+      if(s==='東'){
+        showOptions('可碰', ['碰 '+tile], ()=>{ onPeng('東',tile,by); });
+        return;
+      }else{
+        return setTimeout(()=>{ onPeng(s,tile,by); }, 380);
+      }
+    }
+  }
+  // 吃（只有下一家）
+  const nxt = nextSeat(by);
+  const p = G.players.get(nxt);
+  if(nxt==='東'){
+    const opts = chiOptions(G.players.get('東').hand, tile);
+    if(opts.length){
+      showOptions('可吃', opts.map(a=>({arr:a,label:a.join(' ')})), (opt)=>{
+        onChi('東', opt.arr, by);
+      });
+      return;
+    }
+  }else if(chiOptions(p.hand, tile).length){
+    const opt = chiOptions(p.hand, tile)[0];
+    return setTimeout(()=> onChi(nxt,opt,by), 360);
+  }
+  // 無人要 → 流轉
   scheduleAiChain();
 }
+function onChi(seat, arrOrObj, by){
+  const arr = Array.isArray(arrOrObj)? arrOrObj : arrOrObj;
+  const p = G.players.get(seat);
+  // 從手牌移除另外兩張
+  const last = G.lastDiscard;
+  const need = arr.filter(t=>t!==last);
+  need.forEach(t=>{ const i=p.hand.indexOf(t); if(i>=0) p.hand.splice(i,1); });
+  p.melds.push(arr.slice());
+  G.lastDiscard=null; G.lastDiscarter=null;
+  G.turn = seat; G.needDraw=false;
+  log(p.name,'吃 '+arr.join(''));
+  SFX.meld();
+  renderAll(); enableActionsForYou();
+}
+function canPengBy(p, tile){ return p.hand.filter(x=>x===tile).length>=2; }
+function onPeng(seat, tile, by){
+  const p = G.players.get(seat);
+  let cnt=0, keep=[]; for(const t of p.hand){ if(t===tile && cnt<2){ cnt++; } else keep.push(t); }
+  p.hand = keep; p.melds.push([tile,tile,tile]);
+  G.lastDiscard=null; G.lastDiscarter=null;
+  G.turn = seat; G.needDraw=false;
+  log(p.name,'碰 '+tile);
+  SFX.meld();
+  renderAll(); scheduleAiChainIfAI(seat);
+}
+function canMeldGang(p, tile){ return p.hand.filter(x=>x===tile).length>=3; }
+function onMeldGang(seat, tile, by){
+  const p = G.players.get(seat);
+  // 從手牌移除三張
+  for(let k=0;k<3;k++){ const i=p.hand.indexOf(tile); if(i>=0) p.hand.splice(i,1); }
+  p.melds.push([tile,tile,tile,tile]);
+  G.lastDiscard=null; G.lastDiscarter=null;
+  // 槓後補摸
+  if(G.deck.length){ p.hand.push(G.deck.pop()); }
+  G.turn = seat; G.needDraw=false;
+  log(p.name,'明槓 '+tile);
+  SFX.meld();
+  renderAll(); scheduleAiChainIfAI(seat);
+}
+function canHuByDiscard(p, tile){
+  const h = p.hand.slice(); h.push(tile);
+  return canHuFull(h);
+}
+function onHuBy(seat, tile, by){
+  const p = G.players.get(seat);
+  const h = p.hand.slice(); h.push(tile);
+  if(!canHuFull(h)) return scheduleAiChain();
+  log(p.name,'胡了（吃胡 '+tile+'）！');
+  SFX.hu(); fireworks();
+  G.phase='end';
+  alert(p.name+' 胡了！');
+}
+
+function scheduleAiChainIfAI(seat){
+  if(seat==='東'){ enableActionsForYou(); }
+  else { scheduleAiChain(); }
+}
+
+/* === AI === */
 function scheduleAiChain(){
   if(G.timer) { clearTimeout(G.timer); G.timer=null; }
   if(G.turn !== '東' && G.phase==='playing'){
@@ -288,94 +490,251 @@ function aiTurn(){
   const p = G.players.get(G.turn);
   if(G.needDraw && G.deck.length){
     p.hand.push(G.deck.pop());
-    p.remain = p.hand.length;
     G.needDraw = false;
+    SFX.draw();
   }
-  // 簡單 AI：打第一張非字牌，否則打第一張
+  // 簡易：若可暗槓先暗槓，否則打第一張非字
+  const counts = countTiles(p.hand);
+  for(const [t,c] of counts){
+    if(c===4){ // 暗槓
+      p.hand = p.hand.filter(x=>x!==t);
+      p.melds.push([t,t,t,t]);
+      log(p.name,'暗槓 '+t);
+      SFX.meld();
+      if(G.deck.length){ p.hand.push(G.deck.pop()); }
+      renderAll();
+      return scheduleAiChain();
+    }
+  }
   let idx = p.hand.findIndex(t=>!/東|南|西|北|中|發|白/.test(t));
   if(idx<0) idx=0;
   const t = p.hand.splice(idx,1)[0];
   p.disc.push(t);
   G.lastDiscard = t; G.lastDiscarter = p.seat;
   log(p.name,'打出 '+t);
+  SFX.discard();
   G.turn = nextSeat(G.turn);
-  G.needDraw = true; // 下一家須摸
+  G.needDraw = true;
   renderAll();
-  // 若下一位仍非東家，持續串連 AI；否則換你且可反應/摸牌
-  scheduleAiChain();
+  resolveClaimsAfterDiscard();
 }
-/* 動作 */
-$('#act-pass').addEventListener('click',()=>{
-  if(G.phase!=='playing') return;
-  if(G.turn==='東' && G.needDraw){
-    if(G.deck.length){
-      const you = G.players.get('東');
-      const t = G.deck.pop(); you.hand.push(t); you.remain = you.hand.length;
-      log('你','摸到 '+t);
-      G.needDraw = false;
-      renderAll(); enableActionsForYou();
+
+/* === 判定與工具 === */
+function countTiles(arr){
+  const m = new Map();
+  for(const t of arr) m.set(t,(m.get(t)||0)+1);
+  return m;
+}
+function chiOptions(hand, last){
+  if(!/萬|筒|條/.test(last)) return [];
+  const suit = last.slice(1), x = parseInt(last);
+  const have = new Set(hand.filter(t=> t.slice(1)===suit).map(t=> parseInt(t)));
+  const opts = [];
+  const need = (a,b)=> have.has(a) && have.has(b);
+  if(need(x-2,x-1) && x-2>=1) opts.push([`${x-2}${suit}`,`${x-1}${suit}`, last]);
+  if(need(x-1,x+1) && x-1>=1 && x+1<=9) opts.push([`${x-1}${suit}`, last, `${x+1}${suit}`]);
+  if(need(x+1,x+2) && x+2<=9) opts.push([ last, `${x+1}${suit}`, `${x+2}${suit}`]);
+  return opts;
+}
+// 胡牌
+function canHuFull(hand){
+  if(canSevenPairs(hand)) return true;
+  if(hand.length % 3 !== 2) return false;
+  const counts = toCounts(hand);
+  const tiles = Array.from(counts.keys()).sort(tileOrder);
+  for(const t of tiles){
+    if(counts.get(t)>=2){
+      counts.set(t, counts.get(t)-2);
+      if(canAllMelds(counts)) return true;
+      counts.set(t, counts.get(t)+2);
     }
-  }else{
-    // 對別人牌選擇過
-    G.lastDiscard=null; G.lastDiscarter=null;
-    enableActionsForYou();
   }
+  return false;
+}
+function canSevenPairs(hand){
+  const m = countTiles(hand);
+  if(hand.length%2!==0) return false;
+  let pairs = 0;
+  for(const v of m.values()){ if(v!==2 && v!==4) return false; pairs += Math.floor(v/2); }
+  return pairs>=7;
+}
+function toCounts(arr){
+  const m = new Map();
+  for(const t of arr) m.set(t,(m.get(t)||0)+1);
+  return m;
+}
+function tileOrder(a,b){
+  const rank = t=>{
+    if(/萬/.test(t)) return 100 + parseInt(t);
+    if(/筒/.test(t)) return 200 + parseInt(t);
+    if(/條/.test(t)) return 300 + parseInt(t);
+    if(t==='東') return 401; if(t==='南') return 402; if(t==='西') return 403; if(t==='北') return 404;
+    if(t==='中') return 405; if(t==='發') return 406; if(t==='白') return 407;
+    return 999;
+  };
+  return rank(a)-rank(b);
+}
+function cloneCounts(m){ const n=new Map(); for(const [k,v] of m) n.set(k,v); return n; }
+function canAllMelds(counts){
+  let left = 0; for(const v of counts.values()) left += v;
+  if(left===0) return true;
+  let first=null;
+  for(const [k,v] of counts){ if(v>0){ first=k; break; } }
+  if(!first) return true;
+  if(counts.get(first)>=3){
+    const m = cloneCounts(counts);
+    m.set(first, m.get(first)-3);
+    if(canAllMelds(m)) return true;
+  }
+  if(/萬|筒|條/.test(first)){
+    const suit = first.slice(1);
+    const n = parseInt(first);
+    const a = `${n+1}${suit}`, b = `${n+2}${suit}`;
+    if(n<=7 && counts.get(a)>0 && counts.get(b)>0){
+      const m = cloneCounts(counts);
+      m.set(first, m.get(first)-1);
+      m.set(a, m.get(a)-1);
+      m.set(b, m.get(b)-1);
+      if(canAllMelds(m)) return true;
+    }
+  }
+  return false;
+}
+
+/* === 互動：吃 / 槓 / 聽 / 過 / 碰 / 胡（自回合） === */
+function showOptions(title, options, onPick){
+  const modal = $('#modal');
+  $('#modalTitle').textContent = title;
+  const body = $('#modalBody'); body.innerHTML='';
+  options.forEach(opt=>{
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.textContent = typeof opt==='string'? opt : (opt.label || JSON.stringify(opt));
+    d.addEventListener('click', ()=>{ modal.style.display='none'; onPick(opt); }, {once:true});
+    body.appendChild(d);
+  });
+  modal.style.display='flex';
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.style.display='none'; }, {once:true});
+}
+$('#act-chi').addEventListener('click', ()=>{
+  const last = G.lastDiscard, discarter=G.lastDiscarter;
+  if(!last || discarter!==prevSeat('東')) return;
+  const you = G.players.get('東');
+  const opts = chiOptions(you.hand, last);
+  if(opts.length===0) return;
+  showOptions('選擇要吃的組合', opts.map(a=>({arr:a, label:a.join(' ')})), (opt)=>{
+    const need = opt.arr.filter(t=>t!==last);
+    for(const t of need){ const i = you.hand.indexOf(t); if(i>=0) you.hand.splice(i,1); }
+    you.melds.push(opt.arr.slice());
+    G.lastDiscard=null; G.lastDiscarter=null;
+    G.turn='東'; G.needDraw=false;
+    log('你','吃 '+opt.arr.join(''));
+    SFX.meld();
+    renderAll(); enableActionsForYou();
+  });
 });
 $('#act-peng').addEventListener('click',()=>{
-  if(G.phase!=='playing') return;
   const last = G.lastDiscard; if(!last) return;
   const you = G.players.get('東');
   let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<2){ cnt++; } else keep.push(t); }
   if(cnt===2){
     you.hand = keep;
     you.melds.push([last,last,last]);
-    log('你','碰 '+last);
+    log('你','碰 '+last); SFX.meld();
     G.turn='東'; G.needDraw=false; G.lastDiscard=null;
     renderAll(); enableActionsForYou();
   }
 });
 $('#act-gang').addEventListener('click',()=>{
-  if(G.phase!=='playing') return;
-  const last = G.lastDiscard; if(!last) return;
-  const you = G.players.get('東');
-  let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<3){ cnt++; } else keep.push(t); }
-  if(cnt===3){
-    you.hand = keep;
-    you.melds.push([last,last,last,last]);
-    log('你','槓 '+last);
-    if(G.deck.length){
-      const t = G.deck.pop(); you.hand.push(t); you.remain = you.hand.length;
-      log('你','補摸 '+t);
+  const opts = gangOptionsForYou();
+  if(opts.length===0) return;
+  showOptions('選擇要槓的方式', opts, (opt)=>{
+    const you = G.players.get('東');
+    if(opt.type==='meld'){
+      for(let k=0;k<3;k++){ const i=you.hand.indexOf(opt.tile); if(i>=0) you.hand.splice(i,1); }
+      you.melds.push([opt.tile,opt.tile,opt.tile,opt.tile]);
+      G.lastDiscard=null; G.lastDiscarter=null;
+      log('你','明槓 '+opt.tile);
+    }else if(opt.type==='conceal'){
+      you.hand = you.hand.filter(x=>x!==opt.tile);
+      you.melds.push([opt.tile,opt.tile,opt.tile,opt.tile]);
+      log('你','暗槓 '+opt.tile);
+    }else if(opt.type==='add'){
+      const m = you.melds.find(m=> m.length===3 && m[0]===opt.tile);
+      if(m){ m.push(opt.tile); const i=you.hand.indexOf(opt.tile); if(i>=0) you.hand.splice(i,1); }
+      log('你','加槓 '+opt.tile);
     }
-    G.turn='東'; G.needDraw=false; G.lastDiscard=null;
+    SFX.meld();
+    if(G.deck.length){ const t = G.deck.pop(); you.hand.push(t); log('你','補摸 '+t); }
+    G.turn='東'; G.needDraw=false;
     renderAll(); enableActionsForYou();
+  });
+});
+function gangOptionsForYou(){
+  const you = G.players.get('東');
+  const res = [];
+  const last = G.lastDiscard, discarter = G.lastDiscarter;
+  if(last && discarter && discarter!=='東'){
+    const cnt = you.hand.filter(x=>x===last).length;
+    if(cnt>=3) res.push({type:'meld', tile:last, from:discarter, label:`明槓 ${last}（吃別人）`});
+  }
+  const counts = countTiles(you.hand);
+  for(const [t,c] of counts) if(c===4) res.push({type:'conceal', tile:t, label:`暗槓 ${t}`});
+  for(const m of you.melds){
+    if(m.length===3 && m.every(x=>x===m[0]) && you.hand.includes(m[0])) res.push({type:'add', tile:m[0], label:`加槓 ${m[0]}`});
+  }
+  return res;
+}
+$('#act-ting').addEventListener('click',()=>{
+  const you = G.players.get('東');
+  const waits = calcWaits(you.hand);
+  $('#hint').textContent = waits.length? ('聽：'+waits.join('、')) : '目前無聽牌';
+  SFX.click();
+});
+$('#act-pass').addEventListener('click',()=>{
+  if(G.phase!=='playing') return;
+  if(G.turn==='東' && G.needDraw){
+    if(G.deck.length){
+      const you = G.players.get('東');
+      const t = G.deck.pop(); you.hand.push(t);
+      log('你','摸到 '+t); SFX.draw();
+      G.needDraw = false;
+      renderAll(); enableActionsForYou();
+    }
+  }else{
+    G.lastDiscard=null; G.lastDiscarter=null;
+    scheduleAiChain();
   }
 });
 $('#act-hu').addEventListener('click',()=>{
-  if(G.phase!=='playing') return;
   const you = G.players.get('東');
-  if(canSevenPairs(you.hand)){
-    log('你','胡了！（七對 判定）');
-    alert('恭喜自摸（七對）！本示範為簡化規則。');
-    G.phase='end';
+  if(canHuFull(you.hand)){
+    log('你','自摸胡了！'); SFX.hu(); fireworks();
+    G.phase='end'; alert('恭喜自摸胡！'); 
   }
 });
-function canSevenPairs(hand){
-  const map = new Map();
-  hand.forEach(t=> map.set(t, (map.get(t)||0)+1));
-  let pairs=0; for(const v of map.values()){ if(v%2!==0) return false; pairs += v/2; }
-  return pairs>=7 && (hand.length%2===0);
+function calcWaits(hand){
+  const kinds = new Set();
+  for(const [s,_] of SUITS) for(let n=1;n<=9;n++) kinds.add(`${n}${s}`);
+  HONORS.forEach(h=>kinds.add(h));
+  const res = [];
+  for(const t of kinds){
+    const h = hand.slice(); h.push(t);
+    if(canHuFull(h)) res.push(t);
+  }
+  return res;
 }
+
 /* 新局 */
 $('#btn-new').addEventListener('click', ()=> { setup(); });
 window.addEventListener('resize', ()=>{ fitTilesToHand(); });
 
-// 初始渲染（未開局）
+// 初始
 (function init(){
   $('#log').innerHTML='';
   $('#hand').innerHTML='';
   $('#players').innerHTML='';
-  log('系統','點「開始新局」試玩。此引擎為概念版：支援摸／打、AI 串連出牌，「碰」「槓」「七對自摸」。');
+  log('系統','點「開始新局」試玩。含：優先權（胡>槓>碰>吃）、AI 串連、三種槓、吃碰、一般胡/七對、聽牌提示、音效與胡牌特效。');
   fitTilesToHand();
 })();
 </script>
