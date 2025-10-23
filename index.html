@@ -1640,6 +1640,57 @@ button:active:not(:disabled) {
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.12 — robust portrait hand move, horizontal list; landscape unchanged (OK)
+   ========================= */
+
+/* LANDSCAPE stays the OK variant from v2.11 */
+@media (orientation: landscape) and (max-width: 1024px) {
+  .center-area .hand-tiles .tile {
+    min-width: 34px !important; width: 34px !important; height: 46px !important; font-size: 15px !important;
+  }
+  .mahjong-table { grid-template-rows: 44px 1fr 44px !important; }
+  .controls-section {
+    position: fixed !important; left: 0; right: 0; bottom: 0 !important;
+    padding: 4px 6px calc(6px + env(safe-area-inset-bottom)) !important;
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.85)) !important;
+    z-index: 700 !important; transform: translateZ(0);
+  }
+  .meld-area.meld-bottom { display:flex !important; min-height:42px !important; overflow:visible !important; }
+}
+
+/* PORTRAIT: hand block lives under bottom-area and is horizontal */
+@media (max-width: 768px) and (orientation: portrait) {
+  body.portrait-hand-moved .hand-block .hand-tiles,
+  body.portrait-hand-moved .hand-block [id="yourHand"] {
+    display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important;
+    gap:4px; overflow-x:auto !important; overflow-y:hidden !important; -webkit-overflow-scrolling:touch;
+  }
+  body.portrait-hand-moved .hand-block .hand-tiles::-webkit-scrollbar,
+  body.portrait-hand-moved .hand-block [id="yourHand"]::-webkit-scrollbar { display:none; }
+  body.portrait-hand-moved .hand-block .tile {
+    min-width:31px; width:31px; height:44px; font-size:14px;
+  }
+  /* keep controls fixed bottom (same look as landscape) */
+  .controls-section {
+    position:fixed !important; left:0; right:0; bottom:0 !important;
+    padding:4px 6px calc(6px + env(safe-area-inset-bottom)) !important;
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.92)) !important;
+    z-index:700 !important; transform:translateZ(0);
+  }
+  /* ensure there is spacing below hand to avoid being covered by controls */
+  body.portrait-hand-moved .hand-block { 
+    margin-bottom: calc((var(--ctrlH-runtime, 88px)) + env(safe-area-inset-bottom));
+  }
+  /* bottom-area two columns layout stays */
+  .bottom-area {
+    display:grid; grid-template-columns:92px 1fr; column-gap:8px; align-items:center;
+  }
+  .meld-bottom, .discard-bottom { height:32px !important; }
+}
+
 </style>
 </head>
 <body>
@@ -4486,6 +4537,58 @@ startNewHand(true);
   ['load','resize','orientationchange'].forEach(function(e){
     window.addEventListener(e, update, {passive:true});
   });
+  setTimeout(update, 60);
+  setTimeout(update, 300);
+})();
+</script>
+
+<script>
+// v2.12: find and move the real hand block (.center-mid) under .bottom-area on portrait.
+(function(){
+  var placeholder = null, moved = false;
+
+  function getHandBlock(){
+    // Prefer .center-mid (hand section) under .center-area
+    var block = document.querySelector('.center-area .center-mid');
+    if (!block){
+      // fallback: parent of #yourHand, or the element that contains the hand-tiles
+      var h = document.getElementById('yourHand') || document.querySelector('.center-area .hand-tiles');
+      if (h) block = h.closest('.center-mid') || h.parentElement;
+    }
+    if (block) block.classList.add('hand-block');
+    return block;
+  }
+  function getBottomArea(){ return document.querySelector('.bottom-area'); }
+
+  function movePortrait(){
+    var hb = getHandBlock(), ba = getBottomArea();
+    if (!hb || !ba) return;
+    if (!placeholder){
+      placeholder = document.createElement('div');
+      placeholder.id = 'hand-placeholder';
+      hb.after(placeholder);
+    }
+    if (!moved){
+      ba.after(hb);
+      document.body.classList.add('portrait-hand-moved');
+      moved = true;
+    }
+  }
+  function restoreLandscape(){
+    if (!moved || !placeholder) return;
+    var hb = document.querySelector('.hand-block');
+    if (hb && placeholder.parentElement) { placeholder.after(hb); }
+    document.body.classList.remove('portrait-hand-moved');
+    moved = false;
+  }
+  function update(){
+    var isPortrait = window.matchMedia('(orientation: portrait)').matches && window.innerWidth <= 768;
+    if (isPortrait) movePortrait(); else restoreLandscape();
+    // update runtime control height to keep spacing correct
+    var cs = document.querySelector('.controls-section');
+    if (cs) document.documentElement.style.setProperty('--ctrlH-runtime', (cs.offsetHeight||0) + 'px');
+  }
+  ['load','resize','orientationchange'].forEach(function(ev){ window.addEventListener(ev, update, {passive:true}); });
   setTimeout(update, 60);
   setTimeout(update, 300);
 })();
