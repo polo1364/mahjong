@@ -1723,6 +1723,45 @@ button:active:not(:disabled) {
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.9 — Portrait horizontal hand; Landscape controls tighter bottom
+   ========================= */
+
+/* PORTRAIT: hand tiles must be horizontal (scrollable if overflow) */
+@media (max-width: 768px) and (orientation: portrait) {
+  body.portrait-hand-moved .hand-block { width: 100%; }
+  body.portrait-hand-moved .hand-block .hand-tiles {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  body.portrait-hand-moved .hand-block .hand-tiles::-webkit-scrollbar { display: none; } /* WebKit */
+  /* Keep tiles readable */
+  body.portrait-hand-moved .hand-block .hand-tiles .tile {
+    min-width: 31px; width: 31px; height: 44px; font-size: 14px;
+  }
+}
+
+/* LANDSCAPE: reaction buttons (controls) hug the very bottom */
+@media (orientation: landscape) and (max-width: 1024px) {
+  .controls-section {
+    position: fixed !important;
+    inset-inline: 0 !important;
+    bottom: 0 !important;
+    padding: 0 4px calc(env(safe-area-inset-bottom) + 1px) !important;
+    background: linear-gradient(180deg, rgba(0,40,85,.3), rgba(0,40,85,.8)) !important;
+  }
+  #controls { margin: 0 !important; }
+}
+
 </style>
 </head>
 <body>
