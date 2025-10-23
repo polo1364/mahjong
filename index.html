@@ -1687,6 +1687,42 @@ button:active:not(:disabled) {
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.8 — Portrait: move hand below bottom player (DOM reflow)
+   ========================= */
+
+/* Only affects portrait */
+@media (max-width: 768px) and (orientation: portrait) {
+  body.portrait-hand-moved .bottom-area {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    column-gap: 8px; align-items: center;
+    min-height: 48px;
+    margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI, 0px) + env(safe-area-inset-bottom));
+  }
+  body.portrait-hand-moved .bottom-area .player-info-inline {
+    grid-column: 1; transform: scale(.92); transform-origin: left bottom;
+  }
+  body.portrait-hand-moved .bottom-area .meld-bottom,
+  body.portrait-hand-moved .bottom-area .discard-bottom {
+    grid-column: 2; height: 32px !important;
+  }
+  /* hand block now lives after bottom-area: give it some spacing */
+  body.portrait-hand-moved .hand-block {
+    margin-top: 8px;
+    padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI, 0px) + env(safe-area-inset-bottom));
+  }
+}
+
+/* Landscape: make controls hug the bottom a bit more */
+@media (orientation: landscape) and (max-width: 1024px) {
+  .controls-section {
+    padding: 2px 4px calc(2px + env(safe-area-inset-bottom));
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4521,6 +4557,70 @@ startNewHand(true);
   });
   setTimeout(updateAll, 60);
   setTimeout(updateAll, 300);
+})();
+</script>
+
+<script>
+// v2.8: Move the hand block below the bottom-area in portrait only.
+(function(){
+  var placeholder = null;
+  var moved = false;
+  function findHandBlock(){
+    // Try to locate the block that contains the hand tiles and the "你的手牌" title
+    var el = document.querySelector('.center-area .hand-tiles');
+    if (!el) return null;
+    // climb to a reasonable container (stop at .center-area)
+    var cur = el;
+    while (cur && cur.parentElement && !cur.classList.contains('center-area')) {
+      // Prefer a container whose class contains 'hand' or has role-like semantics
+      var cls = (cur.className || '').toString();
+      if (cls.match(/hand|your-hand|player-hand|tiles-wrap/i)) break;
+      cur = cur.parentElement;
+    }
+    if (!cur || cur.classList.contains('center-area')) {
+      // fallback: the immediate parent of .hand-tiles
+      cur = el.parentElement || el;
+    }
+    cur.classList.add('hand-block');
+    return cur;
+  }
+  function moveForPortrait(){
+    var hand = findHandBlock();
+    var bottom = document.querySelector('.bottom-area');
+    if (!hand || !bottom) return;
+    if (!placeholder){
+      placeholder = document.createElement('div');
+      placeholder.id = 'hand-placeholder';
+      hand.parentElement.insertBefore(placeholder, hand.nextSibling);
+    }
+    // Move only if not already moved
+    if (!moved){
+      bottom.parentElement.insertBefore(hand, bottom.nextSibling);
+      document.body.classList.add('portrait-hand-moved');
+      moved = true;
+    }
+  }
+  function restoreForLandscape(){
+    var hand = document.querySelector('.hand-block');
+    if (!hand || !placeholder) return;
+    if (moved){
+      placeholder.parentElement.insertBefore(hand, placeholder);
+      document.body.classList.remove('portrait-hand-moved');
+      moved = false;
+    }
+  }
+  function update(){
+    var isPortrait = window.matchMedia('(orientation: portrait)').matches && window.innerWidth <= 768;
+    if (isPortrait) moveForPortrait(); else restoreForLandscape();
+    // Update control bar height variable for spacing
+    var cs = document.querySelector('.controls-section');
+    if (cs) document.documentElement.style.setProperty('--ctrlH-runtime', (cs.offsetHeight||0) + 'px');
+  }
+  ['load','resize','orientationchange'].forEach(function(evt){
+    window.addEventListener(evt, update, {passive:true});
+  });
+  setTimeout(update, 60);
+  setTimeout(update, 300);
 })();
 </script>
 </body>
