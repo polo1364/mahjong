@@ -1,287 +1,358 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>麻將｜直式手機堆疊版（全新佈局）</title>
-  <meta name="color-scheme" content="dark">
-  <style>
-    :root{
-      --safeT: env(safe-area-inset-top);
-      --safeB: env(safe-area-inset-bottom);
-      --bg: #062a55;
-      --panel: #0a3b75;
-      --panel-2: #0b3a6a;
-      --muted: #8aa7c7;
-      --acc: #8fe06b;
-      --warn: #ffd05e;
-      --tileW: clamp(28px, 8.8vw, 44px);
-      --tileH: calc(var(--tileW) * 1.4);
-      --radius: 12px;
-      --gap: 10px;
-      --shadow: 0 4px 16px rgba(0,0,0,.18);
-      --btnH: 44px;
-      --ctrlH: 92px;
-      --font: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
-    }
-    *{ box-sizing: border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0; background: radial-gradient(120% 90% at 50% 0%, #0a3b75 0%, #062a55 60%, #052349 100%);
-      color:#eaf3ff; font-family: var(--font);
-      overscroll-behavior-y: none;
-    }
-    .landscape-gate{ display:none; position:fixed; inset:0; background:#031a36; color:#bcd3ef; align-items:center; justify-content:center; font-size:15px; z-index:2000; }
-    @media (orientation:landscape){
-      .landscape-gate{ display:flex; }
-      #app{ filter: blur(2px); pointer-events:none; }
-    }
-    #app{ min-height:100%; padding: calc(var(--safeT) + 6px) 10px calc(var(--ctrlH) + var(--safeB) + 12px); }
-    .row{ display:grid; gap: var(--gap); }
-    .grid-2{ grid-template-columns: 1fr 38%; align-items: start; }
-    @media (max-width:360px){ .grid-2{ grid-template-columns: 1fr 40%; } }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.06);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 10px;
-    }
-    .card-title{
-      display:flex; align-items:center; gap:8px; margin-bottom:6px;
-      font-size:13px; letter-spacing:.6px; color: var(--acc); font-weight:600;
-    }
-    .chip{ font-size:11px; padding:3px 8px; border-radius:999px; background:rgba(255,255,255,.08); color:#cfe5ff; }
-    .muted{ color:var(--muted); }
-    .mono{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
-    .log{ max-height: 126px; overflow:auto; border-radius: 8px; background: rgba(0,0,0,.18); padding:8px; }
-    .log-item{ display:flex; align-items:center; gap:6px; padding:3px 0; font-size:13px; }
-    .log-item .tag{ font-size:11px; padding:1px 6px; border-radius:6px; background: rgba(255,255,255,.08); color:#dff0ff; }
-    .round{ display:grid; gap:6px; }
-    .round .rowline{ display:flex; flex-wrap:wrap; gap:6px; }
-    .badge{ background:#0f4b91; color:#e7f4ff; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.08); }
-    .hand{ display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding:6px 4px; scroll-snap-type: x mandatory; background: rgba(255,255,255,.04); border-radius: 10px; }
-    .hand::-webkit-scrollbar{ display:none; }
-    .tile{
-      width: var(--tileW); height: var(--tileH);
-      background:linear-gradient(180deg, #ffffff, #f2f6ff);
-      border-radius: 6px; color:#102a5e; display:flex; align-items:center; justify-content:center;
-      font-weight:700; font-size: calc(var(--tileW) * .9 * .4 + 9px);
-      box-shadow: 0 1px 0 rgba(0,0,0,.35), 0 6px 10px rgba(0,0,0,.15);
-      border:1px solid #d8e6ff;
-      user-select:none;
-      scroll-snap-align: start;
-      position:relative;
-    }
-    .tile.suit-wan{ color:#e14b4b; }
-    .tile.suit-tong{ color:#1976d2; }
-    .tile.suit-tiao{ color:#2eb972; }
-    .tile.suit-zhong{ color:#e14b4b; }
-    .tile.suit-fa{ color:#1aa563; }
-    .tile.suit-bai{ color:#777; }
-    .tile.active{ outline:3px solid #ffce66; }
-    .tile.small{ transform: scale(.92); transform-origin: bottom center; }
-    .players{ display:grid; gap:12px; }
-    .player{ padding:10px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.06); box-shadow: var(--shadow); }
-    .player-head{ display:flex; align-items:center; justify-content:space-between; gap:6px; }
-    .p-meta{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .seat{ background:#164b9a; color:#fff; border-radius:10px; padding:3px 8px; font-weight:700; }
-    .banker{ background:#f5c04b; color:#402; border-radius:8px; padding:1px 6px; font-weight:800; }
-    .pile{ display:grid; gap:6px; margin-top:8px; }
-    .pile .title{ font-size:12px; color:#9ec3ff; margin: 2px 0 4px 2px; }
-    .pile .rack{ display:flex; flex-wrap:wrap; gap:6px; min-height: var(--tileH); padding-bottom:2px; }
-    .controls{ position:fixed; left:0; right:0; bottom:0; z-index:1000; background: linear-gradient(180deg, rgba(0,30,80,.1), rgba(0,30,80,.95)); padding: 8px 10px calc(8px + var(--safeB)); border-top: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(8px); }
-    .ctrl-row{ display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-    .btn{ height: var(--btnH); padding: 0 14px; background: #0e4fa1; color:#eaf3ff; border:1px solid rgba(255,255,255,.14); border-radius: 12px; box-shadow: var(--shadow); font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; user-select:none; }
-    .btn.warn{ background:#f1b93f; color:#2a1a00; border-color:#f7d37f; }
-    .btn.ghost{ background: rgba(255,255,255,.06); color:#dfeeff; }
-    .btn:disabled{ opacity:.45; filter: grayscale(.3); }
-    .topbar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
-    .chip-pill{ background:#0b447f; border:1px solid rgba(255,255,255,.12); border-radius:1000px; color:#e5f0ff; padding:8px 12px; font-size:13px; display:flex; align-items:center; gap:8px; }
-    .topbar .btn-start{ margin-left:auto; }
-    .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip: rect(0 0 0 0); white-space:nowrap; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>麻將｜直式手機（單頁可遊玩・簡化引擎）</title>
+<meta name="color-scheme" content="dark">
+<style>
+:root{
+  --safeT: env(safe-area-inset-top);
+  --safeB: env(safe-area-inset-bottom);
+  --gap: 8px;
+  --radius: 10px;
+  --shadow: 0 4px 14px rgba(0,0,0,.18);
+  --tileW: clamp(18px, 5.8vw, 28px);
+  --tileH: calc(var(--tileW) * 1.35);
+  --miniW: calc(var(--tileW) * .86);
+  --miniH: calc(var(--tileH) * .86);
+  --font: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --bg1: #062a55; --bg2:#0a3b75;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{ margin:0; font-family:var(--font); color:#eaf3ff;
+  background: radial-gradient(120% 90% at 50% 0%, var(--bg2) 0%, var(--bg1) 60%, #041e3c 100%);}
+#app{ min-height:100vh; padding: calc(var(--safeT) + 6px) 8px calc(var(--safeB) + 8px);
+  display:grid; gap: var(--gap); grid-template-rows: auto auto auto auto 1fr; }
+.card{ background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px; }
+.card-title{font-size:12px;color:#8fe06b;margin-bottom:6px;font-weight:700;letter-spacing:.5px}
+.topbar{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.pill{background:#0b447f;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-size:12px}
+.btn{border-radius:999px;border:1px solid rgba(255,255,255,.16);padding:8px 12px;background:#f1b93f;color:#261a00;font-weight:800}
+.dual{display:grid;grid-template-columns: 1fr 42%; gap: var(--gap)}
+@media (max-width:360px){ .dual{ grid-template-columns: 1fr 44%; } }
+.log{max-height:92px;overflow:auto;border-radius:8px;background:rgba(0,0,0,.18);padding:6px}
+.log-item{display:flex;gap:6px;font-size:12px;padding:2px 0}
+.log-item .tag{background:rgba(255,255,255,.08);border-radius:6px;padding:0 6px;font-size:11px}
+.round{display:grid;gap:6px}
+.rowline{display:flex;flex-wrap:wrap;gap:6px}
+.badge{background:#0f4b91;color:#e7f4ff;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid rgba(255,255,255,.08)}
+.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:space-between}
+.actions .abtn{flex:1 1 auto;text-align:center;background:#0e4fa1;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 0;font-size:13px;font-weight:800}
+.actions .abtn.primary{background:#f1b93f;color:#2a1a00}
+.actions .abtn[disabled]{opacity:.45}
+.hand{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px;background:rgba(255,255,255,.04);border-radius:10px}
+.hand::-webkit-scrollbar{display:none}
+.tile{
+  width:var(--tileW);height:var(--tileH);
+  background:linear-gradient(180deg,#fff,#f2f6ff);color:#0e2a66;border:1px solid #d8e6ff;
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size: calc(var(--tileW)*.4 + 8px);
+  user-select:none;box-shadow:0 1px 0 rgba(0,0,0,.35),0 6px 10px rgba(0,0,0,.15);
+  cursor:pointer; position:relative;
+}
+.tile.selected{ outline:3px solid #ffd05e; }
+.tile.w{color:#e14b4b}.tile.t{color:#1976d2}.tile.s{color:#2eb972}.tile.z{color:#e14b4b}.tile.f{color:#1aa563}.tile.b{color:#777}
+.players{display:grid;gap:6px}
+.player{display:grid;gap:4px;padding:6px 8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06)}
+.phead{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seat{background:#164b9a;border-radius:8px;padding:2px 6px;font-weight:800}
+.banker{background:#f5c04b;color:#402;border-radius:6px;padding:0 6px;font-weight:900}
+.mono{font-variant-numeric:tabular-nums}
+.piles{display:grid;gap:3px}
+.piles .row{display:flex;gap:4px;flex-wrap:nowrap;overflow:hidden}
+.mini{width:var(--miniW);height:var(--miniH);font-size: calc(var(--miniW)*.4 + 6px)}
+.small{font-size:11px;color:#9ec3ff}
+.hint{font-size:11px;color:#9ec3ff;margin-top:4px}
+</style>
 </head>
 <body>
-  <div class="landscape-gate">此頁為直式手機專用，請旋轉為直式以獲得最佳體驗。</div>
-  <main id="app">
-    <div class="topbar">
-      <div class="chip-pill">台灣 16 張麻將（單機）</div>
-      <div class="chip-pill">啟用金牌：<span id="opt-gold">✔</span></div>
-      <div class="chip-pill">底 2000／每台 1000</div>
-      <button class="btn warn btn-start" id="btn-new">開始新局</button>
+<main id="app">
+  <section class="card topbar">
+    <div class="pill">台灣 16 張麻將（簡化引擎示範）</div>
+    <div class="pill">底 2000／每台 1000</div>
+    <button class="btn" id="btn-new">開始新局</button>
+  </section>
+  <section class="dual">
+    <div class="card">
+      <div class="card-title">戰況</div>
+      <div class="log" id="log"></div>
     </div>
-    <div class="row grid-2">
-      <section class="card">
-        <div class="card-title">戰況</div>
-        <div class="log" id="log"></div>
-      </section>
-      <aside class="card">
-        <div class="card-title">牌局資訊</div>
-        <div class="round">
-          <div class="rowline">
-            <div class="badge">場風：<span id="round-wind">東</span></div>
-            <div class="badge">圈數：<span id="round-idx">1</span></div>
-            <div class="badge">莊家：<span id="round-banker">東</span></div>
-          </div>
-          <div class="rowline">
-            <div class="badge">剩餘：<span id="tiles-left">70</span> 張</div>
-            <div class="badge">金牌：<span id="gold-tile">無</span></div>
-          </div>
-          <div class="rowline">
-            <div class="badge">骰子：<span id="dice">3＋4</span></div>
-          </div>
+    <aside class="card">
+      <div class="card-title">牌局資訊</div>
+      <div class="round">
+        <div class="rowline">
+          <div class="badge">場風：<span id="R_wind">東</span></div>
+          <div class="badge">圈數：<span id="R_round">1</span></div>
+          <div class="badge">莊家：<span id="R_banker">東</span></div>
         </div>
-      </aside>
-    </div>
-    <section class="card">
-      <div class="card-title">你的手牌</div>
-      <div class="hand" id="hand" aria-label="你的手牌（可左右滑動）"></div>
-    </section>
-    <section class="players" id="players"></section>
-  </main>
-  <footer class="controls" aria-label="行動操作列">
-    <div class="ctrl-row" id="ctrl-actions">
-      <button class="btn warn" data-action="hu">胡牌</button>
-      <button class="btn" data-action="chi">吃</button>
-      <button class="btn" data-action="peng">碰</button>
-      <button class="btn" data-action="gang">槓</button>
-      <button class="btn ghost" data-action="ting">聽</button>
-      <button class="btn ghost" data-action="pass">過</button>
-    </div>
-  </footer>
-  <script>
-  ;(function(){
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-    const suitClass = (t)=>{
-      if(/[萬]/.test(t)) return 'suit-wan';
-      if(/[筒]/.test(t)) return 'suit-tong';
-      if(/[條]/.test(t)) return 'suit-tiao';
-      if(/[中]/.test(t)) return 'suit-zhong';
-      if(/[發]/.test(t)) return 'suit-fa';
-      if(/[白]/.test(t)) return 'suit-bai';
-      return '';
-    };
-    function renderTile(txt, small=false){
-      const el = document.createElement('div');
-      el.className = 'tile ' + suitClass(txt) + (small ? ' small' : '');
-      el.textContent = txt;
-      el.setAttribute('role', 'button');
-      el.setAttribute('tabindex', '0');
-      el.dataset.tile = txt;
-      el.addEventListener('click', ()=> MobileUI._onTile && MobileUI._onTile(txt));
-      return el;
-    }
-    function renderLog(items){
-      const log = $('#log'); log.innerHTML = '';
-      items.slice(-20).forEach(it=>{
-        const row = document.createElement('div');
-        row.className = 'log-item';
-        const tag = document.createElement('span'); tag.className='tag'; tag.textContent = it.who;
-        const text = document.createElement('span'); text.textContent = it.msg;
-        row.appendChild(tag); row.appendChild(text);
-        log.appendChild(row);
-      });
-      log.scrollTop = log.scrollHeight;
-    }
-    function renderRound(r){
-      $('#round-wind').textContent = r.wind;
-      $('#round-idx').textContent = r.round;
-      $('#round-banker').textContent = r.banker;
-      $('#tiles-left').textContent = r.left;
-      $('#gold-tile').textContent = r.gold || '無';
-      $('#dice').textContent = r.dice.join('＋');
-    }
-    function renderHand(tiles){
-      const hand = $('#hand'); hand.innerHTML = '';
-      tiles.forEach(t=> hand.appendChild(renderTile(t)));
-    }
-    function playerHeader(p){
-      const wrap = document.createElement('div'); wrap.className='player';
-      const head = document.createElement('div'); head.className='player-head';
-      const meta = document.createElement('div'); meta.className='p-meta';
-      const name = document.createElement('div'); name.className='chip-pill'; name.textContent = p.name || ('玩家 ' + p.seat);
-      const seat = document.createElement('div'); seat.className='seat'; seat.textContent = p.seat;
-      meta.appendChild(name); meta.appendChild(seat);
-      if (p.banker) { const b = document.createElement('div'); b.className='banker'; b.textContent='莊'; meta.appendChild(b); }
-      const stat = document.createElement('div'); stat.className='chip-pill mono'; stat.textContent = '💰 ' + (p.score ?? 0).toLocaleString();
-      const left = document.createElement('div'); left.className='chip-pill mono'; left.textContent = '🀄 ' + (p.tiles ?? 0) + ' 張';
-      head.appendChild(meta); head.appendChild(stat); head.appendChild(left);
-      wrap.appendChild(head);
-      const pile = document.createElement('div'); pile.className='pile';
-      const dTitle = document.createElement('div'); dTitle.className='title'; dTitle.textContent = '捨牌'; pile.appendChild(dTitle);
-      const disc = document.createElement('div'); disc.className='rack';
-      (p.discards || []).forEach(t=> disc.appendChild(renderTile(t, true)));
-      pile.appendChild(disc);
-      const mTitle = document.createElement('div'); mTitle.className='title'; mTitle.textContent = '副露'; pile.appendChild(mTitle);
-      const meld = document.createElement('div'); meld.className='rack';
-      (p.melds || []).forEach(group=>{
-        const g = document.createElement('div'); g.style.display='flex'; g.style.gap='4px';
-        group.forEach(t=> g.appendChild(renderTile(t, true)));
-        meld.appendChild(g);
-      });
-      pile.appendChild(meld);
-      wrap.appendChild(pile);
-      return wrap;
-    }
-    function renderPlayers(list){
-      const root = $('#players'); root.innerHTML='';
-      const order = ['東','南','西','北'];
-      const lookup = new Map(list.map(p=>[p.seat,p]));
-      order.forEach(seat=>{
-        const p = lookup.get(seat); if(!p) return;
-        root.appendChild(playerHeader(p));
-      });
-    }
-    function setActions(actions){
-      $$('#ctrl-actions .btn').forEach(b=>{
-        const a = b.dataset.action;
-        const ena = (actions && a in actions) ? !!actions[a] : true;
-        b.disabled = !ena;
-      });
-    }
-    $('#btn-new').addEventListener('click', ()=>{
-      MobileUI._onNew && MobileUI._onNew();
+        <div class="rowline">
+          <div class="badge">剩餘：<span id="R_left">136</span> 張</div>
+          <div class="badge">金牌：<span id="R_gold">—</span></div>
+        </div>
+        <div class="rowline">
+          <div class="badge">骰子：<span id="R_dice">—</span></div>
+        </div>
+      </div>
+    </aside>
+  </section>
+  <section class="card actions">
+    <button class="abtn primary" id="act-hu" disabled>胡牌</button>
+    <button class="abtn" id="act-chi" disabled>吃</button>
+    <button class="abtn" id="act-peng" disabled>碰</button>
+    <button class="abtn" id="act-gang" disabled>槓</button>
+    <button class="abtn" id="act-ting" disabled>聽</button>
+    <button class="abtn" id="act-pass" disabled>過</button>
+  </section>
+  <section class="card">
+    <div class="card-title">你的手牌</div>
+    <div class="hand" id="hand"></div>
+    <div class="hint" id="hint"></div>
+  </section>
+  <section class="players" id="players"></section>
+</main>
+
+<script>
+/* ========= 簡化引擎（可遊玩但非完整規則） ========= */
+const $ = s => document.querySelector(s);
+const log = (who,msg)=>{
+  const row = document.createElement('div');
+  row.className='log-item';
+  row.innerHTML = `<span class="tag">${who}</span><span>${msg}</span>`;
+  const box = $('#log'); box.appendChild(row); box.scrollTop = box.scrollHeight;
+};
+const tilesAll = (()=>{
+  const arr = [];
+  const suits = [['萬','w'],['筒','t'],['條','s']];
+  for(const [s,_c] of suits){
+    for(let n=1;n<=9;n++){ for(let k=0;k<4;k++) arr.push(`${n}${s}`); }
+  }
+  const honors = ['東','南','西','北','中','發','白'];
+  honors.forEach(h=>{ for(let k=0;k<4;k++) arr.push(h); });
+  return arr; // 136 張
+})();
+function tClass(t){ if(/萬/.test(t))return 'w'; if(/筒/.test(t))return 't'; if(/條/.test(t))return 's';
+  if(t==='中')return 'z'; if(t==='發')return 'f'; if(t==='白')return 'b'; return ''; }
+function tileEl(t, mini=false, clickable=false, onClick=null){
+  const d = document.createElement('div');
+  d.className = 'tile '+tClass(t)+(mini?' mini':'');
+  d.textContent = t;
+  if(clickable){ d.addEventListener('click', onClick); }
+  return d;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()* (i+1))|0; [a[i],a[j]]=[a[j],a[i]];} return a; }
+const order = ['東','南','西','北'];
+const nextSeat = s => order[(order.indexOf(s)+1)%4];
+const prevSeat = s => order[(order.indexOf(s)+3)%4];
+
+const G = {
+  deck:[], turn:'東', lastDiscard:null, lastDiscarter:null,
+  players:new Map(), // seat -> {name, score, hand:[], disc:[], melds:[], banker, remain}
+  needDraw:false, phase:'idle'
+};
+function setup(){
+  G.deck = shuffle(tilesAll.slice());
+  G.turn = '東';
+  G.lastDiscard = null; G.lastDiscarter=null;
+  G.players = new Map();
+  order.forEach((s,i)=>{
+    G.players.set(s, { seat:s, name: s==='東'?'你': (s==='南'?'小美': (s==='西'?'阿芬':'建國')), score:100000, hand:[], disc:[], melds:[], banker:(s==='東'), remain:16 });
+  });
+  deal16();
+  G.phase='playing';
+  G.needDraw=false; // 東家 17 張，先打
+  renderAll();
+  log('系統','開局完成，莊家為 東。東家請出牌。');
+  enableActionsForYou();
+}
+function deal16(){
+  // 每家拿 16，莊家多 1（共 17）
+  for(let r=0;r<4;r++){
+    order.forEach(s=>{
+      const p = G.players.get(s);
+      while(p.hand.length < 16){ p.hand.push(G.deck.pop()); }
     });
-    window.MobileUI = {
-      setState(state){
-        if(state.round) renderRound(state.round);
-        if(state.log) renderLog(state.log);
-        if(state.you && state.you.hand) renderHand(state.you.hand);
-        if(state.players) renderPlayers(state.players);
-        if(state.actions) setActions(state.actions);
-      },
-      updateActions: setActions,
-      onTileTap(fn){ this._onTile = fn; },
-      onAction(fn){
-        $$('#ctrl-actions .btn').forEach(b=>{
-          b.onclick = ()=> fn(b.dataset.action);
-        });
-      },
-      onStart(fn){ this._onNew = fn; }
-    };
-    const demo = {
-      round: { wind:'東', round:1, banker:'東', left:54, gold:'8 筒', dice:[3,4] },
-      log: [
-        {who:'系統', msg:'洗牌完成，莊家為 東。'},
-        {who:'你', msg:'摸到 5 筒'},
-        {who:'小美', msg:'打出 9 萬'},
-      ],
-      you: { hand:['1萬','3萬','3萬','4萬','6萬','1筒','2筒','9筒','2條','2條','4條','6條','南','南'] },
-      players: [
-        {seat:'東', name:'你', banker:true, score:100000, tiles:17, discards:['9萬'], melds:[['東','東','東']]},
-        {seat:'南', name:'小美', score:100000, tiles:16, discards:['1條','9筒'], melds:[]},
-        {seat:'西', name:'阿芬', score:100000, tiles:16, discards:['8條'], melds:[['1萬','2萬','3萬']]},
-        {seat:'北', name:'建國', score:100000, tiles:16, discards:['白'], melds:[]},
-      ],
-      actions: {hu:false, chi:['1-2-3條'], peng:true, gang:true, ting:false, pass:true}
-    };
-    MobileUI.setState(demo);
-    MobileUI.onTileTap((t)=>console.log('點了手牌', t));
-    MobileUI.onAction((a)=>console.log('點了動作', a));
-    MobileUI.onStart(()=>console.log('開始新局'));
-  })();
-  </script>
+  }
+  const east = G.players.get('東');
+  east.hand.push(G.deck.pop()); // 第 17 張
+  east.remain = east.hand.length;
+  order.filter(s=>s!=='東').forEach(s=>{ G.players.get(s).remain = 16; });
+  $('#R_left').textContent = String(G.deck.length);
+}
+function sortHand(h){
+  const rank = t=>{
+    if(/萬/.test(t)) return 100 + parseInt(t);
+    if(/筒/.test(t)) return 200 + parseInt(t);
+    if(/條/.test(t)) return 300 + parseInt(t);
+    if(t==='東') return 401; if(t==='南') return 402; if(t==='西') return 403; if(t==='北') return 404;
+    if(t==='中') return 405; if(t==='發') return 406; if(t==='白') return 407;
+    return 999;
+  };
+  h.sort((a,b)=>rank(a)-rank(b));
+}
+function renderAll(){
+  // 你的手牌
+  const you = G.players.get('東');
+  sortHand(you.hand);
+  const handBox = $('#hand'); handBox.innerHTML='';
+  you.hand.forEach((t,idx)=>{
+    handBox.appendChild(tileEl(t,false,true,()=>onYouTapTile(idx)));
+  });
+  // 玩家區
+  const root = $('#players'); root.innerHTML='';
+  order.forEach(s=>{
+    const p = G.players.get(s);
+    const wrap = document.createElement('div'); wrap.className='player';
+    const head = document.createElement('div'); head.className='phead';
+    head.innerHTML = `<div class="meta"><span class="seat">${s}</span>${p.banker?'<span class="banker">莊</span>':''}<span>${p.name}</span></div>
+      <div class="meta small"><span>💰 <span class="mono">${p.score.toLocaleString()}</span></span>
+      <span>🀄 <span class="mono">${p.hand.length}</span> 張</span></div>`;
+    wrap.appendChild(head);
+    const piles = document.createElement('div'); piles.className='piles';
+    const disc = document.createElement('div'); disc.className='row';
+    p.disc.forEach(t=>disc.appendChild(tileEl(t,true,false)));
+    const meld = document.createElement('div'); meld.className='row';
+    p.melds.forEach(g=>{
+      const gEl = document.createElement('span'); gEl.style.display='flex'; gEl.style.gap='3px';
+      g.forEach(t=> gEl.appendChild(tileEl(t,true,false)));
+      meld.appendChild(gEl);
+    });
+    piles.appendChild(disc); piles.appendChild(meld); wrap.appendChild(piles);
+    root.appendChild(wrap);
+  });
+  $('#R_left').textContent = String(G.deck.length);
+  // 動作提示
+  $('#hint').textContent = (G.turn==='東' ? (G.needDraw?'請摸牌（點下方「過」摸）」':'請出牌（點手牌）') : `等待 ${G.players.get(G.turn).name} 出牌…`);
+}
+function enableActionsForYou(){
+  // 預設禁用全部
+  const set = (id, ena)=> $('#'+id).disabled = !ena;
+  set('act-chi', false);
+  set('act-ting', false);
+  set('act-hu', canSevenPairs(G.players.get('東').hand)); // 簡易七對判定（自摸）
+  // 來自上一家之反應
+  const last = G.lastDiscard, discarter = G.lastDiscarter;
+  const you = G.players.get('東');
+  let canPeng=false, canGang=false;
+  if(last && discarter && discarter!== '東'){
+    const cnt = you.hand.filter(x=>x===last).length;
+    canPeng = cnt>=2;
+    canGang = cnt>=3;
+  }
+  set('act-peng', canPeng);
+  set('act-gang', canGang);
+  // 「過」：你的回合要摸牌，或對別人牌可選擇過
+  set('act-pass', true);
+}
+function onYouTapTile(i){
+  if(G.turn!=='東') return;
+  const you = G.players.get('東');
+  if(G.needDraw){
+    log('提示','需先摸牌（點「過」）');
+    return;
+  }
+  const t = you.hand.splice(i,1)[0];
+  you.remain = you.hand.length;
+  G.lastDiscard = t; G.lastDiscarter = '東';
+  you.disc.push(t);
+  log('你','打出 '+t);
+  G.turn = nextSeat(G.turn);
+  G.needDraw = true;
+  renderAll();
+  setTimeout(aiTurn, 450);
+}
+function aiTurn(){
+  const p = G.players.get(G.turn);
+  if(G.needDraw && G.deck.length){
+    p.hand.push(G.deck.pop());
+    p.remain = p.hand.length;
+    G.needDraw = false;
+  }
+  // 簡單 AI：打第一張非字牌，否則打第一張
+  let idx = p.hand.findIndex(t=>!/東|南|西|北|中|發|白/.test(t));
+  if(idx<0) idx=0;
+  const t = p.hand.splice(idx,1)[0];
+  p.disc.push(t);
+  G.lastDiscard = t; G.lastDiscarter = p.seat;
+  log(p.name,'打出 '+t);
+  G.turn = nextSeat(G.turn);
+  G.needDraw = true; // 輪到你摸
+  renderAll();
+  enableActionsForYou();
+}
+/* 動作 */
+$('#act-pass').addEventListener('click',()=>{
+  if(G.turn==='東' && G.needDraw){
+    if(G.deck.length){
+      const you = G.players.get('東');
+      const t = G.deck.pop(); you.hand.push(t); you.remain = you.hand.length;
+      log('你','摸到 '+t);
+      G.needDraw = false;
+      renderAll(); enableActionsForYou();
+    }
+  }else{
+    // 對別人牌選擇過
+    G.lastDiscard=null; G.lastDiscarter=null;
+    enableActionsForYou();
+  }
+});
+$('#act-peng').addEventListener('click',()=>{
+  const last = G.lastDiscard; if(!last) return;
+  const you = G.players.get('東');
+  let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<2){ cnt++; } else keep.push(t); }
+  if(cnt===2){
+    you.hand = keep;
+    you.melds.push([last,last,last]);
+    log('你','碰 '+last);
+    // 你取得回合，需打牌
+    G.turn='東'; G.needDraw=false; G.lastDiscard=null;
+    renderAll(); enableActionsForYou();
+  }
+});
+$('#act-gang').addEventListener('click',()=>{
+  const last = G.lastDiscard; if(!last) return;
+  const you = G.players.get('東');
+  let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<3){ cnt++; } else keep.push(t); }
+  if(cnt===3){
+    you.hand = keep;
+    you.melds.push([last,last,last,last]);
+    log('你','槓 '+last);
+    // 槓後補摸一張
+    if(G.deck.length){
+      const t = G.deck.pop(); you.hand.push(t); you.remain = you.hand.length;
+      log('你','補摸 '+t);
+    }
+    G.turn='東'; G.needDraw=false; G.lastDiscard=null;
+    renderAll(); enableActionsForYou();
+  }
+});
+$('#act-hu').addEventListener('click',()=>{
+  const you = G.players.get('東');
+  if(canSevenPairs(you.hand)){
+    log('你','胡了！（七對 判定）');
+    alert('恭喜自摸（七對）！本示範僅含簡化判定。');
+    G.phase='end';
+  }
+});
+function canSevenPairs(hand){
+  const map = new Map();
+  hand.forEach(t=> map.set(t, (map.get(t)||0)+1));
+  let pairs=0; for(const v of map.values()){ if(v%2!==0) return false; pairs += v/2; }
+  return pairs>=7 && (hand.length%2===0);
+}
+/* 新局 */
+$('#btn-new').addEventListener('click', ()=> setup());
+
+// 初始渲染（未開局）
+(function init(){
+  $('#log').innerHTML='';
+  $('#hand').innerHTML='';
+  $('#players').innerHTML='';
+  log('系統','點「開始新局」試玩。此引擎為概念版：支援摸／打、AI 隨機出牌，「碰」「槓」「七對自摸」。');
+})();
+</script>
 </body>
 </html>
