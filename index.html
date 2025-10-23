@@ -1620,6 +1620,54 @@ button:active:not(:disabled) {
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.5 — runtime ctrl height, 100svh on iOS, stricter fixed controls, fold empties
+   ========================= */
+
+/* Runtime height provided by JS; fallback to previous variables */
+:root { --ctrlH-runtime: 0px; }
+
+/* Prefer dynamic viewport units to avoid Safari URL bar jump */
+@supports (height: 100svh) {
+  @media (orientation: landscape) and (max-width: 1024px) {
+    #table { height: 100svh; }
+    .mahjong-table { height: calc(100svh - 2px); }
+  }
+  @media (max-width: 768px) and (orientation: portrait) {
+    #table { min-height: 100svh; }
+  }
+}
+
+/* Reserve space using runtime height (fallback to portrait/landscape constants) */
+@media (max-width: 768px) and (orientation: portrait) {
+  .center-area { padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + env(safe-area-inset-bottom)); }
+  .bottom-area { margin-bottom:  calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + env(safe-area-inset-bottom)); }
+}
+@media (orientation: landscape) and (max-width: 1024px) {
+  .center-area { padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
+  .bottom-area { margin-bottom:  calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
+}
+
+/* Controls must be viewport-fixed no matter ancestor transforms */
+.controls-section {
+  position: fixed !important;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  z-index: 700 !important;
+  transform: translateZ(0); /* prevent iOS sticky/fixed bugs */
+}
+
+/* Fold empty discard/meld columns/rows aggressively (Safari supports :has) */
+@supports(selector(.discard-area:has(.discard-area-content:empty))) {
+  .discard-area:has(.discard-area-content:empty),
+  .meld-area:has(:empty) {
+    height: 0 !important; min-height: 0 !important;
+    padding: 0 !important; border: 0 !important; background: transparent !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4417,6 +4465,24 @@ function showFinalScore() {
 
 /* ========= 啟動遊戲 ========= */
 startNewHand(true);
+</script>
+
+<script>
+// v2.5: measure control bar height at runtime to avoid overlap
+(function () {
+  function setCtrlH() {
+    try {
+      var cs = document.querySelector('.controls-section');
+      if (!cs) return;
+      var h = cs.offsetHeight || 0;
+      document.documentElement.style.setProperty('--ctrlH-runtime', h + 'px');
+    } catch (e) {}
+  }
+  window.addEventListener('load', setCtrlH);
+  window.addEventListener('resize', setCtrlH);
+  window.addEventListener('orientationchange', setCtrlH);
+  setTimeout(setCtrlH, 200);
+})();
 </script>
 </body>
 </html>
