@@ -1660,6 +1660,74 @@ body { touch-action: manipulation; }
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.1 — Portrait & Landscape tweaks
+   ========================= */
+
+/* Portrait-specific refinements */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* 更窄的側欄，拉大中區 */
+  .mahjong-table {
+    grid-template-columns: 60px 1fr 60px;
+    grid-template-rows: 52px 1fr 54px;
+  }
+  .center-area { padding-bottom: 72px; } /* 預留底部控制列空間 */
+  .controls-section { bottom: 0; }
+
+  /* 底部三分區（玩家資訊/副露/棄牌）高度壓縮，避免與按鈕打架 */
+  .bottom-area { min-height: 46px; gap: 4px; margin-bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .discard-bottom { height: 32px !important; }
+  .meld-bottom    { height: 32px !important; }
+  .info-bottom.player-info-inline { transform: scale(.92); transform-origin: left bottom; }
+
+  /* 中央手牌再微放一點點（可讀性） */
+  .center-area .hand-tiles .tile { min-width: 33px; width: 33px; height: 46px; font-size: 14.5px; }
+  /* 四邊牌維持小尺寸 */
+  .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
+    min-width: 16px; width: 16px; height: 22px; font-size: 9px;
+  }
+}
+
+/* Landscape-specific refinements */
+@media (max-width: 1024px) and (orientation: landscape) {
+  /* 讓下方空白不再過高：壓縮 bottom-area 與容器 */
+  .mahjong-table {
+    grid-template-rows: 48px 1fr 50px;
+  }
+  .bottom-area { min-height: 44px; gap: 6px; }
+  .discard-bottom { height: 30px !important; }
+  .meld-bottom    { height: 30px !important; }
+
+  /* 控制列仍置底但高度更薄 */
+  .controls-section { position: sticky; bottom: 0; padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); }
+  #controls button { padding: 5px 8px; font-size: 12px; }
+
+  /* 中央手牌維持清晰 */
+  .center-area .hand-tiles .tile { min-width: 32px; width: 32px; height: 44px; font-size: 14px; }
+  /* 四邊牌小尺寸 */
+  .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
+    min-width: 16px; width: 16px; height: 22px; font-size: 9px;
+  }
+}
+
+/* 折疊沒有內容的棄牌/副露容器（Safari/iOS 支援 :has） */
+@supports(selector(.discard-area:has(.discard-area-content:empty))) {
+  .discard-area:has(.discard-area-content:empty) {
+    height: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important;
+  }
+}
+@supports(selector(.meld-area:empty)) {
+  .meld-area:empty { height: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+}
+
+/* 防止底部玩家資訊卡片被按鈕遮住（多一點緩衝） */
+@media (max-width: 480px) {
+  .center-area { padding-bottom: 76px; }
+  .bottom-area { margin-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+
 </style>
 </head>
 <body>
