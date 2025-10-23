@@ -1544,222 +1544,48 @@ button:active:not(:disabled) {
 
 
 /* =========================
-   📱 Mobile Polish v2.6.1 — Portrait: force battle log visible
-   ========================= */
-@media (max-width: 768px) and (orientation: portrait) {
-  /* 戰況容器強制顯示、單欄且可捲動 */
-  .center-log-container {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    position: sticky;
-    top: 8px;          /* 在畫面頂緣下方吸附 */
-    z-index: 10;       /* 不被其它元素遮蔽 */
-    min-height: 24vh !important;
-    max-height: 40vh !important;
-    overflow: auto !important;
-  }
-  .center-log-right { display: none !important; }
-  #log.center-log {
-    max-height: inherit !important;
-    overflow: auto !important;
-  }
-}
-
-
-
-/* =========================
-   📱 Mobile Polish v2.7 — Portrait sticky-log (with top bar height), better fullscreen landscape
+   📱 Mobile Polish v2.10 — Portrait: horizontal hand; Landscape: smaller tiles, lift layout, show meld
    ========================= */
 
-/* runtime vars */
-:root {
-  --topBarH: 0px;            /* measured header/topbar height */
-  --iosBottomUI: 0px;        /* from visualViewport */
-  --ctrlH-runtime: 0px;      /* measured controls height */
-  --ctrlH-portrait: 104px;   /* fallback */
-  --ctrlH-landscape: 72px;   /* fallback */
-}
-
-/* ------- Global cleanups & controls row ------- */
-@media (max-width: 1024px) {
-  /* Remove debug frames anywhere (including pseudo elements) */
-  *, *::before, *::after {
-    outline: none !important;
-    box-shadow: none !important;
-  }
-  .top-area, .left-area, .right-area, .bottom-area,
-  .discard-area, .meld-area,
-  .top-area *, .left-area *, .right-area *, .bottom-area * {
-    border: none !important;
-  }
-  #controls {
-    display: flex; flex-wrap: nowrap; overflow-x: auto;
-    -webkit-overflow-scrolling: touch; gap: 6px;
-  }
-  #controls button { flex: 0 0 auto; white-space: nowrap; }
-  .controls-section { z-index: 700 !important; }
-}
-
-/* ------- Portrait: visible battle log with sticky top ------- */
+/* PORTRAIT: hand tiles horizontal & scrollable */
 @media (max-width: 768px) and (orientation: portrait) {
-  .controls-section {
-    position: fixed !important; left: 0; right: 0;
-    bottom: calc(var(--iosBottomUI)); /* float above iOS bottom bar */
-    padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.92));
-    transform: translateZ(0);
-  }
-  /* reserve space */
-  .center-area {
-    display: grid;
-    grid-template-rows: minmax(26vh, 36vh) 1fr; /* log + hand */
-    gap: 8px;
-    padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI) + env(safe-area-inset-bottom));
-  }
-  .bottom-area {
-    margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI) + env(safe-area-inset-bottom));
-    display: grid;
-    grid-template-columns: 92px 1fr;
-    column-gap: 8px; align-items: center;
-    min-height: 48px;
-  }
-  .bottom-area .player-info-inline { grid-column: 1; transform: scale(.92); transform-origin: left bottom; }
-  .meld-bottom, .discard-bottom { grid-column: 2; height: 32px !important; }
-
-  .center-log-container {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    position: sticky; 
-    top: calc(var(--topBarH) + 8px); /* sticky below header */
-    z-index: 20;
-    min-height: 26vh !important; max-height: 40vh !important;
-    overflow: auto !important;
-  }
-  .center-log-right { display: none !important; }
-  #log.center-log { max-height: inherit !important; overflow: auto !important; }
-
-  .center-area .hand-tiles .tile { min-width: 31px; width: 31px; height: 44px; font-size: 14px; padding: 6px 3px; }
-}
-
-/* ------- Landscape: true fullscreen ------- */
-@media (orientation: landscape) and (max-width: 1024px) {
-  /* hide header/options rows */
-  header, .header, .top-toolbar, .options, .options-bar, .config-bar, .row.options { display: none !important; }
-
-  html, body { height: 100%; overflow: hidden; }
-  /* Prefer dynamic viewport units when available */
-  @supports (height: 100dvh) {
-    #table { height: 100dvh; }
-    .mahjong-table { height: calc(100dvh - 2px); }
-  }
-  @supports not (height: 100dvh) {
-    @supports (height: 100svh) {
-      #table { height: 100svh; }
-      .mahjong-table { height: calc(100svh - 2px); }
-    }
-    @supports not (height: 100svh) {
-      #table { height: 100vh; }
-      .mahjong-table { height: calc(100vh - 2px); }
-    }
-  }
-
-  .controls-section {
-    position: fixed !important; left: 0; right: 0; bottom: 0;
-    padding: 4px 6px calc(6px + env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.85));
-    transform: translateZ(0);
-  }
-  .center-area { padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
-  .bottom-area { margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
-
-  .mahjong-table { 
-    grid-template-columns: 56px 1fr 56px;
-    grid-template-rows: 44px 1fr 44px; gap: 4px;
-  }
-}
-
-/* Fold empty discard/meld to zero height/width if supported */
-@supports(selector(.discard-area:has(.discard-area-content:empty))) {
-  .discard-area:has(.discard-area-content:empty),
-  .meld-area:has(:empty) {
-    height: 0 !important; min-height: 0 !important;
-    padding: 0 !important; border: 0 !important; background: transparent !important;
-  }
-}
-
-
-
-/* =========================
-   📱 Mobile Polish v2.8 — Portrait: move hand below bottom player (DOM reflow)
-   ========================= */
-
-/* Only affects portrait */
-@media (max-width: 768px) and (orientation: portrait) {
-  body.portrait-hand-moved .bottom-area {
-    display: grid;
-    grid-template-columns: 92px 1fr;
-    column-gap: 8px; align-items: center;
-    min-height: 48px;
-    margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI, 0px) + env(safe-area-inset-bottom));
-  }
-  body.portrait-hand-moved .bottom-area .player-info-inline {
-    grid-column: 1; transform: scale(.92); transform-origin: left bottom;
-  }
-  body.portrait-hand-moved .bottom-area .meld-bottom,
-  body.portrait-hand-moved .bottom-area .discard-bottom {
-    grid-column: 2; height: 32px !important;
-  }
-  /* hand block now lives after bottom-area: give it some spacing */
-  body.portrait-hand-moved .hand-block {
-    margin-top: 8px;
-    padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI, 0px) + env(safe-area-inset-bottom));
-  }
-}
-
-/* Landscape: make controls hug the bottom a bit more */
-@media (orientation: landscape) and (max-width: 1024px) {
-  .controls-section {
-    padding: 2px 4px calc(2px + env(safe-area-inset-bottom));
-  }
-}
-
-
-
-/* =========================
-   📱 Mobile Polish v2.9 — Portrait horizontal hand; Landscape controls tighter bottom
-   ========================= */
-
-/* PORTRAIT: hand tiles must be horizontal (scrollable if overflow) */
-@media (max-width: 768px) and (orientation: portrait) {
-  body.portrait-hand-moved .hand-block { width: 100%; }
-  body.portrait-hand-moved .hand-block .hand-tiles {
+  #yourHand.hand-tiles {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    align-items: center;
     gap: 4px;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
   }
-  body.portrait-hand-moved .hand-block .hand-tiles::-webkit-scrollbar { display: none; } /* WebKit */
-  /* Keep tiles readable */
-  body.portrait-hand-moved .hand-block .hand-tiles .tile {
+  #yourHand.hand-tiles::-webkit-scrollbar { display: none; }
+  #yourHand.hand-tiles .tile {
     min-width: 31px; width: 31px; height: 44px; font-size: 14px;
   }
 }
 
-/* LANDSCAPE: reaction buttons (controls) hug the very bottom */
+/* LANDSCAPE: smaller hand tiles, lift layout, ensure bottom meld visible */
 @media (orientation: landscape) and (max-width: 1024px) {
-  .controls-section {
-    position: fixed !important;
-    inset-inline: 0 !important;
-    bottom: 0 !important;
-    padding: 0 4px calc(env(safe-area-inset-bottom) + 1px) !important;
-    background: linear-gradient(180deg, rgba(0,40,85,.3), rgba(0,40,85,.8)) !important;
+  /* Smaller tiles */
+  .center-area .hand-tiles .tile {
+    min-width: 28px; width: 28px; height: 40px; font-size: 12.5px;
   }
-  #controls { margin: 0 !important; }
+  /* Lift overall layout (shorter top/bottom rows in the grid) */
+  .mahjong-table {
+    grid-template-rows: 36px 1fr 38px; /* from 44/1fr/44 */
+  }
+  /* Ensure bottom meld area is visible and not collapsed */
+  .meld-area.meld-bottom {
+    display: flex !important;
+    align-items: center;
+    min-height: 40px !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+  /* Avoid any folding of bottom meld/ discard even when :has() rule exists */
+  .meld-area.meld-bottom:has(*) { height: auto !important; }
 }
 
 </style>
@@ -4559,108 +4385,6 @@ function showFinalScore() {
 
 /* ========= 啟動遊戲 ========= */
 startNewHand(true);
-</script>
-
-<script>
-// v2.7 runtime layout helpers: measure header height, control bar height, & iOS bottom UI
-(function(){
-  function setTopBarH(){
-    try{
-      var h = 0;
-      var head = document.querySelector('header') || document.querySelector('.header');
-      if (head) { h = head.getBoundingClientRect().height; }
-      document.documentElement.style.setProperty('--topBarH', Math.round(h) + 'px');
-    }catch(e){}
-  }
-  function setCtrlH(){
-    try{
-      var cs = document.querySelector('.controls-section');
-      var h = cs ? cs.offsetHeight : 0;
-      document.documentElement.style.setProperty('--ctrlH-runtime', h + 'px');
-    }catch(e){}
-  }
-  function setIosBottom(){
-    try{
-      var vv = window.visualViewport;
-      var delta = 0;
-      if (vv) {
-        var inner = window.innerHeight || 0;
-        delta = Math.max(0, Math.round(inner - vv.height - vv.offsetTop));
-      }
-      document.documentElement.style.setProperty('--iosBottomUI', delta + 'px');
-    }catch(e){}
-  }
-  function updateAll(){ setTopBarH(); setCtrlH(); setIosBottom(); }
-  ['load','resize','orientationchange','scroll'].forEach(function(ev){
-    window.addEventListener(ev, updateAll, {passive:true});
-  });
-  setTimeout(updateAll, 60);
-  setTimeout(updateAll, 300);
-})();
-</script>
-
-<script>
-// v2.8: Move the hand block below the bottom-area in portrait only.
-(function(){
-  var placeholder = null;
-  var moved = false;
-  function findHandBlock(){
-    // Try to locate the block that contains the hand tiles and the "你的手牌" title
-    var el = document.querySelector('.center-area .hand-tiles');
-    if (!el) return null;
-    // climb to a reasonable container (stop at .center-area)
-    var cur = el;
-    while (cur && cur.parentElement && !cur.classList.contains('center-area')) {
-      // Prefer a container whose class contains 'hand' or has role-like semantics
-      var cls = (cur.className || '').toString();
-      if (cls.match(/hand|your-hand|player-hand|tiles-wrap/i)) break;
-      cur = cur.parentElement;
-    }
-    if (!cur || cur.classList.contains('center-area')) {
-      // fallback: the immediate parent of .hand-tiles
-      cur = el.parentElement || el;
-    }
-    cur.classList.add('hand-block');
-    return cur;
-  }
-  function moveForPortrait(){
-    var hand = findHandBlock();
-    var bottom = document.querySelector('.bottom-area');
-    if (!hand || !bottom) return;
-    if (!placeholder){
-      placeholder = document.createElement('div');
-      placeholder.id = 'hand-placeholder';
-      hand.parentElement.insertBefore(placeholder, hand.nextSibling);
-    }
-    // Move only if not already moved
-    if (!moved){
-      bottom.parentElement.insertBefore(hand, bottom.nextSibling);
-      document.body.classList.add('portrait-hand-moved');
-      moved = true;
-    }
-  }
-  function restoreForLandscape(){
-    var hand = document.querySelector('.hand-block');
-    if (!hand || !placeholder) return;
-    if (moved){
-      placeholder.parentElement.insertBefore(hand, placeholder);
-      document.body.classList.remove('portrait-hand-moved');
-      moved = false;
-    }
-  }
-  function update(){
-    var isPortrait = window.matchMedia('(orientation: portrait)').matches && window.innerWidth <= 768;
-    if (isPortrait) moveForPortrait(); else restoreForLandscape();
-    // Update control bar height variable for spacing
-    var cs = document.querySelector('.controls-section');
-    if (cs) document.documentElement.style.setProperty('--ctrlH-runtime', (cs.offsetHeight||0) + 'px');
-  }
-  ['load','resize','orientationchange'].forEach(function(evt){
-    window.addEventListener(evt, update, {passive:true});
-  });
-  setTimeout(update, 60);
-  setTimeout(update, 300);
-})();
 </script>
 </body>
 </html>
