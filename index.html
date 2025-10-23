@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#082a55">
-  <link rel="manifest" href="manifest.webmanifest">
-
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>大瑞科技 - 麻將單機</title>
@@ -1550,134 +1544,80 @@ button:active:not(:disabled) {
 
 
 /* =========================
-   📱 Mobile Polish v2.2 — Portrait log visible & Landscape fullscreen
+   📱 Mobile Polish v2.4 — fix overlay cover, 1-row scroll controls, hide debug borders, stronger landscape fullscreen
    ========================= */
 
-/* ------- Portrait: make battle log always visible ------- */
-@media (max-width: 768px) and (orientation: portrait) {
-  /* 中央容器改用二列網格：上=戰況、下=手牌 */
-  .center-area {
-    display: grid;
-    grid-template-rows: minmax(110px, 28vh) 1fr;
-    gap: 6px;
-    padding-bottom: 78px; /* 為底部操作列預留空間 */
-  }
-  .center-log-container {
-    min-height: 110px;
-    max-height: 28vh;
-    overflow: auto;
-    padding: 6px;
-  }
-  #log.center-log {
-    max-height: inherit;
-    overflow: auto;
-  }
-  .center-log-container h4 { font-size: 13px; }
-  .center-log-right { display: none; } /* 精簡：直式只留戰況主欄，右欄隱藏 */
+/* CSS vars for control bar height */
+:root {
+  --ctrlH-portrait: 104px;
+  --ctrlH-landscape: 72px;
 }
 
-/* ------- Landscape: fullscreen-like gameplay ------- */
-@media (orientation: landscape) and (max-width: 1024px) {
-  /* 隱藏頁首，進入近似全螢幕 */
-  header { display: none !important; }
-  html, body { height: 100%; overflow: hidden; }
-
-  #table {
-    position: relative;
-    margin: 0 auto;
-    padding: 0 6px;
-    height: 100vh; /* 充滿可視高度 */
+/* ----- Universal mobile cleanups ----- */
+@media (max-width: 1024px) {
+  /* Remove any debug borders/outlines on areas */
+  .top-area, .left-area, .right-area, .bottom-area,
+  .discard-area, .meld-area,
+  .top-area *, .left-area *, .right-area *, .bottom-area * {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
+  /* Controls: single row, horizontal scroll if overflow */
+  #controls {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+  }
+  #controls button { flex: 0 0 auto; white-space: nowrap; }
+}
+
+/* ----- Portrait: ensure content never hidden by controls ----- */
+@media (max-width: 768px) and (orientation: portrait) {
+  .controls-section {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.9));
+  }
+  /* Reserve space so overlay never covers content */
+  .center-area { padding-bottom: calc(var(--ctrlH-portrait) + env(safe-area-inset-bottom)); }
+  .bottom-area { margin-bottom: calc(var(--ctrlH-portrait) + env(safe-area-inset-bottom)); }
+
+  /* Keep log tall */
+  .center-log-container { min-height: 24vh; max-height: 36vh; }
+}
+
+/* ----- Landscape: stronger fullscreen & header hiding ----- */
+@media (orientation: landscape) and (max-width: 1024px) {
+  /* Hide any header-like bars */
+  header, .header, .top-toolbar, .options-bar, .options, .row.options, .config-bar { display: none !important; }
+
+  html, body { height: 100%; overflow: hidden; }
+  #table { height: 100vh; margin: 0 auto; padding: 0 6px; }
+
+  .controls-section {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    padding: 4px 6px calc(6px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.85));
+  }
+  .center-area { padding-bottom: calc(var(--ctrlH-landscape) + env(safe-area-inset-bottom)); }
+  .bottom-area { margin-bottom: calc(var(--ctrlH-landscape) + env(safe-area-inset-bottom)); }
+
   .mahjong-table {
-    height: calc(100vh - 8px);
-    max-height: none;
-    grid-template-columns: 64px 1fr 64px; /* 再收左右欄 */
-    grid-template-rows: 56px 1fr 48px;   /* 壓縮上下欄，放大中心 */
+    height: calc(100vh - 2px);
+    grid-template-columns: 56px 1fr 56px;
+    grid-template-rows: 44px 1fr 44px;
     gap: 4px;
   }
 
-  /* 中央區域：戰況保留、但高度較小以放大手牌 */
-  .center-area {
-    display: grid;
-    grid-template-rows: minmax(80px, 22vh) 1fr;
-    gap: 6px;
-    padding: 8px;
-  }
-  .center-log-container {
-    min-height: 80px;
-    max-height: 22vh;
-    overflow: auto;
-  }
-
-  /* 底部控制列浮於最底、變薄 */
-  .controls-section {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 4px 6px calc(6px + env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(0,40,85,.4), rgba(0,40,85,.85));
-    z-index: 200;
-  }
-  #controls { gap: 6px; }
-  #controls button { padding: 5px 10px; font-size: 12px; }
-
-  /* bottom-area 再壓縮，避免吃到空間 */
-  .bottom-area { min-height: 44px; gap: 6px; padding: 6px; }
-  .discard-bottom, .meld-bottom { height: 30px !important; }
-
-  /* 提升可讀性：你的手牌略放大 */
-  .center-area .hand-tiles .tile {
-    min-width: 34px; width: 34px; height: 48px;
-    font-size: 15px; padding: 6px 3px;
-  }
-  /* 四邊牌維持小尺寸 */
+  .center-area .hand-tiles .tile { min-width: 34px; width: 34px; height: 46px; font-size: 15px; }
   .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
-    min-width: 16px; width: 16px; height: 22px; font-size: 9px; padding: 2px 1px;
+    min-width: 16px; width: 16px; height: 22px; font-size: 9px;
   }
-}
-
-
-
-/* =========================
-   📱 Mobile Polish v2.3 — Portrait space fix, Landscape cleaner, stronger overlay
-   ========================= */
-
-/* Portrait spacing: reserve more space for bottom controls & keep log taller */
-@media (max-width: 768px) and (orientation: portrait) {
-  .center-area { padding-bottom: 96px; } /* 原 78 → 96 */
-  .bottom-area { margin-bottom: calc(88px + env(safe-area-inset-bottom)); } /* 原 56/60 → 88 */
-  .center-log-container { min-height: 22vh; max-height: 34vh; } /* 戰況更容易看到 */
-  /* 玩家下方資訊卡片稍微縮小避免撞到按鈕 */
-  .bottom-area .player-info-inline { transform: scale(0.9); transform-origin: left bottom; }
-}
-
-/* Landscape: cleaner "fullscreen-like" */
-@media (orientation: landscape) and (max-width: 1024px) {
-  /* 隱藏左右與上方玩家資訊卡片，集中視線在牌桌 */
-  .left-area .player-info-inline,
-  .right-area .player-info-inline,
-  .top-area .player-info-inline { display: none !important; }
-
-  /* 自己的資訊卡片保留但變小，並且不與按鈕打架 */
-  .bottom-area .player-info-inline {
-    transform: scale(.9); transform-origin: left bottom;
-    margin-bottom: 34px;
-  }
-
-  /* 增加手牌尺寸（可讀性） */
-  .center-area .hand-tiles .tile {
-    min-width: 36px; width: 36px; height: 52px; font-size: 16px;
-  }
-}
-
-/* Controls overlay stronger z-index and backdrop */
-.controls-section {
-  z-index: 500 !important;
-  backdrop-filter: blur(6px);
-}
-
-/* Remove any debug outlines/borders on small screens just in case */
-@media (max-width: 1024px) {
-  *[style*="outline"], *[style*="border: 1px solid red"] { outline: none !important; border: none !important; }
 }
 
 </style>
