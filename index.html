@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>麻將｜直式手機（單頁可遊玩・簡化引擎）</title>
+<title>麻將｜直式手機（單頁可遊玩・簡化引擎 v2）</title>
 <meta name="color-scheme" content="dark">
 <style>
 :root{
@@ -12,10 +12,11 @@
   --gap: 8px;
   --radius: 10px;
   --shadow: 0 4px 14px rgba(0,0,0,.18);
-  --tileW: clamp(18px, 5.8vw, 28px);
-  --tileH: calc(var(--tileW) * 1.35);
-  --miniW: calc(var(--tileW) * .86);
-  --miniH: calc(var(--tileH) * .86);
+  /* 這些尺寸會由 JS 依手牌寬度自動調整 */
+  --tileW: 26px;
+  --tileH: 35.1px;
+  --miniW: 22px;
+  --miniH: 30px;
   --font: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   --bg1: #062a55; --bg2:#0a3b75;
 }
@@ -43,8 +44,7 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
 .actions .abtn{flex:1 1 auto;text-align:center;background:#0e4fa1;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 0;font-size:13px;font-weight:800}
 .actions .abtn.primary{background:#f1b93f;color:#2a1a00}
 .actions .abtn[disabled]{opacity:.45}
-.hand{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px;background:rgba(255,255,255,.04);border-radius:10px}
-.hand::-webkit-scrollbar{display:none}
+.hand{display:flex;gap:4px;overflow-x:hidden;padding:4px;background:rgba(255,255,255,.04);border-radius:10px}
 .tile{
   width:var(--tileW);height:var(--tileH);
   background:linear-gradient(180deg,#fff,#f2f6ff);color:#0e2a66;border:1px solid #d8e6ff;
@@ -72,7 +72,7 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
 <body>
 <main id="app">
   <section class="card topbar">
-    <div class="pill">台灣 16 張麻將（簡化引擎示範）</div>
+    <div class="pill">台灣 16 張麻將（簡化引擎示範 v2）</div>
     <div class="pill">底 2000／每台 1000</div>
     <button class="btn" id="btn-new">開始新局</button>
   </section>
@@ -105,7 +105,7 @@ body{ margin:0; font-family:var(--font); color:#eaf3ff;
     <button class="abtn" id="act-peng" disabled>碰</button>
     <button class="abtn" id="act-gang" disabled>槓</button>
     <button class="abtn" id="act-ting" disabled>聽</button>
-    <button class="abtn" id="act-pass" disabled>過</button>
+    <button class="abtn" id="act-pass" >過</button>
   </section>
   <section class="card">
     <div class="card-title">你的手牌</div>
@@ -140,7 +140,7 @@ function tileEl(t, mini=false, clickable=false, onClick=null){
   const d = document.createElement('div');
   d.className = 'tile '+tClass(t)+(mini?' mini':'');
   d.textContent = t;
-  if(clickable){ d.addEventListener('click', onClick); }
+  if(clickable){ d.addEventListener('click', onClick, {passive:true}); }
   return d;
 }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()* (i+1))|0; [a[i],a[j]]=[a[j],a[i]];} return a; }
@@ -151,7 +151,7 @@ const prevSeat = s => order[(order.indexOf(s)+3)%4];
 const G = {
   deck:[], turn:'東', lastDiscard:null, lastDiscarter:null,
   players:new Map(), // seat -> {name, score, hand:[], disc:[], melds:[], banker, remain}
-  needDraw:false, phase:'idle'
+  needDraw:false, phase:'idle', timer:null
 };
 function setup(){
   G.deck = shuffle(tilesAll.slice());
@@ -169,17 +169,14 @@ function setup(){
   enableActionsForYou();
 }
 function deal16(){
-  // 每家拿 16，莊家多 1（共 17）
-  for(let r=0;r<4;r++){
-    order.forEach(s=>{
-      const p = G.players.get(s);
-      while(p.hand.length < 16){ p.hand.push(G.deck.pop()); }
-    });
-  }
+  // 正確發牌：每家 16，東家 +1
+  order.forEach(s=>{
+    const p = G.players.get(s);
+    for(let i=0;i<16;i++){ p.hand.push(G.deck.pop()); }
+  });
   const east = G.players.get('東');
   east.hand.push(G.deck.pop()); // 第 17 張
-  east.remain = east.hand.length;
-  order.filter(s=>s!=='東').forEach(s=>{ G.players.get(s).remain = 16; });
+  order.forEach(s=> G.players.get(s).remain = G.players.get(s).hand.length);
   $('#R_left').textContent = String(G.deck.length);
 }
 function sortHand(h){
@@ -193,7 +190,24 @@ function sortHand(h){
   };
   h.sort((a,b)=>rank(a)-rank(b));
 }
+function fitTilesToHand(){
+  const you = G.players.get('東');
+  const n = Math.max(you ? you.hand.length : 14, 14); // 至少預留 14
+  const gap = 4;
+  const box = $('#hand');
+  const cw = box.clientWidth || window.innerWidth - 16;
+  let w = Math.floor((cw - (n-1)*gap) / n);
+  w = Math.max(18, Math.min(28, w)); // 上下限
+  const h = Math.round(w*1.35);
+  const miniW = Math.round(w*0.86), miniH = Math.round(h*0.86);
+  const root = document.documentElement.style;
+  root.setProperty('--tileW', w+'px');
+  root.setProperty('--tileH', h+'px');
+  root.setProperty('--miniW', miniW+'px');
+  root.setProperty('--miniH', miniH+'px');
+}
 function renderAll(){
+  fitTilesToHand();
   // 你的手牌
   const you = G.players.get('東');
   sortHand(you.hand);
@@ -225,15 +239,13 @@ function renderAll(){
   });
   $('#R_left').textContent = String(G.deck.length);
   // 動作提示
-  $('#hint').textContent = (G.turn==='東' ? (G.needDraw?'請摸牌（點下方「過」摸）」':'請出牌（點手牌）') : `等待 ${G.players.get(G.turn).name} 出牌…`);
+  $('#hint').textContent = (G.turn==='東' ? (G.needDraw?'請摸牌（點下方「過」）':'請出牌（點手牌）') : `等待 ${G.players.get(G.turn).name} 出牌…`);
 }
 function enableActionsForYou(){
-  // 預設禁用全部
-  const set = (id, ena)=> $('#'+id).disabled = !ena;
-  set('act-chi', false);
-  set('act-ting', false);
-  set('act-hu', canSevenPairs(G.players.get('東').hand)); // 簡易七對判定（自摸）
-  // 來自上一家之反應
+  const toggle = (id, ena)=> $('#'+id).disabled = !ena;
+  toggle('act-chi', false);
+  toggle('act-ting', false);
+  toggle('act-hu', canSevenPairs(G.players.get('東').hand)); // 七對自摸
   const last = G.lastDiscard, discarter = G.lastDiscarter;
   const you = G.players.get('東');
   let canPeng=false, canGang=false;
@@ -242,13 +254,12 @@ function enableActionsForYou(){
     canPeng = cnt>=2;
     canGang = cnt>=3;
   }
-  set('act-peng', canPeng);
-  set('act-gang', canGang);
-  // 「過」：你的回合要摸牌，或對別人牌可選擇過
-  set('act-pass', true);
+  toggle('act-peng', canPeng);
+  toggle('act-gang', canGang);
+  toggle('act-pass', true);
 }
 function onYouTapTile(i){
-  if(G.turn!=='東') return;
+  if(G.turn!=='東' || G.phase!=='playing') return;
   const you = G.players.get('東');
   if(G.needDraw){
     log('提示','需先摸牌（點「過」）');
@@ -262,9 +273,18 @@ function onYouTapTile(i){
   G.turn = nextSeat(G.turn);
   G.needDraw = true;
   renderAll();
-  setTimeout(aiTurn, 450);
+  scheduleAiChain();
+}
+function scheduleAiChain(){
+  if(G.timer) { clearTimeout(G.timer); G.timer=null; }
+  if(G.turn !== '東' && G.phase==='playing'){
+    G.timer = setTimeout(aiTurn, 420);
+  }else{
+    enableActionsForYou();
+  }
 }
 function aiTurn(){
+  if(G.phase!=='playing') return;
   const p = G.players.get(G.turn);
   if(G.needDraw && G.deck.length){
     p.hand.push(G.deck.pop());
@@ -279,12 +299,14 @@ function aiTurn(){
   G.lastDiscard = t; G.lastDiscarter = p.seat;
   log(p.name,'打出 '+t);
   G.turn = nextSeat(G.turn);
-  G.needDraw = true; // 輪到你摸
+  G.needDraw = true; // 下一家須摸
   renderAll();
-  enableActionsForYou();
+  // 若下一位仍非東家，持續串連 AI；否則換你且可反應/摸牌
+  scheduleAiChain();
 }
 /* 動作 */
 $('#act-pass').addEventListener('click',()=>{
+  if(G.phase!=='playing') return;
   if(G.turn==='東' && G.needDraw){
     if(G.deck.length){
       const you = G.players.get('東');
@@ -300,6 +322,7 @@ $('#act-pass').addEventListener('click',()=>{
   }
 });
 $('#act-peng').addEventListener('click',()=>{
+  if(G.phase!=='playing') return;
   const last = G.lastDiscard; if(!last) return;
   const you = G.players.get('東');
   let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<2){ cnt++; } else keep.push(t); }
@@ -307,12 +330,12 @@ $('#act-peng').addEventListener('click',()=>{
     you.hand = keep;
     you.melds.push([last,last,last]);
     log('你','碰 '+last);
-    // 你取得回合，需打牌
     G.turn='東'; G.needDraw=false; G.lastDiscard=null;
     renderAll(); enableActionsForYou();
   }
 });
 $('#act-gang').addEventListener('click',()=>{
+  if(G.phase!=='playing') return;
   const last = G.lastDiscard; if(!last) return;
   const you = G.players.get('東');
   let cnt=0, keep=[]; for(const t of you.hand){ if(t===last && cnt<3){ cnt++; } else keep.push(t); }
@@ -320,7 +343,6 @@ $('#act-gang').addEventListener('click',()=>{
     you.hand = keep;
     you.melds.push([last,last,last,last]);
     log('你','槓 '+last);
-    // 槓後補摸一張
     if(G.deck.length){
       const t = G.deck.pop(); you.hand.push(t); you.remain = you.hand.length;
       log('你','補摸 '+t);
@@ -330,10 +352,11 @@ $('#act-gang').addEventListener('click',()=>{
   }
 });
 $('#act-hu').addEventListener('click',()=>{
+  if(G.phase!=='playing') return;
   const you = G.players.get('東');
   if(canSevenPairs(you.hand)){
     log('你','胡了！（七對 判定）');
-    alert('恭喜自摸（七對）！本示範僅含簡化判定。');
+    alert('恭喜自摸（七對）！本示範為簡化規則。');
     G.phase='end';
   }
 });
@@ -344,14 +367,16 @@ function canSevenPairs(hand){
   return pairs>=7 && (hand.length%2===0);
 }
 /* 新局 */
-$('#btn-new').addEventListener('click', ()=> setup());
+$('#btn-new').addEventListener('click', ()=> { setup(); });
+window.addEventListener('resize', ()=>{ fitTilesToHand(); });
 
 // 初始渲染（未開局）
 (function init(){
   $('#log').innerHTML='';
   $('#hand').innerHTML='';
   $('#players').innerHTML='';
-  log('系統','點「開始新局」試玩。此引擎為概念版：支援摸／打、AI 隨機出牌，「碰」「槓」「七對自摸」。');
+  log('系統','點「開始新局」試玩。此引擎為概念版：支援摸／打、AI 串連出牌，「碰」「槓」「七對自摸」。');
+  fitTilesToHand();
 })();
 </script>
 </body>
