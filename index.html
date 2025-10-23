@@ -1565,6 +1565,128 @@ button:active:not(:disabled) {
   }
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.7 — Portrait sticky-log (with top bar height), better fullscreen landscape
+   ========================= */
+
+/* runtime vars */
+:root {
+  --topBarH: 0px;            /* measured header/topbar height */
+  --iosBottomUI: 0px;        /* from visualViewport */
+  --ctrlH-runtime: 0px;      /* measured controls height */
+  --ctrlH-portrait: 104px;   /* fallback */
+  --ctrlH-landscape: 72px;   /* fallback */
+}
+
+/* ------- Global cleanups & controls row ------- */
+@media (max-width: 1024px) {
+  /* Remove debug frames anywhere (including pseudo elements) */
+  *, *::before, *::after {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .top-area, .left-area, .right-area, .bottom-area,
+  .discard-area, .meld-area,
+  .top-area *, .left-area *, .right-area *, .bottom-area * {
+    border: none !important;
+  }
+  #controls {
+    display: flex; flex-wrap: nowrap; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; gap: 6px;
+  }
+  #controls button { flex: 0 0 auto; white-space: nowrap; }
+  .controls-section { z-index: 700 !important; }
+}
+
+/* ------- Portrait: visible battle log with sticky top ------- */
+@media (max-width: 768px) and (orientation: portrait) {
+  .controls-section {
+    position: fixed !important; left: 0; right: 0;
+    bottom: calc(var(--iosBottomUI)); /* float above iOS bottom bar */
+    padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.92));
+    transform: translateZ(0);
+  }
+  /* reserve space */
+  .center-area {
+    display: grid;
+    grid-template-rows: minmax(26vh, 36vh) 1fr; /* log + hand */
+    gap: 8px;
+    padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI) + env(safe-area-inset-bottom));
+  }
+  .bottom-area {
+    margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-portrait)) + var(--iosBottomUI) + env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    column-gap: 8px; align-items: center;
+    min-height: 48px;
+  }
+  .bottom-area .player-info-inline { grid-column: 1; transform: scale(.92); transform-origin: left bottom; }
+  .meld-bottom, .discard-bottom { grid-column: 2; height: 32px !important; }
+
+  .center-log-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    position: sticky; 
+    top: calc(var(--topBarH) + 8px); /* sticky below header */
+    z-index: 20;
+    min-height: 26vh !important; max-height: 40vh !important;
+    overflow: auto !important;
+  }
+  .center-log-right { display: none !important; }
+  #log.center-log { max-height: inherit !important; overflow: auto !important; }
+
+  .center-area .hand-tiles .tile { min-width: 31px; width: 31px; height: 44px; font-size: 14px; padding: 6px 3px; }
+}
+
+/* ------- Landscape: true fullscreen ------- */
+@media (orientation: landscape) and (max-width: 1024px) {
+  /* hide header/options rows */
+  header, .header, .top-toolbar, .options, .options-bar, .config-bar, .row.options { display: none !important; }
+
+  html, body { height: 100%; overflow: hidden; }
+  /* Prefer dynamic viewport units when available */
+  @supports (height: 100dvh) {
+    #table { height: 100dvh; }
+    .mahjong-table { height: calc(100dvh - 2px); }
+  }
+  @supports not (height: 100dvh) {
+    @supports (height: 100svh) {
+      #table { height: 100svh; }
+      .mahjong-table { height: calc(100svh - 2px); }
+    }
+    @supports not (height: 100svh) {
+      #table { height: 100vh; }
+      .mahjong-table { height: calc(100vh - 2px); }
+    }
+  }
+
+  .controls-section {
+    position: fixed !important; left: 0; right: 0; bottom: 0;
+    padding: 4px 6px calc(6px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0,40,85,.35), rgba(0,40,85,.85));
+    transform: translateZ(0);
+  }
+  .center-area { padding-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
+  .bottom-area { margin-bottom: calc(var(--ctrlH-runtime, var(--ctrlH-landscape)) + env(safe-area-inset-bottom)); }
+
+  .mahjong-table { 
+    grid-template-columns: 56px 1fr 56px;
+    grid-template-rows: 44px 1fr 44px; gap: 4px;
+  }
+}
+
+/* Fold empty discard/meld to zero height/width if supported */
+@supports(selector(.discard-area:has(.discard-area-content:empty))) {
+  .discard-area:has(.discard-area-content:empty),
+  .meld-area:has(:empty) {
+    height: 0 !important; min-height: 0 !important;
+    padding: 0 !important; border: 0 !important; background: transparent !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4362,6 +4484,44 @@ function showFinalScore() {
 
 /* ========= 啟動遊戲 ========= */
 startNewHand(true);
+</script>
+
+<script>
+// v2.7 runtime layout helpers: measure header height, control bar height, & iOS bottom UI
+(function(){
+  function setTopBarH(){
+    try{
+      var h = 0;
+      var head = document.querySelector('header') || document.querySelector('.header');
+      if (head) { h = head.getBoundingClientRect().height; }
+      document.documentElement.style.setProperty('--topBarH', Math.round(h) + 'px');
+    }catch(e){}
+  }
+  function setCtrlH(){
+    try{
+      var cs = document.querySelector('.controls-section');
+      var h = cs ? cs.offsetHeight : 0;
+      document.documentElement.style.setProperty('--ctrlH-runtime', h + 'px');
+    }catch(e){}
+  }
+  function setIosBottom(){
+    try{
+      var vv = window.visualViewport;
+      var delta = 0;
+      if (vv) {
+        var inner = window.innerHeight || 0;
+        delta = Math.max(0, Math.round(inner - vv.height - vv.offsetTop));
+      }
+      document.documentElement.style.setProperty('--iosBottomUI', delta + 'px');
+    }catch(e){}
+  }
+  function updateAll(){ setTopBarH(); setCtrlH(); setIosBottom(); }
+  ['load','resize','orientationchange','scroll'].forEach(function(ev){
+    window.addEventListener(ev, updateAll, {passive:true});
+  });
+  setTimeout(updateAll, 60);
+  setTimeout(updateAll, 300);
+})();
 </script>
 </body>
 </html>
