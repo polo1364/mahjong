@@ -1541,6 +1541,30 @@ button:active:not(:disabled) {
   color: #ffdf75;
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2.6.1 — Portrait: force battle log visible
+   ========================= */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* 戰況容器強制顯示、單欄且可捲動 */
+  .center-log-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    position: sticky;
+    top: 8px;          /* 在畫面頂緣下方吸附 */
+    z-index: 10;       /* 不被其它元素遮蔽 */
+    min-height: 24vh !important;
+    max-height: 40vh !important;
+    overflow: auto !important;
+  }
+  .center-log-right { display: none !important; }
+  #log.center-log {
+    max-height: inherit !important;
+    overflow: auto !important;
+  }
+}
+
 </style>
 </head>
 <body>
