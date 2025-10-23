@@ -1541,6 +1541,125 @@ button:active:not(:disabled) {
   color: #ffdf75;
 }
 
+
+
+/* =========================
+   📱 Mobile Polish v2 (只動手機)
+   - 依區域縮放：中心(你)手牌較大；四邊(他人)牌更小
+   - 壓縮留白、精簡邊框、優化按鈕操作
+   ========================= */
+
+/* 進一步通用優化：降低雙擊縮放干擾 */
+body { touch-action: manipulation; }
+
+/* --- 768px 以下：第一層收斂 --- */
+@media (max-width: 768px) {
+  /* 四邊區塊：去除除錯框、縮小內距 */
+  .top-area, .left-area, .right-area, .bottom-area {
+    border: none !important;
+    background: rgba(0,0,0,0.18);
+    padding: 4px;
+  }
+
+  /* 中央區域：手牌與戰況上下堆疊更緊湊 */
+  .mahjong-table {
+    grid-template-columns: 72px 1fr 72px;
+    grid-template-rows: 54px 1fr 54px;
+    min-height: 300px; max-height: 340px;
+    gap: 2px; padding: 3px; margin-top: 4px;
+  }
+  .center-area { padding: 6px; gap: 6px; }
+
+  /* 戰況+牌局資訊改成單欄堆疊（小螢幕更易讀） */
+  .center-log-container {
+    grid-template-columns: 1fr !important;
+    gap: 6px; padding: 6px;
+  }
+
+  /* 區域化牌面尺寸：中心(你)手牌較大；四邊更小 */
+  .center-area .hand-tiles .tile {
+    min-width: 32px; width: 32px; height: 44px;
+    padding: 6px 3px; font-size: 14px;
+  }
+  .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
+    min-width: 18px; width: 18px; height: 24px;
+    padding: 2px 1px; font-size: 9px;
+  }
+
+  /* 棄牌 / 副露容器縮小 */
+  .discard-top, .discard-bottom { width: 140px !important; height: 38px !important; }
+  .discard-left, .discard-right { width: 48px !important;  height: 96px !important; }
+  .meld-top, .meld-bottom     { width: 100px !important; height: 40px !important; }
+  .meld-left, .meld-right     { width: 48px !important;  height: 82px !important; }
+
+  /* 玩家資訊卡片更精簡 */
+  .player-info-inline { min-width: 78px; padding: 4px 6px; font-size: 11px; }
+  .player-info-inline .player-name,
+  .player-info-inline .player-score { font-size: 11px; }
+
+  /* 頂部設定膠囊可橫向滑動 */
+  header .row:first-child {
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  header .row:first-child::-webkit-scrollbar { display: none; }
+
+  /* 操作按鈕：縮排 + 自動換行 */
+  #controls { gap: 6px; }
+  #controls button { flex: 1 1 auto; min-width: 0; padding: 7px 10px; font-size: 12px; }
+}
+
+/* --- 480px 以下：再收一階（iPhone 窄寬） --- */
+@media (max-width: 480px) {
+  #table { margin: 6px auto; padding: 0 4px; }
+
+  .mahjong-table {
+    grid-template-columns: 68px 1fr 68px;
+    grid-template-rows: 52px 1fr 52px;
+    min-height: 280px; max-height: 320px;
+  }
+
+  /* 中心(你)手牌適度縮小一點點 */
+  .center-area .hand-tiles .tile {
+    min-width: 30px; width: 30px; height: 40px;
+    padding: 5px 3px; font-size: 13px;
+  }
+
+  /* 四邊(他人)牌再縮：避免擠壓中心 */
+  .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
+    min-width: 16px; width: 16px; height: 22px;
+    padding: 2px 1px; font-size: 9px;
+  }
+
+  .discard-top, .discard-bottom { width: 120px !important; height: 36px !important; }
+  .discard-left, .discard-right { width: 44px !important;  height: 90px !important; }
+  .meld-top, .meld-bottom       { width: 90px !important;  height: 38px !important; }
+  .meld-left, .meld-right       { width: 44px !important;  height: 80px !important; }
+
+  /* 操作鍵做成置底吸附（Safe-Area 友善） */
+  .controls-section {
+    position: sticky; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,40,85,.55), rgba(0,40,85,.9));
+    backdrop-filter: blur(6px);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    z-index: 120;
+  }
+  #controls { gap: 4px; }
+  #controls button { padding: 6px 8px; font-size: 12px; }
+
+  /* 方向箭頭縮小，避免遮擋 */
+  .turn-indicator { font-size: 24px; }
+}
+
+/* --- 360px 以下：特小螢幕保命值 --- */
+@media (max-width: 360px) {
+  .center-area .hand-tiles .tile {
+    min-width: 28px; width: 28px; height: 38px; font-size: 12.5px;
+  }
+  .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
+    min-width: 14px; width: 14px; height: 20px; font-size: 8px;
+  }
+}
+
 </style>
 </head>
 <body>
