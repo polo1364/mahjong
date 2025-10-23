@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#082a55">
+  <link rel="manifest" href="manifest.webmanifest">
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>大瑞科技 - 麻將單機</title>
@@ -1627,6 +1633,51 @@ button:active:not(:disabled) {
   .top-area .tile, .left-area .tile, .right-area .tile, .bottom-area .tile {
     min-width: 16px; width: 16px; height: 22px; font-size: 9px; padding: 2px 1px;
   }
+}
+
+
+
+/* =========================
+   📱 Mobile Polish v2.3 — Portrait space fix, Landscape cleaner, stronger overlay
+   ========================= */
+
+/* Portrait spacing: reserve more space for bottom controls & keep log taller */
+@media (max-width: 768px) and (orientation: portrait) {
+  .center-area { padding-bottom: 96px; } /* 原 78 → 96 */
+  .bottom-area { margin-bottom: calc(88px + env(safe-area-inset-bottom)); } /* 原 56/60 → 88 */
+  .center-log-container { min-height: 22vh; max-height: 34vh; } /* 戰況更容易看到 */
+  /* 玩家下方資訊卡片稍微縮小避免撞到按鈕 */
+  .bottom-area .player-info-inline { transform: scale(0.9); transform-origin: left bottom; }
+}
+
+/* Landscape: cleaner "fullscreen-like" */
+@media (orientation: landscape) and (max-width: 1024px) {
+  /* 隱藏左右與上方玩家資訊卡片，集中視線在牌桌 */
+  .left-area .player-info-inline,
+  .right-area .player-info-inline,
+  .top-area .player-info-inline { display: none !important; }
+
+  /* 自己的資訊卡片保留但變小，並且不與按鈕打架 */
+  .bottom-area .player-info-inline {
+    transform: scale(.9); transform-origin: left bottom;
+    margin-bottom: 34px;
+  }
+
+  /* 增加手牌尺寸（可讀性） */
+  .center-area .hand-tiles .tile {
+    min-width: 36px; width: 36px; height: 52px; font-size: 16px;
+  }
+}
+
+/* Controls overlay stronger z-index and backdrop */
+.controls-section {
+  z-index: 500 !important;
+  backdrop-filter: blur(6px);
+}
+
+/* Remove any debug outlines/borders on small screens just in case */
+@media (max-width: 1024px) {
+  *[style*="outline"], *[style*="border: 1px solid red"] { outline: none !important; border: none !important; }
 }
 
 </style>
