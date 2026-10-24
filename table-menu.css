@@ -404,3 +404,13 @@ html:not(.cultivation-mode) #tableMenu #tmPage-voice .hero-voice-preview { displ
   #tableMenu #tmPage-voice label { flex: none; }
   html:not(.cultivation-mode) #tableMenu #tmPage-voice .hero-voice-preview { display: none; }
 }
+
+/* App version label and update banner */
+.app-version { position: absolute; right: 14px; bottom: 8px; font: 11px/1 "Segoe UI", "Microsoft JhengHei", sans-serif; color: #8f9cb6; letter-spacing: .5px; pointer-events: none; opacity: .85; }
+#tableMenu .table-menu-heading { position: relative; }
+#tableMenu .table-menu-heading > .app-version { right: 22px; bottom: 4px; }
+#startScreen > .app-version { position: fixed; right: 16px; bottom: 12px; z-index: 5; }
+.app-update-banner { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 400; display: flex; align-items: center; gap: 10px;
+  padding: 8px 18px; border-radius: 999px; border: 1px solid #fff1c8; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c);
+  box-shadow: 0 10px 26px #000a; font: 13px "Microsoft JhengHei", sans-serif; cursor: pointer; }
+.app-update-banner b { font-size: 14px; } .app-update-banner:disabled { opacity: .8; cursor: progress; }

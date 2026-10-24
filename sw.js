@@ -4,6 +4,12 @@ const CACHE_PREFIX = `mahjong-pwa:${new URL(self.registration.scope).pathname}:`
 const CACHE_NAME = CACHE_PREFIX + self.MAHJONG_PRECACHE.version;
 const shellURLs = new Set(self.MAHJONG_PRECACHE.urls.map(path => new URL(path, self.registration.scope).href));
 
+self.addEventListener('message', event => {
+  const data = event.data || {};
+  if (data.type === 'MAHJONG_SKIP_WAITING') self.skipWaiting();
+  if (data.type === 'MAHJONG_VERSION') event.source?.postMessage({ type: 'MAHJONG_VERSION', version: self.MAHJONG_PRECACHE.version, label: self.MAHJONG_PRECACHE.label });
+});
+
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(
     [...shellURLs].map(url => new Request(url, { cache: 'reload' }))
