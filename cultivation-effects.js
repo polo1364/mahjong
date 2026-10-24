@@ -102,6 +102,8 @@
         this.inStage = !!(slot && slot.w > 24 && slot.h > 24);
         this.beastSize = this.inStage ? Math.min(slot.w, slot.h * 1.5) : Math.min(190, Math.max(72, this.w * .17));
         const card = monster || { x: this.w / 2 - 60, y: this.h * .4, w: 120, h: 120 };
+        // Move names sit just above the monster card so they never cover its name or HP bar.
+        this.bannerY = this.inStage ? Math.max(22, card.y - 14) : null;
         if (this.inStage) this.target = center(slot);
         else {
           this.target = { x: card.x + card.w + this.beastSize * .48 + 9, y: card.y + card.h * .46 };
@@ -286,7 +288,7 @@
       const to = item.type === 'hurt' ? actor : attack || enemyAura ? target : actor;
       const size = Math.min(this.w * .32, 125 + item.profile.tier * 22);
       if (item.type === 'skill' || item.type === 'finisherPart') {
-        this.text(item.label, this.w / 2, this.demo ? 28 : Math.max(32, target.y - 80), Math.sin(progress * Math.PI), '#ffe3a2', this.w < 450 ? 15 : 19); return;
+        this.text(item.label, this.w / 2, this.demo ? 28 : this.bannerY ?? Math.max(32, target.y - 80), Math.sin(progress * Math.PI), '#ffe3a2', this.w < 450 ? 15 : 19); return;
       }
       if (item.type === 'kill' || item.type === 'spawn') {
         this.texture(item.type === 'kill' ? 'dust' : 'seal', to.x, to.y, size * (1 + progress), 0, (1 - progress) * .7);
@@ -393,6 +395,8 @@
       const canvas = document.createElement('canvas'); canvas.id = 'cultivationBattleEffects'; canvas.className = 'cult-battle-effects'; canvas.setAttribute('aria-hidden', 'true'); table.append(canvas); main = new Stage(canvas);
       loadAssets().then(()=>{if(active)main?.wake();});
     }
+    // Table re-renders can detach the canvas; put it back so the monster and effects stay visible.
+    if (!main.canvas.isConnected) { const table = document.getElementById('playersGrid'); if (!table) return; table.append(main.canvas); }
     main.layout();
     main.monster = state.cultivation.monster;
     loadMonster(state.cultivation.version >= 2 ? main.monster.speciesId : null);

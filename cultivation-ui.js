@@ -384,6 +384,21 @@
     dialog.showModal(); dialog.querySelector('[data-option]')?.focus();
   }
 
+  // 終式連招與跨局劫印: summary card, one row per finisher part with its share bar, seals as per-player cards.
+  function finishSheet(state, combat) {
+    const f = combat.finisher, method = f ? { selfDraw: '自摸', discard: '點胡', robKong: '搶槓' }[f.method] || '胡牌' : '';
+    const top = Math.max(1, ...(f?.parts || []).map(part => part.damage || 0));
+    const summary = f
+      ? `<section class="cfs-summary"><div><small>終式施放者</small><strong>${escape(playerName(state, f.pid))}</strong><i>${escape(method)}</i></div><div class="cfs-total"><small>終式總傷害</small><b>${number(f.total)}</b></div></section>`
+      : '<section class="cfs-summary cfs-none"><strong>本局無胡牌終式</strong></section>';
+    const parts = (f?.parts || []).map((part, index) => `<li class="cfs-part"><span class="cfs-index">${index + 1}</span><span class="cfs-name"><i>${escape(part.label)}</i><strong>${escape(part.name)}</strong></span><span class="cfs-bar" aria-hidden="true"><em style="width:${Math.round((part.damage || 0) / top * 100)}%"></em></span><b>${number(part.damage)}</b></li>`).join('');
+    const seals = combat.players.map((p, pid) => {
+      const pending = p.pendingSeals?.length ? sealList(p, 'pendingSeals').split(/[；;]/).map(text => text.trim()).filter(Boolean) : [];
+      if (!pending.length && !p.expiredSeals?.length) return '';
+      return `<article class="cfs-seal-card"><header><strong>${escape(playerName(state, pid))}</strong><span>${pending.length ? '下一局生效' : '已解除'}</span></header>${pending.length ? `<ul>${pending.map(text => { const [name, ...rest] = text.split(/[:：]/); return `<li><b>${escape(name)}</b>${rest.length ? `<span>${escape(rest.join('：'))}</span>` : ''}</li>`; }).join('')}</ul>` : '<p>上一局劫印已於本局結算後解除。</p>'}</article>`;
+    }).join('');
+    return `<div class="cfs">${summary}<div class="cfs-cols">${parts ? `<section class="cfs-col"><h3 class="cfs-title">終式連招</h3><ol class="cfs-parts">${parts}</ol></section>` : ''}${seals ? `<section class="cfs-col"><h3 class="cfs-title">跨局劫印</h3><div class="cfs-seals">${seals}</div><p class="cfs-note">劫印於下一局生效、下一局結束解除；普通淨化無效。</p></section>` : ''}</div></div>`;
+  }
   function showResult(state) {
     if (!state?.cultivation) return;
     const panel = document.querySelector('#reactionPanel .result-panel');
@@ -398,10 +413,7 @@
     if (head) head.innerHTML = `<div class="eyebrow">修仙論道 · 第 ${number(combat.handNumber || 1)} 局 · 傷害結算</div><h3>${failed ? '全員虛弱 · 挑戰結束' : `${leaders.length > 1 ? '並列首席' : '本局首席'} · ${leaders.map(row => escape(playerName(state, row.pid))).join('、')}`}</h3><div class="rs-summary"><span class="rs-from">${won ? `${escape(playerName(state, state.winner))}${(combat.finisher?.method === 'selfDraw' || (!combat.finisher && state.fromPlayer === -1)) ? '自摸' : combat.finisher?.method === 'robKong' ? '搶槓' : '點胡'}，終式已計分` : '無胡牌終式'}</span><span>擊敗 ${number(combat.kills?.length)} 隻 · 傷害含過量傷害</span></div>`;
     if (head && (combat.finisher || combat.players.some(p => p.pendingSeals?.length || p.expiredSeals?.length))) {
       head.insertAdjacentHTML('beforeend', `<button type="button" class="cult-finish-detail">終式 ${number(combat.finisher?.total || 0)} 傷害 · 查看連招與劫印</button>`);
-      head.querySelector('.cult-finish-detail').onclick = () => information('終式連招與跨局劫印',
-        `<p>${combat.finisher ? `${escape(playerName(state, combat.finisher.pid))} · ${escape({ selfDraw: '自摸', discard: '點胡', robKong: '搶槓' }[combat.finisher.method])} · 共 ${number(combat.finisher.total)} 傷害` : '本局無胡牌終式'}</p>`
-        + (combat.finisher?.parts || []).map(part => `<div class="cult-finish-part"><span>${escape(part.label)} → <strong>${escape(part.name)}</strong></span><b>${number(part.damage)} 傷害</b></div>`).join('')
-        + combat.players.map((p, pid) => `${p.expiredSeals?.length ? `<p>${escape(playerName(state, pid))}：上一局劫印已於本局結算後解除。</p>` : ''}${p.pendingSeals?.length ? `<p class="cult-pending-seals">${escape(playerName(state, pid))} · 下一局生效：${escape(sealList(p, 'pendingSeals'))}。下一局結束解除，普通淨化無效。</p>` : ''}`).join(''));
+      head.querySelector('.cult-finish-detail').onclick = () => information('終式連招與跨局劫印', finishSheet(state, combat), 'cult-finish-sheet');
     }
     panel.querySelectorAll('.result-player').forEach((row, pid) => {
       const identity = row.querySelector('.rs-name');
