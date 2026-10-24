@@ -15,6 +15,10 @@ for (const file of [...files, 'sw.js']) {
   hash.update(file).update(/\.(html|css|js|webmanifest)$/.test(file)
     ? content.toString('utf8').replace(/\r\n/g, '\n') : content);
 }
+// Images are cached on first use under their unchanged URLs, so any art change must also bump the version.
+const walk = dir => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap(entry =>
+  entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name).split(path.sep).join('/')]);
+for (const asset of walk('assets').sort()) hash.update(asset).update(fs.readFileSync(path.join(root, asset)));
 const version = hash.digest('hex').slice(0, 16);
 const target = path.join(root, 'pwa-assets.js');
 // The label keeps its build date while the content is unchanged, so --check stays stable.

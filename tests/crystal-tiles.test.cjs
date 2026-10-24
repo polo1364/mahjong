@@ -32,8 +32,10 @@ test('all source rectangles are inside the selected PNG and never overlap anothe
   for (const [name, sheet] of Object.entries(art.sheets)) {
     const bytes = fs.readFileSync(path.join(root, 'assets/tiles-crystal', sheet.file));
     assert.equal(bytes.subarray(1, 4).toString(), 'PNG');
-    assert.equal(bytes.readUInt32BE(16), sheet.width);
-    assert.equal(bytes.readUInt32BE(20), sheet.height);
+    // Runtime sheets may be downscaled; crops use the source coordinate system, so only the aspect ratio must hold.
+    const ratio = bytes.readUInt32BE(16) / bytes.readUInt32BE(20);
+    assert.ok(Math.abs(ratio - sheet.width / sheet.height) < 0.005, `${sheet.file} aspect ratio`);
+    assert.ok(bytes.readUInt32BE(16) >= sheet.width / 2 - 1, `${sheet.file} keeps at least half resolution`);
     const rectangles = Object.entries(art.tiles).filter(([, tile]) => tile.sheet === name);
     for (let i = 0; i < rectangles.length; i++) {
       const [key, { rect: [x, y, w, h] }] = rectangles[i];
@@ -45,7 +47,7 @@ test('all source rectangles are inside the selected PNG and never overlap anothe
   }
 });
 
-test('runtime PNGs match their selected manifest sources and recorded hashes byte for byte', () => {
+test('runtime PNGs and their art sources match their recorded hashes', () => {
   const digest = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
   const assets = path.join(root, 'assets/tiles-crystal');
   const manifest = JSON.parse(fs.readFileSync(path.join(assets, 'manifest.json'), 'utf8').replace(/^\uFEFF/, ''));
@@ -54,7 +56,8 @@ test('runtime PNGs match their selected manifest sources and recorded hashes byt
     const selected = manifest.sheets.find(entry => entry.file === sheet.file);
     assert.equal(typeof selected.source, 'string', sheet.file);
     const runtimeHash = digest(path.join(assets, sheet.file));
-    assert.equal(runtimeHash, digest(path.resolve(assets, selected.source)), `${sheet.file} differs from its selected source`);
+    // The art source is unchanged; the runtime copy is the recorded optimized build of it.
+    assert.equal(digest(path.resolve(assets, selected.source)), selected.sourceSha256.toLowerCase(), `${sheet.file} source differs from its recorded hash`);
     assert.equal(runtimeHash, selected.sha256.toLowerCase(), `${sheet.file} differs from its recorded hash`);
   }
 });

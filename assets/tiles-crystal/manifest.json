@@ -1,7 +1,7 @@
 {
   "title": "五行晶石麻將圖集",
   "source": "../../art-source/previews/tile-crystal-full-preview-20261021/manifest.json",
-  "pixelPolicy": "Selected generated PNGs copied byte-for-byte; browser crops retain the native resolution. Numbered and flower tile corner text removed with built-in image_gen; honor atlas unchanged.",
+  "pixelPolicy": "Selected generated PNGs are the art sources (sourceSha256). Runtime copies are resized to half size and palette-compressed by tools/optimize-assets.py; crystal-tiles.js keeps the source coordinate system and stretches each sheet back to it, so crops are unchanged. Numbered and flower tile corner text removed with built-in image_gen; honor atlas unchanged.",
   "renderer": "../../crystal-tiles.js",
   "faceCount": 42,
   "backCount": 1,
@@ -10,7 +10,7 @@
       "file": "01-wan-red-crystal-no-label.png",
       "width": 1086,
       "height": 1448,
-      "sha256": "A0480407B59F217F2DAACB008B708C181A0A53F6BA7A5C7BC6929176F94FBEF9",
+      "sha256": "EA811972FF81058E55421F17442B74D343B166E5DD02BF70F2191F82CD8A56DA",
       "tileKeys": [
         "W1",
         "W2",
@@ -22,13 +22,16 @@
         "W8",
         "W9"
       ],
-      "source": "../../art-source/edits/tile-crystal-no-label-20261021/01-wan-red-crystal-no-label.png"
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/01-wan-red-crystal-no-label.png",
+      "sourceSha256": "A0480407B59F217F2DAACB008B708C181A0A53F6BA7A5C7BC6929176F94FBEF9",
+      "runtimeWidth": 543,
+      "runtimeHeight": 724
     },
     {
       "file": "02-dots-spirit-pearls-no-label.png",
       "width": 1086,
       "height": 1448,
-      "sha256": "AF7C623A284F423BCF9B225F9AA94DCA2E0839A65DE1B335E8317FBFD7408CC4",
+      "sha256": "55051F9858705C0C8351A39E548CB39AFE36E7D5DA6417ABD3A226EAD8A76119",
       "tileKeys": [
         "T1",
         "T2",
@@ -40,13 +43,16 @@
         "T8",
         "T9"
       ],
-      "source": "../../art-source/edits/tile-crystal-no-label-20261021/02-dots-spirit-pearls-no-label.png"
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/02-dots-spirit-pearls-no-label.png",
+      "sourceSha256": "AF7C623A284F423BCF9B225F9AA94DCA2E0839A65DE1B335E8317FBFD7408CC4",
+      "runtimeWidth": 543,
+      "runtimeHeight": 724
     },
     {
       "file": "03-bamboo-flying-swords-no-label.png",
       "width": 1086,
       "height": 1448,
-      "sha256": "519C22CD88EC91E91E3354FBE6815A32D4924511FBF5A3D4FB1F5859D0D3AC85",
+      "sha256": "CDD3A819543C43085C24F7B880142B03DDE9D8633C8035DCE7FC31780602FF46",
       "tileKeys": [
         "B1",
         "B2",
@@ -58,13 +64,16 @@
         "B8",
         "B9"
       ],
-      "source": "../../art-source/edits/tile-crystal-no-label-20261021/03-bamboo-flying-swords-no-label.png"
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/03-bamboo-flying-swords-no-label.png",
+      "sourceSha256": "519C22CD88EC91E91E3354FBE6815A32D4924511FBF5A3D4FB1F5859D0D3AC85",
+      "runtimeWidth": 543,
+      "runtimeHeight": 724
     },
     {
       "file": "04-honors-and-back.png",
       "width": 1536,
       "height": 1024,
-      "sha256": "C5A211B5F3128306031B19B2DA33E091F74B67A3749284AED008E5D7C0760107",
+      "sha256": "F746C459FF2B10BFC380C02E423D0EF6E00E448A3E6868B0FEB3CDB024B1B976",
       "tileKeys": [
         "FE",
         "FS",
@@ -75,13 +84,16 @@
         "DB",
         "BACK"
       ],
-      "source": "../../art-source/previews/tile-crystal-full-preview-20261021/04-honors-and-back.png"
+      "source": "../../art-source/previews/tile-crystal-full-preview-20261021/04-honors-and-back.png",
+      "sourceSha256": "C5A211B5F3128306031B19B2DA33E091F74B67A3749284AED008E5D7C0760107",
+      "runtimeWidth": 768,
+      "runtimeHeight": 512
     },
     {
       "file": "05-flowers-eight-no-label.png",
       "width": 1536,
       "height": 1024,
-      "sha256": "7D30D0D84D22B3F3EBD31F98C58BFCA3E172180EEF386859CD174E73B536AA6B",
+      "sha256": "734BEC4D746CDDAA165DE0ABBD732F14AC3DB7291806BBD97E5B7B1B99A67E9C",
       "tileKeys": [
         "H1",
         "H2",
@@ -92,7 +104,10 @@
         "H7",
         "H8"
       ],
-      "source": "../../art-source/edits/tile-crystal-no-label-20261021/05-flowers-eight-no-label.png"
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/05-flowers-eight-no-label.png",
+      "sourceSha256": "7D30D0D84D22B3F3EBD31F98C58BFCA3E172180EEF386859CD174E73B536AA6B",
+      "runtimeWidth": 768,
+      "runtimeHeight": 512
     }
   ],
   "editedSource": "../../art-source/edits/tile-crystal-no-label-20261021/manifest.json",
