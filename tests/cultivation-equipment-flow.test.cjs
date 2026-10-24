@@ -22,6 +22,7 @@ test('V2 migration only publishes saved V3 and failed prepare retries the exact 
 });
 test('preparation persistence locks direct new-session and restore navigation',async()=>{
   const {run}=setup();run(`endHand();let finishSave;writeGameSave=()=>new Promise(resolve=>{finishSave=resolve;});let original=S;continueCultivationResult();`);
+  await Promise.resolve();
   assert.equal(run(`startNewSession('cultivation')`),false);assert.equal(run('S===original'),true);
   assert.throws(()=>run('restoreGame({})'),/正在儲存/);
   run('finishSave(true)');await run('cultivationPreparationSave');assert.equal(run('shown'),1);
@@ -38,7 +39,7 @@ test('next hand preserves the committed preparation autosave until a new hand sa
   const {run}=setup();run(`endHand();writeGameSave=async()=>true;continueCultivationResult();`);await run('cultivationPreparationSave');
   run(`let clearCalls=0;clearAutoSave=async()=>{clearCalls++;};startNewSession('cultivation');`);
   assert.equal(run('S.cultivation.handNumber'),2);assert.equal(run('clearCalls'),0);
-  run(`startNewSession('cultivation',{freshJourney:true})`);assert.equal(run('clearCalls'),1);
+  run(`startNewSession('cultivation',{freshJourney:true})`);assert.equal(run('clearCalls'),0);
 });
 test('restored legacy V2 preparation migrates save-first and retries without opening V2 courtyard',async()=>{
   const {run}=setup();run(`endHand();S.cultivation=window.MahjongCultivationCombat.prepare(S.cultivation);

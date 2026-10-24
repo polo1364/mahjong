@@ -1,5 +1,27 @@
 # 🀄 台灣16張麻將模擬器
-> 雀仙門 · 橫式 PWA｜更新：2026-10-24
+> 雀仙門 · 橫式 PWA｜更新：2026-10-25
+
+## 修仙永久養成
+
+玩家修為與境界由十位角色共用，重新開始旅程仍保留；三位 AI 各自養成，隨新旅程重置。正常完成一局取得 12 修為，吃、碰、槓、補花、胡牌各類操作最多再加 3 點。試煉、中途離開與舊存檔歷史牌局不補發修為。
+
+| 境界 | 累積修為 | 功法點 | 可配功法 | 單項最高等級 |
+| --- | ---: | ---: | ---: | ---: |
+| 煉氣 | 0 | 1 | 1 | 1 |
+| 築基 | 100 | 2 | 1 | 2 |
+| 金丹 | 400 | 4 | 2 | 3 |
+| 元嬰 | 1000 | 5 | 2 | 3 |
+| 化神 | 2200 | 6 | 2 | 3 |
+
+20 修為開放六種功法。整備的「修行」頁可免費退點、重新配置及挑戰渡劫；手機先按「角色・修行」。境界與功法加成和裝備相加，再套用角色原有倍率；新增仇恨的綜合倍率最低 0.75。每局開局固定養成快照，戰鬥途中不變更能力。
+
+渡劫使用獨立存檔與原旅程的角色、裝備、道具副本，全員回滿生命、不帶劫印。擊敗目標立即成功；失敗或放棄不扣修為、不消耗原旅程道具。突破取得稱號，以及當下旅程一次性金幣／靈砂：築基 100／5、金丹 200／10、元嬰 300／15、化神 400／20。AI 依目前境界期間的隊伍擊殺提早突破，化神戰績條件為 2 隻 BOSS；修為達標後若戰績不足，最多再完成 10 局即可保底突破。每次整備至多一階。
+
+四階試煉生命倍率為原型的 **1／0.85／0.85／0.95**。最終驗證完成 30 段連續旅程、4,921 局正常牌局及 197 次試煉；其中預先指定的 20 段獨立旅程，四階首次通過率為 90%／45%／75%／50%，各階 AI 平均絕對突破局差最高 9.57 局。這是固定種子的有限樣本結果，並非所有玩家的保證通過率。一般征途怪物沒有因此削弱。整備的同行摘要可查看 AI 的功法、突破、裝備強化、備妥道具與剩餘資源。
+
+首頁可繼續或放棄未完成渡劫。試煉期間停用手動封存，普通旅程自存保持不變；突破、領獎紀錄與原旅程錢包在同一筆 IndexedDB 交易提交。修為收據避免重複結算，存檔版本檢查避免舊分頁覆寫新進度。舊檔在安全整備階段初始化養成，不回補歷史修為；手動讀取舊牌局不會回退永久境界或再次領取同局修為。
+
+養成資料使用 `cultivationProgressionV1`、渡劫使用 `cultivationTrialSaveV1`，一般修仙旅程仍使用 `cultivationAutoSaveV1`／`cultivationManualSaveV1`。這些資料只在目前瀏覽器的本機 IndexedDB，沒有跨裝置同步。規格與驗證見 [養成規格](docs/CULTIVATION_PROGRESSION_PLAN.md)及[養成驗證紀錄](docs/verification/CULTIVATION_PROGRESSION_VERIFICATION.md)。
 
 ## 安裝與橫式遊玩
 
@@ -9,7 +31,7 @@
 - **iPhone／iPad Safari**：透過 HTTPS 開啟網站，使用「分享 → 加入主畫面」，再從主畫面開啟並橫放裝置。
 - 第一次需要連線。Service Worker 安裝完成後會快取程式主體、10 張角色縮圖及 5 張常用麻將圖集；其他圖片與音效採使用時快取。可離線重新開啟並進入一般模式，但尚未載入的圖片／語音／新修仙場景仍需要連線；不保證完整素材全部離線可用。
 - 更新版本會等待此網站的舊遊戲分頁全部關閉後啟用，不會強制重載正在玩的牌局。更新前可在設定儲存進度；快取更新不會清除 IndexedDB 或 localStorage。
-- 安裝與離線功能需要 **HTTPS 或本機 localhost／127.0.0.1**；直接雙擊 `index.html` 可遊玩，但無法安裝 PWA，也不會註冊 Service Worker。
+- 安裝與離線功能需要 **HTTPS 或本機 localhost／127.0.0.1**；請依下列方式透過本機 HTTP 啟動；直接雙擊 `index.html` 的修仙養成流程未驗證，亦無法安裝 PWA。
 
 ### 本機啟動與部署
 
@@ -19,7 +41,7 @@ python -m http.server 8765 --bind 127.0.0.1
 
 開啟 <http://127.0.0.1:8765/>。正式部署請完整保留根目錄的 HTML、JS、CSS、`manifest.webmanifest`、`sw.js`、`pwa-assets.js` 與 `assets/`。所有 PWA 路徑均為相對路徑，可部署於網域根目錄或 `/mahjong/` 子路徑。
 
-若使用 GitHub Pages，可在儲存庫 **Settings → Pages** 選擇從 `main` 分支的 `/ (root)` 發布；本次 push 本身不代表已啟用網站部署。
+本專案的 GitHub Pages 已設定從 `main` 分支的 `/ (root)` 發布：[開啟遊戲](https://polo1364.github.io/mahjong/)。push 後仍須等 Pages 建置完成；網站部署狀態與本機測試結果分開確認。
 
 修改正式 HTML／CSS／JS／manifest 後，提交前重新產生快取清單：
 
@@ -30,7 +52,7 @@ node tools/build-pwa.cjs --check
 
 圖示來源為 `assets/pwa/icon.svg`；需要重製 PNG 時先執行 `node tools/build-pwa-icons.cjs`（需要 Playwright／Chromium），再產生快取清單。
 
-### 本次驗證與文件
+### PWA 驗證與文件
 
 ```powershell
 node --test tests/engine.test.cjs tests/crystal-tiles.test.cjs tests/opening-runtime.test.cjs
@@ -53,7 +75,7 @@ node tests/start-screen.cjs
 
 - 「首頁 → 模式選擇 → 牌桌」提供一般與修仙模式。首頁與模式頁不建立牌局；有暫存時分別顯示「繼續一般模式」「繼續修仙模式」，續局不重播洗牌或戰鬥事件，無效暫存留在首頁並顯示錯誤。設定內可儲存並返回首頁。
 - 修仙模式保留台灣十六張與 144 張牌：一名玩家和三名 AI 共打五行怪物，依累積傷害排名；合法出牌普攻、吃碰槓與花牌施放獨立技能，怪物每四次出牌在玩家反應完成後攻擊。胡牌施放終式後結算，胡牌者不一定傷害第一。完整 [170 招技能](docs/CULTIVATION_SKILLS.md)、[戰鬥／結算預覽](artifacts/cultivation-preview.html) 與 [驗證報告](docs/verification/CULTIVATION_VERIFICATION.md)。數值仍屬測試起點。
-- 修仙使用 `cultivationAutoSaveV1`／`cultivationManualSaveV1`，保存戰鬥、亂數、預告與待處理反應；一般模式保留 `autoSave`／`manualSave` 及既有點數收付。沒有新增裝備、掉落或永久修為。
+- 修仙使用 `cultivationAutoSaveV1`／`cultivationManualSaveV1`，保存戰鬥、亂數、預告與待處理反應；一般模式保留 `autoSave`／`manualSave` 及既有點數收付。裝備、道具與 AI 養成跟隨旅程，玩家永久養成另行保存。
 - 42 種牌名改為赤晶、靈珠、飛劍與指定的字牌／花牌短名。`tile-names.js` 統一提示、戰況、無障礙名稱與試聽；舊名稱仍可解析，牌 key、牌圖、一般模式規則及存檔格式不變。元素與技能另由修仙模組定義。
 - 新版 42 段 Kevin Tu 語音獨立放在 `assets/audio/voice-crystal-v1/`；一般補花報公開花牌名稱，開局補花不逐張排入語音，連補保留合併。首頁、模式與完整牌名／語音預覽見 [本次預覽](artifacts/crystal-start-preview.html)，驗證見 [本次交付紀錄](docs/verification/CRYSTAL_START_VERIFICATION.md)。
 - 依已確認的結構預覽改為填滿可用視窗的四家牌桌，桌機採寬桌；四家資訊卡顯示頭像、名稱、風位、分數與手牌張數。自家手牌與副露共同按可用空間縮放，留在桌內、全部同排且不左右滑動。桌面持續顯示其他三家的暗手牌背、公開副露、花牌與棄牌。
@@ -85,7 +107,7 @@ node tests/start-screen.cjs
 - 換莊同步更新門風；修正起手天聽與已出牌後誤計地胡／人胡。搶槓依座次等待胡／過，讀檔維持優先順序；報聽後槓牌會續玩，槓上開花不被報聽視窗遮住。
 - 底台收付改為一般台灣麻將方式：點胡／搶槓由放槍者付一份，自摸由其他三家各付一份；莊家與連莊加台只影響涉及莊家的收付。
 
-直接開啟 `index.html` 即可使用；請一併保留 `cultivation-skills.js`、`cultivation-finishers.js`、`cultivation-combat.js`、`cultivation-ui.js`、`cultivation.css`、`start-screen.*`、`tile-names.js`、`styles.css`、`lounge.css`、`table-layout.*`、`table-scene.css`、`table-menu.js`、`table-menu.css`、`opening-animation.*`、`table-art.css`、`theme-xianxia.css`、`crystal-tiles.js`、`crystal-tiles.css`、`feedback-*.js`、`feedback-effects.css` 與 `assets/`（含 `player-portraits.png`）。場景與牌面為原創素材，無外部 CDN 或字型下載。
+透過上述本機 HTTP 服務開啟 `index.html`；請一併保留 `cultivation-skills.js`、`cultivation-finishers.js`、`cultivation-combat.js`、`cultivation-progression*.js`／`cultivation-progression-ui.css`、`cultivation-ui.js`、`cultivation.css`、`start-screen.*`、`tile-names.js`、`styles.css`、`lounge.css`、`table-layout.*`、`table-scene.css`、`table-menu.js`、`table-menu.css`、`opening-animation.*`、`table-art.css`、`theme-xianxia.css`、`crystal-tiles.js`、`crystal-tiles.css`、`feedback-*.js`、`feedback-effects.css` 與 `assets/`（含 `player-portraits.png`）。場景與牌面為原創素材，無外部 CDN 或字型下載。
 
 右上「設定」可直接調整特效、音量與語音開關。「晶石牌名與語音」展開後可查看對照與試聽 63 個選項（42 牌名、16 圈風、5 莊家）。聲音預設開啟，語音預設關閉；偏好獨立保存，不改牌局或分數。瀏覽器要在第一次點擊或按鍵後才會出聲，口音與聽感仍以使用者試聽為準。
 
@@ -174,7 +196,7 @@ node tests/gameplay-audit.cjs --controlled --mobile --sound --voice --style=ink 
 
 本版採 [明列的台灣 16 張含花規則](docs/RULES.md)。各地對花槓、全求獨聽、高階牌型有差異，以本桌規則為準。八對子已移除；舊版無花存檔保留但不能載入，須重新開局，主動儲存會更新同一手動存檔。新版存讀檔核對 144 張牌，含花牌與過水狀態。
 
-手機驗證為 Chromium 視窗模擬，尚未在實體 iOS／Android 裝置驗收，也未部署公開網站。存檔依目前瀏覽器與來源隔離；切換瀏覽器、HTTP 位址或 file 開啟模式不會自動共用存檔。離頁非同步存檔無法保證完成，離開前可使用「儲存牌局」。
+手機驗證使用 Chromium／WebKit 的瀏覽器視窗，尚未在實體 iOS／Android 裝置驗收；公開網站為上方 GitHub Pages 連結。存檔依目前瀏覽器與來源隔離；切換瀏覽器、HTTP 位址或 file 開啟模式不會自動共用存檔。離頁非同步存檔無法保證完成，離開前可使用「儲存牌局」。
 
 歷史版面結果（2026-10-22，加入橫式限制之前）：當時 320×568 的 17 張手牌寬 14px，五槓情境暗手 11px、副露最小約 9.45px；未以影像放大或銳化宣稱增加解析度。當時 568×320 與 943px 的密集案例通過桌內邊界與資訊避讓，結論限於該輪報告的情境。**目前直式僅顯示轉向提醒，無法操作牌桌**；以上尺寸數據不屬本次 PWA 驗收。
 

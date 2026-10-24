@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="cultivation-prep-layout.css">
 <link rel="stylesheet" href="cultivation-choice.css">
 <link rel="stylesheet" href="cultivation-finish.css">
+<link rel="stylesheet" href="cultivation-progression-ui.css">
 <script src="image-assets.js"></script>
 <script src="image-loading.js"></script>
 <script src="tile-names.js"></script>
@@ -48,12 +49,16 @@
 <script src="hero-voices.js?v=hero-voices-20261023-1"></script>
 <script src="cultivation-monster-skills.js?v=monster-skills-1"></script>
 <script src="cultivation-monsters.js?v=monster-skills-1"></script>
+<script src="cultivation-progression.js"></script>
 <script src="cultivation-equipment.js?v=equipment-items-20261024-2"></script>
 <script src="cultivation-items.js?v=items-20261024-3"></script>
 <script src="cultivation-economy.js?v=items-20261024-3"></script>
 <script src="cultivation-combat.js?v=items-20261024-3"></script>
 <script src="cultivation-choreography.js?v=bronze-20261023-2"></script>
 <script src="cultivation-presentation.js?v=monster-skills-1"></script>
+<script src="cultivation-progression-store.js"></script>
+<script src="cultivation-progression-ui.js"></script>
+<script src="cultivation-progression-flow.js"></script>
 </head>
 <body>
 <dialog id="landscapeNotice" aria-labelledby="landscapeTitle" aria-describedby="landscapeDescription" tabindex="-1">
@@ -850,7 +855,7 @@ function finishCultivationFailure() {
   S.phase = 'end'; S.winner = null; S.fromPlayer = null;
   S.waitReact = null; S.currentReactions = null; S.cultivationAwaitingSelfDraw = false;
   hideReactionPanel(); clearReactionButtons();
-  log('四位道友皆陷入虛弱，戰鬥失敗。依累積傷害結算。');
+  log(S.cultivation?.result?.reason === 'trial' ? '渡劫目標已擊敗，請返回整備領取突破獎勵。' : '四位道友皆陷入虛弱，戰鬥失敗。依累積傷害結算。');
   renderAll(); autoSaveGame();
   scheduleGame(showHandsAndContinue, window.MahjongCultivationEffects?.resultDelay(window.MahjongPrefs?.pace) || 500);
 }
@@ -1185,6 +1190,12 @@ function beginDealtHand(firstAIDelay) {
       for (const tile of S.players[pid].flowers.slice().sort((a, b) => a.rank - b.rank)) {
         cultivationEvent({ type: 'flower', pid, key: tileKey(tile) });
       }
+    }
+    if (S.cultivation.ended) {
+      // All opening flowers are already physically revealed. Preserve their save metadata
+      // without casting more skills after an immediate trial victory.
+      S.cultivation.players.forEach((p,pid) => { p.flowers=S.players[pid].flowers.map(tileKey); });
+      finishCultivationFailure();return;
     }
   }
   if (resolveFlowerWin()) return;
@@ -3672,6 +3683,7 @@ let cultivationPreparationPending = null;
 let cultivationPreparationSave = null;
 function startNewSession(mode = gameMode, options = {}) {
   if (cultivationPreparationLocked) return false;
+  if (mode === 'cultivation' && window.MahjongProgressionFlow && !options.progressionReady) return window.MahjongProgressionFlow.guardStart(mode, options);
   const carry = mode === 'cultivation' && !options.freshJourney ? S?.cultivation || null : null;
   if (mode === 'cultivation' && !carry && !options.heroId) {
     const previous = S;
@@ -3702,9 +3714,9 @@ function startNewSession(mode = gameMode, options = {}) {
   // When starting a brand new game, reset the dealer streak counter.
   dealerStreak = 0;
   // 清除自動暫存
-  if (!carry) clearAutoSave();
+  if (!carry && mode !== 'cultivation') clearAutoSave();
   options.onStarted?.();
-  startNewHand(true, carry, options.heroId ? { heroId: options.heroId, equipment: options.equipment === true } : {});
+  startNewHand(true, carry, { ...(options.heroId ? { heroId: options.heroId, equipment: options.equipment === true } : {}), ...(options.progression ? {progression:options.progression,progressionId:options.progressionId} : {}) });
   return true;
 }
 
@@ -3712,6 +3724,7 @@ function showCultivationPreparation() {
   if (S?.cultivation?.version < 2 || !S?.cultivation?.ended) return;
   hideReactionPanel();
   window.MahjongCultivationJourneyUI.showPreparation(S, {
+    progression: window.MahjongProgressionFlow?.preparationOptions(),
     getState() { return S; },
     save(next) { return writeGameSave(gameSaveKey('auto'), next); },
     publish(next) { S = next; },
@@ -3726,24 +3739,31 @@ function continueCultivationResult() {
   if (cultivationPreparationLocked) return true;
   const source = S;
   if (!cultivationPreparationPending || cultivationPreparationPending.source !== source) {
-    cultivationPreparationPending = { source, next: {...source, cultivation: window.MahjongCultivationCombat.prepare(source.cultivation, {equipment:true})} };
+    cultivationPreparationPending = window.MahjongProgressionFlow
+      ? {source,promise:window.MahjongProgressionFlow.prepare(source)}
+      : { source, next: {...source, cultivation: window.MahjongCultivationCombat.prepare(source.cultivation, {equipment:true})} };
   }
-  const next = cultivationPreparationPending.next;
   cultivationPreparationLocked = true;
   document.getElementById('btnContinueNext').disabled = true;
-  cultivationPreparationSave = writeGameSave(gameSaveKey('auto'), next).then(saved => {
+  cultivationPreparationSave = Promise.resolve(cultivationPreparationPending.next || cultivationPreparationPending.promise).then(async next => {
+    const saved = await writeGameSave(gameSaveKey('auto'), next);
     if (saved !== true || S !== source) throw new Error('庭院進度未完成儲存');
     S = next;
     cultivationPreparationPending = null;
     cultivationPreparationLocked = false;
     showCultivationPreparation();
   }).catch(error => {
+    if (cultivationPreparationPending?.promise) cultivationPreparationPending = null;
     document.getElementById('saveStatus').textContent = `整備儲存失敗：${error.message}。請重試前往整備。`;
     cultivationPreparationLocked = false;
   }).finally(() => { document.getElementById('btnContinueNext').disabled = false; });
   return true;
 }
 document.getElementById('newGameBtn').onclick = () => {
+  if (S?.cultivation?.trial) {
+    if (confirm('放棄本次渡劫並返回原旅程整備？')) window.MahjongProgressionFlow.finishTrial(true).catch(error => log('返回整備失敗：'+error.message));
+    return;
+  }
   const freshJourney = gameMode === 'cultivation';
   const message = freshJourney ? '重開論道會重設牌局、連戰與所有劫印，確定重新開始嗎？' : '重新開局會重設目前牌局與分數，確定重新開始嗎？';
   if ((freshJourney || S && ['deal', 'play'].includes(S.phase)) && !confirm(message)) return;
@@ -3751,8 +3771,7 @@ document.getElementById('newGameBtn').onclick = () => {
 };
 
 // ========= IndexedDB 存檔/讀檔功能 =========
-function restoreGame(data, expectedMode) {
-  if (cultivationPreparationLocked) throw new Error('正在儲存整備交易，請稍候。');
+function validateGameSave(data, expectedMode) {
   const state = data?.gameState;
   const savedMode = state?.cultivation ? 'cultivation' : 'normal';
   if (expectedMode && expectedMode !== savedMode) throw new Error('存檔模式不符，未變更目前牌局。');
@@ -3795,6 +3814,12 @@ function restoreGame(data, expectedMode) {
       (state.waitReact && (!Array.isArray(state.waitReact) || state.waitReact.some(r => !['hu','pong','kong','chow'].includes(r.type) || !Number.isInteger(r.pid) || r.pid < 0 || r.pid > 3)))) {
     throw new Error('存檔牌局資料錯誤，未變更目前牌局。');
   }
+  return savedMode;
+}
+function restoreGame(data, expectedMode) {
+  if (cultivationPreparationLocked) throw new Error('正在儲存整備交易，請稍候。');
+  const savedMode = validateGameSave(data, expectedMode), state = data.gameState;
+  if (savedMode === 'cultivation') window.MahjongProgressionFlow?.observe(data);
   cancelGameTimers();
   window.MahjongCultivationJourneyUI?.close();
   S = clone(state);
@@ -3822,7 +3847,7 @@ function restoreGame(data, expectedMode) {
 
 function resumeRestoredHand() {
   if (S.phase === 'end') {
-    if (S.cultivation?.version === 2 && S.cultivation.journey.phase === 'preparation') { showHandsAndContinue(); continueCultivationResult(); }
+    if (S.cultivation?.journey?.phase === 'preparation' && (S.cultivation.version === 2 || (window.MahjongProgressionFlow && !S.cultivation.progression))) { showHandsAndContinue(); continueCultivationResult(); }
     else if (S.cultivation?.version === 3 && S.cultivation.journey.phase === 'preparation') showCultivationPreparation();
     else showHandsAndContinue();
     return;
@@ -3851,6 +3876,7 @@ const MANUAL_SAVE_KEY = 'manualSave';
 const CULTIVATION_AUTO_SAVE_KEY = 'cultivationAutoSaveV1';
 const CULTIVATION_MANUAL_SAVE_KEY = 'cultivationManualSaveV1';
 function gameSaveKey(kind, mode = gameMode) {
+  if (mode === 'cultivation' && S?.cultivation?.trial) return 'cultivationTrialSaveV1';
   return mode === 'cultivation'
     ? (kind === 'manual' ? CULTIVATION_MANUAL_SAVE_KEY : CULTIVATION_AUTO_SAVE_KEY)
     : (kind === 'manual' ? MANUAL_SAVE_KEY : AUTO_SAVE_KEY);
@@ -3876,16 +3902,22 @@ function initDB() {
 // Capture a stable snapshot before opening storage; report success only after commit.
 // 進行中或局間結算畫面可存；整場結束後不再存。
 const canSaveState = state => !!state && (state.phase === 'play' || (state.phase === 'end' && !state.sessionOver));
+function gameSaveEnvelope(candidate) {
+  return {gameState:clone(candidate),rules:clone(RULES),seatNames:seatNames.slice(),randomNames:randomNames?randomNames.slice():null,
+    customPlayerName,dealerStreak,timestamp:new Date().toISOString()};
+}
 async function writeGameSave(key, candidate = S) {
   if (cultivationPreparationLocked && candidate === S) return false;
   if (!canSaveState(S) || !canSaveState(candidate)) return false;
   const state = S;
   const journeyPhase = S.cultivation?.journey?.phase;
-  const gameData = {
-    gameState: clone(candidate), rules: clone(RULES), seatNames: seatNames.slice(),
-    randomNames: randomNames ? randomNames.slice() : null,
-    customPlayerName, dealerStreak, timestamp: new Date().toISOString()
-  };
+  const gameData = gameSaveEnvelope(candidate);
+  if (candidate.cultivation && window.MahjongProgressionFlow && (key === CULTIVATION_AUTO_SAVE_KEY || candidate.cultivation.trial)) {
+    const saved = await window.MahjongProgressionFlow.save(gameData);
+    if (!saved) throw new Error('旅程已在其他頁面變更或有未完成渡劫，請回首頁繼續最新進度。');
+    document.getElementById('saveStatus').textContent = candidate.cultivation.trial ? '渡劫已獨立暫存' : '修仙進度已儲存';
+    return true;
+  }
   const db = await initDB();
   try {
     if (S !== state || !canSaveState(S) || S.cultivation?.journey?.phase !== journeyPhase || (cultivationPreparationLocked && candidate === S)) return false;
@@ -3904,13 +3936,14 @@ async function writeGameSave(key, candidate = S) {
 async function autoSaveGame() {
   try { await writeGameSave(gameSaveKey('auto')); }
   catch (error) {
-    document.getElementById('saveStatus').textContent = '自動暫存失敗，請使用儲存牌局重試。';
+    document.getElementById('saveStatus').textContent = '自動暫存失敗：'+error.message;
     console.error('自動暫存失敗:', error);
   }
 }
 
 // 清除自動暫存
 async function clearAutoSave(mode = gameMode) {
+  if (S?.cultivation?.trial) return;
   const key = gameSaveKey('auto', mode);
   try {
     const db = await initDB();
@@ -3927,7 +3960,7 @@ async function clearAutoSave(mode = gameMode) {
 
 // 讀取自動暫存
 async function loadAutoSave(mode = 'normal') {
-  const key = gameSaveKey('auto', mode);
+  const key = mode === 'cultivation' ? CULTIVATION_AUTO_SAVE_KEY : AUTO_SAVE_KEY;
   try {
     const db = await initDB();
     const transaction = db.transaction([STORE_NAME], 'readonly');
@@ -3948,6 +3981,7 @@ async function loadAutoSave(mode = 'normal') {
 
 // 手動存檔
 async function saveGame() {
+  if (S?.cultivation?.trial) { log('渡劫會獨立自動暫存，試煉中不提供手動封存。'); return false; }
   try {
     const saved = await writeGameSave(gameSaveKey('manual'));
     log(saved ? '💾 遊戲已存檔' : '⚠️ 遊戲尚未開始或已結束，無法存檔');
@@ -3961,10 +3995,12 @@ async function saveGame() {
 
 // 手動讀檔
 async function loadGame() {
+  if (S?.cultivation?.trial || window.MahjongProgressionFlow?.hasTrial) { log('請先結束或放棄渡劫，再讀取其他存檔。'); return false; }
   const mode = gameMode;
   const previousState = S;
   const key = gameSaveKey('manual', mode);
   try {
+    const revision = mode === 'cultivation' ? await window.MahjongProgressionFlow?.readAutoRevision() : undefined;
     const db = await initDB();
     const transaction = db.transaction([STORE_NAME], 'readonly');
     transaction.oncomplete = () => db.close();
@@ -3983,6 +4019,7 @@ async function loadGame() {
     }
     
     if (gameMode !== mode || S !== previousState) return false;
+    if (revision !== undefined) gameData.progressionRevision = revision;
     restoreGame(gameData, mode);
 
     const saveTime = new Date(gameData.timestamp).toLocaleString('zh-TW');
@@ -4086,6 +4123,20 @@ function askRestoreAutoSave(saveTime) {
 document.addEventListener('mahjong-images-ready', () => { if (S) renderAll(); });
 
 window.addEventListener('DOMContentLoaded', () => {
+  window.MahjongProgressionFlow?.init({openDB:initDB,storeName:STORE_NAME,validateSave:data=>validateGameSave(data,'cultivation'),
+    getState:()=>S,publish:next=>{S=next;},pack:gameSaveEnvelope,restore:restoreGame,startSession:startNewSession,
+    lock:()=>{cultivationPreparationLocked=true;},unlock:()=>{cultivationPreparationLocked=false;},
+    status:text=>{document.getElementById('saveStatus').textContent=text;document.getElementById('startStatus').textContent=text;},
+    reveal:()=>window.MahjongStartScreen.revealTable(),
+    launchTrial(parent,trial,profile){
+      cultivationPreparationLocked=false;window.MahjongCultivationJourneyUI.close({progressionCommitted:true});window.MahjongProgressionUI.close();
+      S=clone(parent.gameState);gameMode='cultivation';seatNames=parent.seatNames.slice();randomNames=parent.randomNames?.slice()||S.names;
+      customPlayerName=parent.customPlayerName;dealerStreak=parent.dealerStreak||0;
+      RULES.points=clone(parent.rules.points);RULES.initialPoints=parent.rules.initialPoints;
+      window.MahjongStartScreen.revealTable();
+      startNewHand(true,S.cultivation,{trial,progression:profile,progressionId:trial.parentJourneyId});
+    }
+  });
   window.MahjongStartScreen.init({
     loadAutoSave,
     startNewSession,
@@ -4623,10 +4674,16 @@ function renderAll() {
     pass.classList.remove('active');
   }
   window.MahjongCultivationUI?.render(S);
+  document.getElementById('saveGameBtn').disabled = S.phase !== 'play' || !!S.cultivation?.trial;
+  document.getElementById('loadGameBtn').disabled = !!S.cultivation?.trial;
 }
 
 function showHandsAndContinue() {
   const panel = document.getElementById('reactionPanel');
+  if (S.cultivation?.trial && window.MahjongProgressionFlow) {
+    window.MahjongProgressionFlow.trialResult(panel,S);
+    panel.style.display='block';document.getElementById('overlay').style.display='block';return;
+  }
   const won = S.winner !== null;
   const detail = won ? (S.resultDetail || calcFanDetails(S.winner, S.winTile, S.fromPlayer === -1)) : null;
   const title = won ? `${escapeHTML(playerName(S.winner))} · ${S.fromPlayer === -1 ? '自摸' : '胡牌'}` : '流局 · 靈氣耗盡';
@@ -4656,6 +4713,10 @@ function showHandsAndContinue() {
   html += '</div><div class="result-footer"><button id="btnContinueNext" class="primary">再入下一局 →</button></div></div>';
   panel.innerHTML = html;
   window.MahjongCultivationUI?.showResult(S);
+  if (S.cultivation && window.MahjongProgressionFlow) {
+    const host=document.createElement('div');host.className='progression-result';
+    panel.querySelector('.result-footer').before(host);window.MahjongProgressionFlow.result(host,S);
+  }
   panel.style.display = 'block';
   document.getElementById('overlay').style.display = 'block';
   document.getElementById('btnContinueNext').onclick = () => {

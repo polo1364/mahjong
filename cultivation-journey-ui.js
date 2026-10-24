@@ -7,12 +7,15 @@
   let current = null;
   let previousFocus = null;
   let equipmentSession = null;
-  function close() {
-    if (equipmentSession?.busy || equipmentSession?.pending) return;
+  let progressionBusy = false;
+  function close(options = {}) {
+    if (equipmentSession?.busy || equipmentSession?.pending || (progressionBusy && !options.progressionCommitted)) return;
     if (!current) return;
+    root.MahjongProgressionUI?.close();
     const dialog = current;
     current = null;
     equipmentSession = null;
+    progressionBusy = false;
     dialog.close(); dialog.remove();
     if (previousFocus?.isConnected && !previousFocus.disabled) previousFocus.focus({ preventScroll: true });
   }
@@ -28,10 +31,10 @@
     dialog.showModal();
     return dialog;
   }
-  // Hero base stats with the player's equipment (always-on bonuses only; conditional effects resolve per move).
+  // Hero base stats with always-on equipment and progression bonuses; conditional effects resolve per move.
   function statValues(hero, player) {
     const E = root.MahjongCultivationEquipment, base = hero.stats;
-    if (!player?.economy || !E) return { ...base };
+    if ((!player?.economy && !player?.progression) || !E) return { ...base };
     return { damage: base.damage * E.factor(player, 'damage'), defense: 200 - (200 - base.defense) * E.factor(player, 'taken'),
       healing: base.healing * E.factor(player, 'heal'), shield: base.shield * E.factor(player, 'shield') };
   }
@@ -44,7 +47,7 @@
   }
   function heroDetails(hero, player) {
     const life = player ? `${Number(player.hp).toLocaleString('en-US')} / ${Number(player.maxHp).toLocaleString('en-US')}` : Number(hero.hp || 1000).toLocaleString('en-US');
-    return `<p class="journey-role">${esc(hero.role)} · 生命 ${life}</p><h2>${esc(hero.name)}</h2>${player?.economy ? '<p class="journey-muted journey-stats-note">含裝備常駐加成；條件效果另依招式結算。</p>' : ''}${stats(hero, player)}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
+    return `<p class="journey-role">${esc(hero.role)} · 生命 ${life}</p><h2>${esc(hero.name)}</h2>${player?.economy || player?.progression ? '<p class="journey-muted journey-stats-note">含裝備、境界與功法常駐加成；條件效果另依招式結算。</p>' : ''}${stats(hero, player)}${player?.progression ? (root.MahjongProgressionUI?.details(player) || '') : ''}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
   }
   function chooseHero(onChoose, onCancel) {
     const heroes = root.MahjongCultivationHeroes.all;
@@ -100,9 +103,27 @@
     const status = dialog.querySelector('.journey-footer p');
     let navigating = false;
     let equipmentLocked = false;
+    let progressionHost = null;
+    const updateNavigationLock = () => {
+      const locked = equipmentLocked || progressionBusy;
+      nextButton.disabled = homeButton.disabled = locked || navigating;
+      if (progressionHost) progressionHost.inert = equipmentLocked;
+      callbacks.onLock?.(locked);
+    };
+    if (callbacks.progression && root.MahjongProgressionUI) {
+      const host = document.createElement('section');
+      progressionHost = host;
+      host.className = 'journey-progression';
+      host.setAttribute('aria-label', '修為與功法整備');
+      dialog.querySelector('.journey-road').after(host);
+      root.MahjongProgressionUI.preparation(host, combat, {
+        ...callbacks.progression,
+        onBusy(busy) { progressionBusy = busy; equipmentSession?.setNavigationLocked(busy); updateNavigationLock(); callbacks.progression.onBusy?.(busy); }
+      });
+    }
     if (combat.version === 3 && root.MahjongCultivationEquipmentUI) {
       dialog.classList.add('journey-equipment-screen');
-      dialog.querySelector('.journey-preparation-side > section:nth-child(2)')?.remove();
+      dialog.querySelector('.journey-preparation-side > .journey-panel:not(.journey-road)')?.remove();
       dialog.querySelector('.journey-npcs')?.remove();
       const equipment = document.createElement('section');
       equipment.className = 'equip-ui';
@@ -115,8 +136,7 @@
         publish: callbacks.publish,
         onLock(locked) {
           equipmentLocked = locked;
-          nextButton.disabled = homeButton.disabled = locked || navigating;
-          callbacks.onLock?.(locked);
+          updateNavigationLock();
         }
       });
     }

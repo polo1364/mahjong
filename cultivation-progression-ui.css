@@ -1,0 +1,39 @@
+.progression-card,.progression-dialog { color:#e9ead7; font:14px/1.55 "Microsoft JhengHei",sans-serif; }
+.progression-card { min-width:0; padding:15px 18px; border:1px solid #a8b39855; border-radius:12px; background:#0b242bd9; }
+.progression-card h3,.progression-dialog h2 { margin:0 0 7px; color:#eed4a1; font-size:20px; font-weight:500; }
+.progression-card h3 small { color:#b6c4a6; font-size:12px; font-weight:400; }
+.progression-card p { margin:5px 0; }
+#cultivationProgressionHome { margin-top:14px; max-width:410px; }
+.prep-left-body > .journey-progression:not([hidden]) { display:block !important; height:100%; overflow:auto; }
+.prep-left-body .journey-progression .progression-card { padding:12px; }
+.progression-kicker { margin:0 0 4px; color:#b6c4a6; font-size:11px; letter-spacing:2px; }
+.progression-muted { color:#afc4b7; font-size:12px; }
+.progression-error { min-height:1.2em; color:#ffd7b7; font-size:12px; }
+.progression-meter { height:8px; overflow:hidden; border-radius:10px; background:#102c33; border:1px solid #728f8177; }
+.progression-meter span { display:block; height:100%; border-radius:10px; background:linear-gradient(90deg,#6fa68c,#e0c885); }
+.progression-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:12px; }
+.progression-actions button,.progression-card > button,.progression-dialog button { min-height:38px; padding:6px 12px; border:1px solid #b2ac7c; border-radius:7px; color:#f8e8bb; background:#25564e; cursor:pointer; font:inherit; }
+.progression-actions button:disabled,.progression-dialog button:disabled { opacity:.45; cursor:not-allowed; }
+.progression-actions button:focus-visible,.progression-card button:focus-visible,.progression-dialog button:focus-visible { outline:2px solid #d2f5d9; outline-offset:2px; }
+.progression-ai { margin-top:10px; border-top:1px solid #a8b39855; }
+.progression-ai summary { min-height:38px; padding:9px 0; color:#e8d19d; cursor:pointer; }
+.progression-ai summary:focus-visible { outline:2px solid #d2f5d9; outline-offset:2px; }
+.progression-ai ul { display:grid; gap:7px; margin:3px 0 0; padding:0; list-style:none; }
+.progression-ai li { display:grid; gap:2px; padding:8px 10px; border-radius:7px; background:#14353b; }
+.progression-ai li strong { color:#e8d19d; }.progression-ai li span { color:#c2d0c3; font-size:12px; }.progression-ai li em { color:#f4d18f; font-size:12px; font-style:normal; }
+.progression-dialog { box-sizing:border-box; width:min(680px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); overflow:auto; border:1px solid #c7b686; border-radius:14px; padding:22px; background:#09232a; box-shadow:0 18px 50px #001419; }
+.progression-dialog::backdrop { background:#03121bc9; }
+.progression-dialog p { margin:8px 0; }
+.progression-skill-list { display:grid; grid-template-columns:1fr; gap:7px; margin:12px 0; }
+.progression-skill { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; padding:9px; border:1px solid #a8b39855; border-radius:8px; background:#14353b; }
+.progression-skill strong,.progression-skill small { display:block; }
+.progression-skill strong { color:#e8d19d; }.progression-skill small { color:#b8c9bb; font-size:11px; }
+.progression-stepper { display:flex; align-items:center; flex-shrink:0; gap:6px; }
+.progression-stepper button { width:28px; height:30px; min-height:30px; padding:0; }
+.progression-stepper b { min-width:1ch; text-align:center; }
+.progression-dialog footer { display:flex; justify-content:flex-end; gap:9px; margin-top:16px; }
+.progression-details { margin:13px 0; padding:10px 12px; border-left:2px solid #d5bc81; background:#b1cc9810; }
+.progression-details h3 { margin:0 0 4px; color:#e2c994; font-size:14px; }
+.progression-details p { margin:3px 0; font-size:12px; color:#c3d2c4; }
+@media (max-width:580px) { .progression-dialog { padding:14px; }.progression-skill-list { grid-template-columns:1fr; }.progression-card { padding:12px; } }
+@media (max-height:520px) and (orientation:landscape) { .progression-dialog { max-height:calc(100dvh - 12px); padding:12px; }.progression-skill-list { margin:8px 0; }.progression-skill { padding:5px 8px; } }

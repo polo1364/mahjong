@@ -1,5 +1,6 @@
 /* Equipment V3 catalog and pure ability queries. */
 (function(root) { 'use strict';
+  const Progression=typeof module!=='undefined'&&module.exports?require('./cultivation-progression.js'):root.MahjongCultivationProgression;
   const slots = Object.freeze(['weapon', 'armor', 'accessory']);
   const grades = Object.freeze(['凡', '靈', '玄', '地', '天']);
   const base = Object.freeze([2, 2.5, 3, 3.5, 4]);
@@ -43,10 +44,11 @@
   }
   function factor(player,kind,ctx={}) {
     const b=bonuses(player);
-    if(kind==='damage') return 1+b.damage+(ctx.basic?b.basic:0)+(ctx.counter?b.counter:0)+(ctx.active?b.active:0);
-    if(kind==='taken') return 1-b.taken-(ctx.top?b.topTaken:0)-(ctx.aoe?b.aoeTaken:0);
-    if(kind==='aggro') return 1-b.aggro;
-    return 1+(b[kind]||0);
+    const p=player.progression&&Progression?Progression.bonuses(player.progression):{};
+    if(kind==='damage') return 1+b.damage+(p.damage||0)+(ctx.basic?b.basic+(p.basic||0):0)+(ctx.counter?b.counter+(p.counter||0):0)+(ctx.active?b.active+(p.active||0):0);
+    if(kind==='taken') return 1-b.taken-(p.taken||0)-(ctx.top?b.topTaken:0)-(ctx.aoe?b.aoeTaken:0);
+    if(kind==='aggro') return 1-b.aggro-(p.aggro||0);
+    return 1+(b[kind]||0)+(p[kind]||0);
   }
   function passiveState() { return {stored:0,generated:0,extraDamage:0,extraHits:0,discardHeals:0,discardShields:0,zhenyueMeter:0,zhenyueUses:0,jiuyouMeter:0,jiuyouUses:0,chixiaoCount:0,chixiaoUses:0,wuxiangCount:0,wuxiangElement:null,wuxiangUses:0}; }
   function record(player,kind,amount) {

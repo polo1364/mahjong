@@ -14,6 +14,7 @@
   const MonsterSkills = typeof module !== "undefined" && module.exports
     ? require("./cultivation-monster-skills.js") : root.MahjongMonsterSkills;
   const Equipment = typeof module !== "undefined" && module.exports ? require("./cultivation-equipment.js") : root.MahjongCultivationEquipment;
+  const Progression = typeof module !== "undefined" && module.exports ? require("./cultivation-progression.js") : root.MahjongCultivationProgression;
   const Economy = typeof module !== "undefined" && module.exports ? require("./cultivation-economy.js") : root.MahjongCultivationEconomy;
   const Items = typeof module !== 'undefined' && module.exports ? require('./cultivation-items.js') : root.MahjongCultivationItems;
   const ELEMENTS = ["metal", "wood", "water", "fire", "earth"];
@@ -234,6 +235,12 @@
     return kind === "taken" ? (200 - stats.defense) / 100 : stats[kind] / 100;
   }
   function passive(player, id) { return player.heroId === id; }
+  function threatFactor(state,p,extra=1) {
+    const value=extra*(state.version>=2&&passive(p,'ye-shuying')?.92:1)*
+      (Finishers?.factor?Finishers.factor(p,'aggro'):1)*
+      (state.version===3?Equipment.factor(p,'aggro'):1);
+    return p.progression?Math.max(.75,value):value;
+  }
   function passiveState() {
     return { discards: 0, swordUses: 0, fireMonsterId: null, tideUses: 0,
       stored: 0, generated: 0, counterUses: 0, counterReady: true,
@@ -338,12 +345,67 @@
   }
   function prepare(input, options = {}) {
     validate(input);
+    if (input.trial) throw Error('Trial returns to its parent journey');
     if (input.version < 2 || !input.ended) throw Error("Preparation requires ended V2 hand");
     const state = copy(input);
     if (state.version === 2 && options.equipment) { Economy.init(state, state.rng); state.version = 3; }
     state.journey.phase = "preparation";
     if (state.version === 3) Economy.prepare(state);
+    if (state.version === 3) {
+      if (options.progression && !state.progression) initProgression(state, options.progression, options.progressionId);
+      else if (options.progression && state.progression) {
+        Progression.validate(options.progression);
+        state.players[0].progression=copy(options.progression);
+      }
+      prepareAIProgression(state);
+    }
     validate(state); return state;
+  }
+  function initProgression(state, profile, journeyId) {
+    Progression.validate(profile);
+    if (journeyId !== undefined && (typeof journeyId !== 'string' || !journeyId.length || journeyId.length>128)) throw Error('Invalid progression journey id');
+    state.progression={journeyId:journeyId||state.economy.journeyId,activeHand:state.handNumber+(state.ended?1:0),preparedHand:0,actions:[[],[],[],[]],earned:[0,0,0,0],aiBreakthroughs:[]};
+    state.players.forEach((p,pid)=>{ p.progression=pid===0?copy(profile):{...Progression.fresh(),killStart:state.kills.length}; });
+  }
+  function validTrial(trial,journeyId) {
+    if (!trial || typeof trial!=='object') return false;
+    let spec;
+    try { spec=Progression.trialSpec(trial.targetRealm); } catch { return false; }
+    return typeof trial.id==='string' && trial.id.length>0 && trial.id.length<=128 &&
+      typeof trial.parentJourneyId==='string' && trial.parentJourneyId.length>0 && trial.parentJourneyId.length<=128 &&
+      (!journeyId || trial.parentJourneyId===journeyId) &&
+      Object.keys(trial).length===5 && Object.entries(spec).every(([key,value])=>trial[key]===value);
+  }
+  function prepareAIProgression(state) {
+    if (!state.progression) return;
+    if (state.progression.preparedHand===state.handNumber) {
+      // A preparation saved before the wait counter existed starts waiting here;
+      // do not process another breakthrough or count this preparation twice.
+      for (const p of state.players.slice(1)) if (p.progression.eligibleHand===undefined &&
+          !state.progression.aiBreakthroughs.some(entry=>entry.pid===p.pid) &&
+          p.progression.realm<4 && p.progression.xp>=Progression.realms[p.progression.realm+1].xp)
+        p.progression.eligibleHand=state.handNumber;
+      return;
+    }
+    for (const p of state.players.slice(1)) {
+      const {profile,reward}=Progression.advanceAI(p.progression,state.kills,p.heroId,state.handNumber);
+      p.progression=Progression.configure(profile,Progression.aiAllocation(p.heroId,profile));
+      if (reward) { p.economy.gold+=reward.gold; p.economy.sand+=reward.sand; state.progression.aiBreakthroughs.push({pid:p.pid,...reward}); }
+    }
+    state.progression.preparedHand=state.handNumber;
+  }
+  function recordProgressionAction(state,pid,action) {
+    if (!state.progression || state.trial || !Number.isInteger(pid) || pid<0 || pid>3) return;
+    const actions=state.progression.actions[pid];
+    if (!actions.includes(action)) actions.push(action);
+  }
+  function settleProgression(state) {
+    if (!state.progression || state.trial) return;
+    for (let pid=0;pid<4;pid++) {
+      const earned=12+Math.min(3,state.progression.actions[pid].length);
+      state.progression.earned[pid]=earned;
+      if (pid) state.players[pid].progression.xp+=earned;
+    }
   }
   function journeyPreview(state) {
     validate(state);
@@ -414,7 +476,8 @@
           (ps.fireMonsterId !== null && !int(ps.fireMonsterId, 1, state.monster.id))) fail("passive state");
     }
     const m = state.monster, species = Monsters.get(m?.speciesId);
-    if (!species || m.tier !== species.tier || m.name !== species.name || (m.maxHp !== species.hp && m.maxHp !== species.legacyHp) || m.armor !== species.armor ||
+    if (!species || m.tier !== species.tier || m.name !== species.name ||
+        (state.trial ? (m.speciesId!==state.trial.targetSpeciesId || m.maxHp!==Math.round(species.hp*state.trial.lifeScale)) : (m.maxHp !== species.hp && m.maxHp !== species.legacyHp)) || m.armor !== species.armor ||
         (m.speciesId !== "five-phase-sovereign" && m.element !== species.element) ||
         !int(m.attacks) || !int(m.heals, 0, 2) || !int(m.shields, 0, 2)) fail("journey monster");
     if (m.speciesId === "five-phase-sovereign" && m.element !== ELEMENTS[Math.floor(m.attacks / 2) % 5]) fail("boss rotation");
@@ -534,6 +597,7 @@
   function create(seed, previous = null, options = {}) {
     if (previous) validate(previous);
     if (previous?.version >= 2 && !previous.ended) return copy(previous);
+    if (previous?.trial) throw Error('Trial cannot continue as a journey');
     const v2 = previous ? previous.version >= 2 : options.heroId !== undefined;
     if (v2 && !previous && !Heroes.get(options.heroId)) throw Error("Unknown cultivation hero");
     const state = {
@@ -602,7 +666,27 @@
       } else Economy.init(state, Number(seed) >>> 0 || 0x6d2b79f5);
     }
     if(state.version===3&&!previous){if(options.itemRulesVersion===0)state.itemRulesVersion=0;else Items.init(state);}
+    if (state.version === 3 && (options.progression || previous?.progression)) {
+      if (options.progression) Progression.validate(options.progression);
+      const journeyId=options.progressionId||previous?.progression?.journeyId||state.economy.journeyId;
+      initProgression(state,options.progression||previous.players[0].progression,journeyId);
+      if (previous?.progression) for (let pid=1;pid<4;pid++) state.players[pid].progression=copy(previous.players[pid].progression);
+    }
+    if (options.trial) {
+      if (state.version!==3) throw Error('Trial requires V3 combat');
+      if (!validTrial(options.trial,state.progression?.journeyId||state.economy.journeyId)) throw Error('Invalid trial specification');
+      state.trial=copy(options.trial);
+      for (const p of state.players) { p.activeSeals=[]; p.pendingSeals=[]; }
+    }
     spawn(state);
+    if (state.trial) {
+      const species=Monsters.get(state.trial.targetSpeciesId);
+      const m=state.monster;
+      Object.assign(m,{speciesId:species.id,tier:species.tier,name:species.name,element:species.element,
+        hp:Math.round(species.hp*state.trial.lifeScale),maxHp:Math.round(species.hp*state.trial.lifeScale),
+        shield:species.shield,armor:species.armor,statuses:[],attacks:0,heals:0,shields:0});
+      m.nextAttack=telegraphJourney(state);
+    }
     return state;
   }
   function condition(state, ctx, when) {
@@ -925,10 +1009,8 @@
       const ar = buff(p, ctx.dot ? "dotAggroRate" : "aggroRate");
       if (ar && ar.trigger !== "attackSkill") rate *= ar.value;
       rate *= ctx.next.aggro || 1;
-      rate *= Finishers?.factor ? Finishers.factor(p, 'aggro') : 1;
-      if (state.version >= 2 && passive(p, 'ye-shuying')) rate *= 0.92;
-      if (state.version === 3) rate *= Equipment.factor(p, 'aggro');
       rate *= 1 + Math.min(.15, sumStatus(p.statuses, 'monsterAggroUp'));
+      rate = effect.aggroFactor === 0 ? 0 : threatFactor(state,p,rate);
       p.aggro = clamp(p.aggro + damage * rate, 0, MAX_DAMAGE);
       if (actual && m.hp === 0 && ctx.killer === null) {
         ctx.killer = ctx.pid;
@@ -968,7 +1050,7 @@
       }
     }
     if (effect.extraAggro && !buff(p, "noExtraAggro"))
-      p.aggro = clamp(p.aggro + effect.extraAggro * (1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp'))) * (state.version >= 2 && passive(p, 'ye-shuying') ? 0.92 : 1) * (Finishers?.factor ? Finishers.factor(p, 'aggro') : 1) * (state.version === 3 ? Equipment.factor(p, 'aggro') : 1), 0, MAX_DAMAGE);
+      p.aggro = clamp(p.aggro + effect.extraAggro * threatFactor(state,p,1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp'))), 0, MAX_DAMAGE);
     if (!ctx.equipmentExtra && !ctx.secondary && !ctx.basic) {
       for (const dot of m.statuses)
         if (dot.owner === ctx.pid && dot.extendOnHit > 0) {
@@ -1101,14 +1183,12 @@
             p.aggro = Math.max(0, p.aggro * (1 - effect.value));
           else if (effect.mode === "top") {
             const highest = Math.max(...state.players.map(q => q.aggro));
-            const rate = (Finishers?.factor ? Finishers.factor(p, 'aggro') : 1) *
-              (state.version >= 2 && passive(p, "ye-shuying") ? 0.92 : 1) *
-              (state.version === 3 ? Equipment.factor(p, 'aggro') : 1) * (1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp')));
+            const rate = threatFactor(state,p,1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp')));
             p.aggro += (highest + effect.value - p.aggro) * rate;
             if (state.version >= 2) p.aggro = Math.max(p.aggro, highest + 1);
             if(Items.enabled(state))p.economy.items.tauntMonster=state.monster.id;
           }
-          else if (effect.mode === "add") p.aggro += effect.value * (1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp'))) * (state.version >= 2 && passive(p, 'ye-shuying') ? 0.92 : 1) * (Finishers?.factor ? Finishers.factor(p, 'aggro') : 1) * (state.version === 3 ? Equipment.factor(p, 'aggro') : 1);
+          else if (effect.mode === "add") p.aggro += effect.value * threatFactor(state,p,1+Math.min(.15,sumStatus(p.statuses,'monsterAggroUp')));
           else throw new Error("Unknown aggro mode");
           p.aggro = clamp(p.aggro, 0, MAX_DAMAGE);
           break;
@@ -1395,19 +1475,25 @@
     if (state.monster.hp > 0) return;
     if (state.kills.some(k => k.monsterId === state.monster.id)) return;
     const pid = ctx.killer === null ? ctx.pid : ctx.killer;
-    if (state.version >= 2) advanceJourney(state);
+    if (state.version >= 2 && !state.trial) advanceJourney(state);
     state.kills.push({
       monsterId: state.monster.id,
       index: state.monster.index,
       name: state.monster.name,
       element: state.monster.element,
-      ...(state.version >= 2 ? { speciesId: state.monster.speciesId, tier: state.monster.tier, cycle: state.journey.cycle - (state.monster.tier === "boss" ? 1 : 0) } : {}),
+      ...(state.version >= 2 ? { speciesId: state.monster.speciesId, tier: state.monster.tier, cycle: state.journey.cycle - (state.monster.tier === "boss" && !state.trial ? 1 : 0) } : {}),
       pid,
       seq: state.seq,
     });
-    if (state.version === 3) Economy.creditKill(state, state.monster, pid);
+    if (state.version === 3 && !state.trial) Economy.creditKill(state, state.monster, pid);
     for(const player of state.players)player.statuses=player.statuses.filter(s=>!s.monsterSkill||s.monsterId!==state.monster.id);
     emit(state, output, { type: "kill", pid, name: state.monster.name });
+    if (state.trial) {
+      state.ended=true; state.enemyDue=null;
+      state.result={reason:'trial',huPid:null,ranking:ranking(state)};
+      emit(state,output,{type:'end',reason:'trial'});
+      return;
+    }
     if (!noSpawn) {
       spawn(state);
       emit(state, output, { type: "spawn", name: state.monster.name });
@@ -1895,8 +1981,9 @@
     const state = copy(input);
     const output = [];
     if (event.type === "preparation") {
+      if (state.trial) throw Error('Trial returns to its parent journey');
       if (state.version < 2 || !state.ended) throw Error("Preparation requires ended V2 hand");
-      state.seq = event.id; state.journey.phase = "preparation"; if(state.version===3)Economy.prepare(state); validate(state); return { state, effects: output };
+      state.seq = event.id; state.journey.phase = "preparation"; if(state.version===3) { Economy.prepare(state); prepareAIProgression(state); } validate(state); return { state, effects: output };
     }
     if (state.ended) return { state, effects: output };
     state.seq = event.id;
@@ -1924,6 +2011,7 @@
         };
         const ctx = cast(state, event.pid, skill, output, { basic: true });
         finishKill(state, ctx, output, false);
+        if (state.ended) break;
         ownTurn(state, event.pid, output, wasWeak);
         equipmentDiscard(state, event.pid, output);
         if (state.monster.id === before) {
@@ -1937,6 +2025,7 @@
         const ctx = cast(state, event.pid, skill, output, {
           secret: event.pid !== 0 && event.action === "concealed",
         });
+        recordProgressionAction(state,event.pid,event.action==='chow'?'chow':event.action==='pong'?'pong':'kong');
         finishKill(state, ctx, output, false);
         break;
       }
@@ -1944,6 +2033,7 @@
         const p = actor(state, event.pid);
         if (!/^H[1-8]$/.test(event.key)) throw new Error("Invalid flower");
         if (p.flowers.includes(event.key)) break;
+        recordProgressionAction(state,event.pid,'flower');
         p.flowers.push(event.key);
         if (state.version >= 2 && passive(p, "hua-jianlu") && p.passiveState.flowerUses < 3) {
           p.passiveState.flowerUses++;
@@ -1957,6 +2047,7 @@
           output,
         );
         finishKill(state, ctx, output, false);
+        if (state.ended) break;
         for (const [id, keys] of [
           ["seasons", ["H1", "H2", "H3", "H4"]],
           ["gentlemen", ["H5", "H6", "H7", "H8"]],
@@ -2009,6 +2100,7 @@
             );
           }
           const ctx = cast(state, event.pid, skill, output);
+          recordProgressionAction(state,event.pid,'win');
           finishKill(state, ctx, output, true);
           const parts = output.filter(e => e.type === 'finisherPart').map(part => ({
             id: part.segmentId, name: part.name, label: part.label, fan: part.fan, budget: part.budget,
@@ -2022,20 +2114,22 @@
           state.finisher = { pid: event.pid, from: event.from ?? -1, method, parts, total: parts.reduce((n, p) => n + p.damage, 0) };
           if (curseItems && event.from >= 0 && method !== 'selfDraw') actor(state, event.from).pendingSeals = Finishers.curses(curseItems);
         }
-        state.ended = true;
-        state.enemyDue = null;
-        state.result = {
-          reason: event.reason || "hu",
-          huPid: event.pid === undefined ? null : event.pid,
-          ranking: ranking(state),
-        };
-        emit(state, output, { type: "end", reason: state.result.reason });
+        if (!state.ended) {
+          state.ended = true;
+          state.enemyDue = null;
+          state.result = {
+            reason: event.reason || "hu",
+            huPid: event.pid === undefined ? null : event.pid,
+            ranking: ranking(state),
+          };
+          emit(state, output, { type: "end", reason: state.result.reason });
+        }
         break;
       }
       default:
         throw new Error("Unknown combat event " + event.type);
     }
-    if(event.type!=='enemy')afterItems(state,output);
+    if(event.type!=='enemy' && (!state.trial || !state.ended))afterItems(state,output);
     if (!state.ended && state.players.every((p) => p.hp === 0)) {
       state.ended = true;
       state.enemyDue = null;
@@ -2043,7 +2137,9 @@
       emit(state, output, { type: "end", reason: "defeat" });
     }
     if (state.ended && state.version >= 2) settleJourney(state);
-    if (state.ended && state.version === 3) Economy.settle(state);
+    if (state.ended && state.trial) Items.settle(state);
+    if (state.ended && state.version === 3 && !state.trial) Economy.settle(state);
+    if (state.ended) settleProgression(state);
     if (state.ended) for (const p of state.players) {
       if (p.activeSeals?.length) p.expiredSeals = copy(p.activeSeals);
       if (p.activeSeals) p.activeSeals = [];
@@ -2097,6 +2193,26 @@
       !int(state.rng, 1, 4294967295)
     )
       fail("state header");
+    if (state.trial !== undefined) {
+      if (state.version!==3 || !validTrial(state.trial,state.progression?.journeyId||state.economy?.journeyId)) fail('trial');
+    }
+    if (state.progression !== undefined) {
+      const progress=state.progression;
+      if (state.version!==3 || !progress || typeof progress.journeyId!=='string' || !progress.journeyId.length || progress.journeyId.length>128 ||
+          !int(progress.activeHand,1,1000001) || progress.activeHand<state.handNumber || progress.activeHand>state.handNumber+1 ||
+          (progress.preparedHand!==undefined && !int(progress.preparedHand,0,state.handNumber)) ||
+          !Array.isArray(progress.actions) || progress.actions.length!==4 || !Array.isArray(progress.earned) || progress.earned.length!==4) fail('progression');
+      for (let i=0;i<4;i++) {
+        try { Progression.validate(state.players[i].progression); } catch { fail('progression profile'); }
+        if (state.players[i].progression.killStart>state.kills.length) fail('progression kill start');
+        if (state.players[i].progression.eligibleHand>state.handNumber) fail('progression eligible hand');
+        const a=progress.actions[i];
+        if (!Array.isArray(a) || a.length>5 || new Set(a).size!==a.length || a.some(x=>!['chow','pong','kong','flower','win'].includes(x)) || !int(progress.earned[i],0,15)) fail('progression actions');
+        if (progress.earned[i] !== (state.ended && !state.trial && progress.activeHand===state.handNumber ? 12+Math.min(3,a.length) : 0)) fail('progression reward');
+      }
+      if (!Array.isArray(progress.aiBreakthroughs) || progress.aiBreakthroughs.length>3 || progress.aiBreakthroughs.some(x=>
+        !int(x.pid,1,3)||!int(x.realm,1,4)||x.title!==Progression.realms[x.realm].title||x.gold!==100*x.realm||x.sand!==5*x.realm)) fail('AI breakthroughs');
+    } else if (state.players.some(p=>p.progression!==undefined)) fail('progression header');
     if (!Array.isArray(state.players) || state.players.length !== 4)
       fail("players");
     const scaleSources = new Set([
@@ -2383,7 +2499,8 @@
       const r = state.result;
       if (
         !r ||
-        !["defeat", "draw", "hu"].includes(r.reason) ||
+        !["defeat", "draw", "hu", ...(state.trial?["trial"]:[])].includes(r.reason) ||
+        (r.reason==='trial' && (m.hp!==0 || !state.kills.some(k=>k.monsterId===m.id&&k.speciesId===state.trial.targetSpeciesId) || r.huPid!==null)) ||
         (r.huPid !== null && !pid(r.huPid)) ||
         JSON.stringify(r.ranking) !== JSON.stringify(ranking(state))
       )

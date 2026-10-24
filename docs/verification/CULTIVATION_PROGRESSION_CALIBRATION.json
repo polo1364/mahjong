@@ -1,0 +1,136 @@
+{
+  "status": "frozen-before-holdout",
+  "protocolHash": "9374ee0a6765f0a6c6f49fa18b22f08937edbc7d06815f030c2fe5501aef8d48",
+  "scope": "Only new calibration seeds 91001+101*i inspected. Stage4 safety margin 4/10 was precommitted; stages1-3 remain fixed. Holdout files not opened before this record.",
+  "sourceHashes": {
+    "index.html": "5e11797b7b16100096aae366d05e6fe38ca3c7950f557417a4e64bcc686b0649",
+    "cultivation-progression.js": "838ea5086fa600faccc0715d89f8203450def555d48035b6b93ea130b499e361",
+    "cultivation-combat.js": "7d4e7895fc18b7b8764a3433a361d37014211e84f9b8c5d09d19c2afceb17776",
+    "cultivation-economy.js": "04347638dea0cd7cb23dc0bdc0587842a58c59f1d04dd649febbd1467685c78e",
+    "cultivation-equipment.js": "fd8d74509114cce056115eb829fcc519b26bc69df083c0558b53ffd54d5dc9b6",
+    "cultivation-heroes.js": "2837a83e3f765c112f8e6666dea532d07014a11b1af702b975303bc5b9b842b6",
+    "tests/game-harness.cjs": "056a1ce68021c0b161c30b62c5d3b2ef11f9cbc6309bb5f4e96ced907ee33706"
+  },
+  "scales": [
+    1,
+    0.85,
+    0.85,
+    0.95
+  ],
+  "calibrationSeeds": [
+    91001,
+    91102,
+    91203,
+    91304,
+    91405,
+    91506,
+    91607,
+    91708,
+    91809,
+    91910
+  ],
+  "candidates": [
+    {
+      "scale": 1.1,
+      "successes": 1,
+      "n": 10
+    },
+    {
+      "scale": 1.05,
+      "successes": 3,
+      "n": 10
+    },
+    {
+      "scale": 1,
+      "successes": 3,
+      "n": 10
+    },
+    {
+      "scale": 0.95,
+      "successes": 5,
+      "n": 10
+    }
+  ],
+  "results": [
+    {
+      "seed": 91001,
+      "heroId": "shen-gufeng",
+      "scale": 0.95,
+      "passed": false,
+      "reason": "hu",
+      "monsterHp": 224
+    },
+    {
+      "seed": 91102,
+      "heroId": "chi-ling",
+      "scale": 0.95,
+      "passed": true,
+      "reason": "trial",
+      "monsterHp": 0
+    },
+    {
+      "seed": 91203,
+      "heroId": "mu-canglan",
+      "scale": 0.95,
+      "passed": false,
+      "reason": "hu",
+      "monsterHp": 332
+    },
+    {
+      "seed": 91304,
+      "heroId": "su-lingheng",
+      "scale": 0.95,
+      "passed": true,
+      "reason": "trial",
+      "monsterHp": 0
+    },
+    {
+      "seed": 91405,
+      "heroId": "yue-zhenshan",
+      "scale": 0.95,
+      "passed": true,
+      "reason": "trial",
+      "monsterHp": 0
+    },
+    {
+      "seed": 91506,
+      "heroId": "luo-xuanyu",
+      "scale": 0.95,
+      "passed": true,
+      "reason": "trial",
+      "monsterHp": 0
+    },
+    {
+      "seed": 91607,
+      "heroId": "tie-wujiu",
+      "scale": 0.95,
+      "passed": false,
+      "reason": "hu",
+      "monsterHp": 912
+    },
+    {
+      "seed": 91708,
+      "heroId": "ye-shuying",
+      "scale": 0.95,
+      "passed": false,
+      "reason": "hu",
+      "monsterHp": 763
+    },
+    {
+      "seed": 91809,
+      "heroId": "yun-zhiwei",
+      "scale": 0.95,
+      "passed": false,
+      "reason": "hu",
+      "monsterHp": 700
+    },
+    {
+      "seed": 91910,
+      "heroId": "hua-jianlu",
+      "scale": 0.95,
+      "passed": true,
+      "reason": "trial",
+      "monsterHp": 0
+    }
+  ]
+}

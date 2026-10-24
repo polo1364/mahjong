@@ -54,20 +54,20 @@
   function enhance(dialog) {
     if (dialog.classList.contains('prep-noscroll')) return;
     const wrap = dialog.querySelector('.journey-wrap'), grid = dialog.querySelector('.journey-preparation-grid'), equip = dialog.querySelector('.equip-ui');
-    const hero = dialog.querySelector('.journey-prepared-hero'), road = dialog.querySelector('.journey-preparation-side'), party = dialog.querySelector('.journey-party');
+    const hero = dialog.querySelector('.journey-prepared-hero'), road = dialog.querySelector('.journey-preparation-side'), party = dialog.querySelector('.journey-party'), progression = dialog.querySelector('.journey-progression');
     const header = dialog.querySelector('.journey-header'), intro = dialog.querySelector('.journey-intro'), footer = dialog.querySelector('.journey-footer');
     if (!wrap || !grid || !equip || !hero || !header || !footer) return;
     dialog.classList.add('prep-noscroll');
     // Header carries the title, the hand summary and the two navigation buttons, always in view.
     const titleBox = header.firstElementChild; if (intro) titleBox?.append(intro);
     // On short screens the left column folds away behind this button.
-    const leftToggle = document.createElement('button'); leftToggle.type = 'button'; leftToggle.className = 'prep-left-toggle'; leftToggle.textContent = '角色・征途';
+    const leftToggle = document.createElement('button'); leftToggle.type = 'button'; leftToggle.className = 'prep-left-toggle'; leftToggle.textContent = progression ? '角色・修行' : '角色・征途';
     leftToggle.setAttribute('aria-expanded', 'false');
     leftToggle.onclick = () => { const open = dialog.classList.toggle('prep-left-open'); leftToggle.setAttribute('aria-expanded', String(open)); if (open) requestAnimationFrame(() => layoutLeft(dialog)); };
     header.append(leftToggle, footer);
     // Left column: one card at a time.
     const left = document.createElement('section'); left.className = 'prep-left';
-    const panes = [['hero', '角色', hero], ['road', '征途', road], ['party', '同行', party]].filter(([, , el]) => el);
+    const panes = [['hero', '角色', hero], ['progression', '修行', progression], ['road', '征途', road], ['party', '同行', party]].filter(([, , el]) => el);
     left.innerHTML = `<div class="prep-left-tabs" role="tablist" aria-label="庭院資訊">${panes.map(([id, name]) => `<button type="button" role="tab" data-left="${id}">${name}</button>`).join('')}<button type="button" class="prep-left-close" aria-label="收起角色資訊">×</button></div>`;
     left.querySelector('.prep-left-close').onclick = () => { dialog.classList.remove('prep-left-open'); dialog.querySelector('.prep-left-toggle')?.setAttribute('aria-expanded', 'false'); };
     const body = document.createElement('div'); body.className = 'prep-left-body';
@@ -87,6 +87,7 @@
     dialog.addEventListener('load', event => { if (event.target.tagName === 'IMG') { clearTimeout(dialog.prepReflow); dialog.prepReflow = setTimeout(() => { layoutRight(dialog); layoutLeft(dialog); }, 60); } }, true);
     document.fonts?.ready.then(() => { layoutRight(dialog); layoutLeft(dialog); });
     new MutationObserver(() => requestAnimationFrame(() => layoutLeft(dialog))).observe(hero, { childList: true, subtree: true });
+    if (progression) new MutationObserver(() => requestAnimationFrame(() => layoutLeft(dialog))).observe(progression, { childList: true });
     requestAnimationFrame(() => { layoutRight(dialog); layoutLeft(dialog); });
   }
   function layoutRight(dialog) {
@@ -98,6 +99,11 @@
   }
   function layoutLeft(dialog) {
     const pane = dialog.querySelector(`.prep-left-body > [data-left-pane="${leftTab}"]`); if (!pane) return;
+    if (leftTab === 'progression') {
+      dialog.querySelector('.prep-left-body > .prep-pager')?.remove();
+      pane.querySelectorAll('.prep-off').forEach(el => el.classList.remove('prep-off'));
+      return;
+    }
     const inner = [...pane.children].flatMap(el => el.matches('div:not([class])') ? [...el.children] : [el]);
     paginate(dialog.querySelector('.prep-left-body'), 'left:' + leftTab, inner.filter(el => !el.hidden));
   }

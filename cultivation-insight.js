@@ -44,6 +44,24 @@
   const fmt = v => typeof v === 'object' && v ? (v.lo === v.hi ? String(v.lo) : `${v.lo}～${v.hi}`) : String(v);
   function line(label, value, tone = '') { return `<div class="ins-line"><span>${label}</span><b class="${tone}">${value}</b></div>`; }
   function total(label, value) { return `<div class="ins-total"><span>${label}</span><b>${value}</b></div>`; }
+  function constantBonuses(player, kind, context) {
+    const equipment = root.MahjongCultivationEquipment?.bonuses?.(player);
+    if (!equipment) return '';
+    const progression = player.progression ? root.MahjongCultivationProgression?.bonuses?.(player.progression) : null;
+    const suffix = kind === 'damage' ? context === 'basic' ? 'basic' : 'active' : null;
+    const gear = (equipment[kind] || 0) + (suffix ? equipment[suffix] || 0 : 0);
+    const growth = (progression?.[kind] || 0) + (suffix ? progression?.[suffix] || 0 : 0);
+    const format = value => `${value > 0 ? '+' : ''}${Math.round(value * 1000) / 10}%`;
+    return (gear ? line('裝備常駐加成', format(gear), gear > 0 ? 'up' : 'down') : '') +
+      (growth ? line('境界／功法常駐加成', format(growth), growth > 0 ? 'up' : 'down') : '');
+  }
+  function threatNote(player) {
+    if (!player.progression) return '';
+    const E = root.MahjongCultivationEquipment, factor = E?.factor?.(player, 'aggro');
+    if (factor === undefined || factor === 1) return '';
+    return line('新增仇恨（裝備／功法）', `×${Math.round(factor * 100) / 100}`) +
+      '<div class="ins-detail">隱修被動、劫印另算；最終新增仇恨倍率不低於 0.75。</div>';
+  }
 
   function discardCard(key) {
     const g = game(), c = g.cultivation, p = c.players[0], m = c.monster, combat = C();
@@ -57,8 +75,8 @@
     if (p.equipmentState?.stored > 0) rows.push(line('裝備儲傷', '+' + Math.round(p.equipmentState.stored), 'up'));
     rows.push(line(`${elements[element] || '無'}屬 → ${elements[m.element] || ''}屬妖`, '×' + mult, mult > 1 ? 'up' : mult < 1 ? 'down' : ''));
     if (hero && hero.stats.damage !== 100) rows.push(line(`${hero.name} 傷害`, hero.stats.damage + '%', hero.stats.damage > 100 ? 'up' : 'down'));
-    const gear = root.MahjongCultivationEquipment?.factor?.(p, 'damage', { basic: true });
-    if (gear && Math.abs(gear - 1) > .001) rows.push(line('裝備加成', '+' + (Math.round((gear - 1) * 1000) / 10) + '%', 'up'));
+    rows.push(constantBonuses(p, 'damage', 'basic'));
+    rows.push(threatNote(p));
     if (armorCut > 0) rows.push(line(`怪物護甲 ${Math.round(armorCut * 100)}%`, '×' + (Math.round((1 - armorCut) * 100) / 100), 'down'));
     if (m.shield > 0) rows.push(line(`怪物護盾 ${m.shield}`, '先吸收', 'down'));
     const combos = possibleSkills(key).slice(0, 2).map(x => `<div class="ins-combo">可組 ${esc(x.label)} → <b>${esc(x.skill.name)}</b> ${x.text}</div>`).join('');
@@ -94,6 +112,11 @@
     const sim = simulate(pid, meldEvent(pid, skill));
     const m = g.cultivation.monster, mult = C().elementMultiplier(skill.element, m.element);
     const rows = [line('屬性', `${elements[skill.element] || '無'} → ${elements[m.element] || ''}妖 ×${mult}`, mult > 1 ? 'up' : mult < 1 ? 'down' : '')];
+    const player = g.cultivation.players[pid];
+    if (sim && top(sim.damage) > 0) rows.push(constantBonuses(player, 'damage', 'active'));
+    if (sim && top(sim.heal) > 0) rows.push(constantBonuses(player, 'heal'));
+    if (sim && top(sim.shield) > 0) rows.push(constantBonuses(player, 'shield'));
+    rows.push(threatNote(player));
     if (sim && top(sim.heal) > 0) rows.push(line('回復', fmt(sim.heal), 'up'));
     if (sim && top(sim.shield) > 0) rows.push(line('護盾', fmt(sim.shield), 'up'));
     return { title: `${esc(owner)} · ${esc(source)}`, sub: `${esc(skill.name)}${cast ? '（已施放）' : ''}`,

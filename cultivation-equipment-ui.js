@@ -110,6 +110,7 @@
       return `<section class="equip-confirm" role="alertdialog" aria-modal="true" aria-labelledby="equipConfirmTitle"><h3 id="equipConfirmTitle">${confirmation.type==='transfer'?'確認強化移轉':'確認分解裝備'}</h3>${confirmation.type==='transfer'?`<p>來源：${esc(label(source))} → <b>+0</b></p><p>目標：${esc(label(target))} → <b>+${source.level}</b></p><p>費用：<b>30 金幣、2 靈砂</b>；不改變品階，強化等級不相加。</p>`:`<p>${esc(label(source))}</p><p>將永久失去此裝備，返還 <b>${source.grade} 靈砂</b>；不返還強化費、王印或金幣。</p>`}<div class="equip-actions"><button type="button" id="equipConfirmCancel">取消</button><button type="button" class="primary" id="equipConfirmAccept">${confirmation.type==='transfer'?'確認移轉':'確認分解'}</button></div></section>`;
     }
     function render() {
+      state=callbacks.getState?.()||state;
       const active=host.ownerDocument?.activeElement;
       if(host.contains?.(active)){const attrs=['id','data-tab','data-action','data-uid','data-item','data-select','data-filter'];const key=attrs.filter(a=>active.hasAttribute?.(a)).map(a=>[a,active.getAttribute(a)]);if(key.length)focusKey=key;}
       const p=player(), itemsOn=!!p.economy.items&&!!U;tab=itemsOn?p.economy.items.tab:['loot','items'].includes(tab)?'inventory':tab;

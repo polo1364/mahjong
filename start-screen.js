@@ -62,7 +62,7 @@
     }
   });
 
-  function startMode(mode) {
+  async function startMode(mode) {
     if (!initialized || state !== 'modes') return;
     state = 'starting';
     normal.disabled = true;
@@ -70,7 +70,9 @@
     back.disabled = true;
     // Measure the visible table before the opening animation captures its targets.
     try {
-      if (mode === 'cultivation' && autoSaves.cultivation) {
+      if (mode === 'cultivation' && window.MahjongProgressionFlow?.hasTrial) {
+        await window.MahjongProgressionFlow.resumeTrial();
+      } else if (mode === 'cultivation' && autoSaves.cultivation) {
         actions.restoreGame(autoSaves.cultivation, mode);
         revealTable();
       } else {
@@ -101,14 +103,15 @@
     });
   });
 
-  function resumeMode(mode, button) {
+  async function resumeMode(mode, button) {
     if (!initialized || state !== 'home' || !autoSaves[mode]) return;
     state = 'starting';
     button.disabled = true;
     start.disabled = true;
     try {
       // Existing restore validates the original save format before assigning state.
-      actions.restoreGame(autoSaves[mode], mode);
+      if (mode === 'cultivation' && window.MahjongProgressionFlow?.hasTrial) await window.MahjongProgressionFlow.resumeTrial();
+      else actions.restoreGame(autoSaves[mode], mode);
       revealTable();
       if (document.getElementById('reactionPanel').style.display === 'none') menu.focus({ preventScroll: true });
     } catch (error) {
@@ -137,6 +140,13 @@
     modes.hidden = true;
     for (const button of [resume, cultivationResume]) { button.hidden = true; button.disabled = true; }
     const loaded = await Promise.all([actions.loadAutoSave('normal'), actions.loadAutoSave('cultivation')]);
+    let progressionError = null;
+    if (window.MahjongProgressionFlow) {
+      let host = document.getElementById('cultivationProgressionHome');
+      if (!host) { host = document.createElement('div'); host.id = 'cultivationProgressionHome'; home.querySelector('.start-home-copy').append(host); }
+      try { await window.MahjongProgressionFlow.refresh(); window.MahjongProgressionFlow.home(host); }
+      catch (error) { progressionError = error; host.textContent = '永久養成資料無法讀取，請重試。'; }
+    }
     ['normal', 'cultivation'].forEach((mode, index) => {
       autoSaves[mode] = loaded[index];
       const button = mode === 'normal' ? resume : cultivationResume;
@@ -155,10 +165,11 @@
       }
     });
     start.disabled = false;
-    if (restartJourney) { restartJourney.hidden = !autoSaves.cultivation; restartJourney.disabled = false; }
+    if (restartJourney) { restartJourney.hidden = !autoSaves.cultivation; restartJourney.disabled = !!progressionError || !!window.MahjongProgressionFlow?.hasTrial; }
     cultivation.textContent = autoSaves.cultivation ? '繼續修仙旅程 →' : '踏入修仙之路 →';
     initialized = true;
     showPage('home', start);
+    if (progressionError) message(`養成資料讀取失敗：${progressionError.message}`, true);
   }
 
   async function init(callbacks) {
@@ -167,5 +178,5 @@
     await showHome();
   }
 
-  window.MahjongStartScreen = Object.freeze({ init, showHome, get state() { return state; } });
+  window.MahjongStartScreen = Object.freeze({ init, showHome, revealTable, get state() { return state; } });
 })();
