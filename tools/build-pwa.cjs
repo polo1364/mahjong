@@ -7,6 +7,12 @@ const files = fs.readdirSync(root).filter(file => /\.(css|js)$/.test(file)
   && !['sw.js', 'pwa-assets.js'].includes(file));
 files.push('index.html', 'manifest.webmanifest', 'assets/pwa/icon-192.png',
   'assets/pwa/icon-512.png', 'assets/pwa/apple-touch-icon.png');
+// Small hero icons should be ready even before the first visit to selection.
+files.push(...require('../cultivation-heroes.js').all.map(hero => hero.thumbnail));
+// Shared tile atlases are small and needed by every hand, including offline starts.
+require('../crystal-tiles.js');
+files.push(...Object.values(globalThis.MahjongCrystalTiles.sheets)
+  .map(sheet => 'assets/tiles-crystal/' + sheet.file.replace(/\.png$/, '.webp')));
 files.sort();
 const hash = crypto.createHash('sha256');
 for (const file of [...files, 'sw.js']) {

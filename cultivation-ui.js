@@ -1,6 +1,7 @@
 /* Cultivation presentation only. The mahjong and combat engines own every action. */
 (function (root) {
   'use strict';
+  const imageURL = root.MahjongImageURL || (value => value);
   const elements = { fire: '火', water: '水', metal: '金', wood: '木', earth: '土', neutral: '五行' };
   const actions = { chow: '吃', pong: '碰', exposed: '明槓', concealed: '暗槓', added: '加槓', flower: '補花', formation: '花陣', finish: '胡牌' };
   const families = { W: '赤晶', T: '靈珠', B: '飛劍', honor: '字牌', flower: '花牌', formation: '花陣', finish: '終式' };
@@ -131,8 +132,8 @@
   }
   function emblem(element, monster, version) {
     const species = version >= 2 && root.MahjongCultivationMonsters?.get(monster.speciesId);
-    if (species) return `<img src="${escape(species.image)}" alt="${escape(species.name)}" class="cult-emblem cult-journey-emblem">`;
-    return `<img src="assets/cultivation-vfx/monster.png" alt="${escape(elements[element] || '五行')}屬性妖獸" class="cult-emblem">`;
+    if (species) return `<img src="${escape(imageURL(species.image))}" alt="${escape(species.name)}" class="cult-emblem cult-journey-emblem">`;
+    return `<img src="assets/cultivation-vfx/monster.webp" alt="${escape(elements[element] || '五行')}屬性妖獸" class="cult-emblem">`;
   }
   function monsterMarkup(state, locked) {
     const combat = state.cultivation, monster = combat.monster;
@@ -207,7 +208,7 @@
         const portrait = info.querySelector('.seat-portrait');
         if (portrait) {
           portrait.style.backgroundImage = 'none';
-          portrait.innerHTML = `<img src="${escape(hero.image)}" alt="" class="cult-hero-portrait">`;
+          portrait.innerHTML = `<img src="${escape(imageURL(hero.image))}" alt="" class="cult-hero-portrait">`;
         }
         const name = info.querySelector('.seat-name');
         if (name?.firstChild?.nodeType === 3) name.firstChild.textContent = hero.name;
@@ -215,7 +216,7 @@
           name.classList.add('cult-hero-detail-trigger');
           name.title = `${playerName(state, pid)} · ${hero.role} · 查看角色與被動`;
           name.setAttribute('role', 'button'); name.setAttribute('aria-haspopup', 'dialog'); name.tabIndex = 0;
-          const show = () => { information(`${hero.name} · ${hero.role}`, `<div class="role-sheet"><figure class="role-portrait"><img src="${escape(hero.image)}" alt="${escape(hero.name)}"></figure><div class="role-main">${root.MahjongCultivationJourneyUI.heroDetails(hero) + root.MahjongCultivationJourneyUI.passiveState(currentState.cultivation.players[pid], currentState.cultivation.monster.id) + (root.MahjongCultivationEquipmentUI?.roleInfo(currentState.cultivation.players[pid]) || '')}</div></div>`, 'cult-role-sheet');
+          const show = () => { information(`${hero.name} · ${hero.role}`, `<div class="role-sheet"><figure class="role-portrait"><img src="${escape(imageURL(hero.image))}" alt="${escape(hero.name)}"></figure><div class="role-main">${root.MahjongCultivationJourneyUI.heroDetails(hero) + root.MahjongCultivationJourneyUI.passiveState(currentState.cultivation.players[pid], currentState.cultivation.monster.id) + (root.MahjongCultivationEquipmentUI?.roleInfo(currentState.cultivation.players[pid]) || '')}</div></div>`, 'cult-role-sheet');
             // Only sets with pieces worn (rendered open) are shown on the status sheet.
             document.querySelectorAll('#cultivationInformation .equip-sets details:not([open])').forEach(node => node.remove());
             document.querySelectorAll('#cultivationInformation .equip-sets:empty').forEach(node => node.remove()); };

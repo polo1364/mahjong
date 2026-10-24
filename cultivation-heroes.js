@@ -162,7 +162,7 @@ const all = [
     "image": "assets/cultivation-journey/heroes/hua-jianlu.png"
   }
 ];
-for (const hero of all) { Object.freeze(hero.stats); Object.freeze(hero.passive); Object.freeze(hero); }
+for (const hero of all) { hero.thumbnail = hero.image.replace(/\.png$/, '.thumb.webp'); Object.freeze(hero.stats); Object.freeze(hero.passive); Object.freeze(hero); }
 const api = Object.freeze({all:Object.freeze(all),get:(id)=>all.find(hero=>hero.id===id)||null});
 root.MahjongCultivationHeroes=api; if(typeof module!=="undefined" && module.exports) module.exports=api;
 })(typeof window!=="undefined"?window:globalThis);

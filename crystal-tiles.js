@@ -1,6 +1,7 @@
 /* Five-Element Crystal artwork. Edited PNGs remove corner text except on honor tiles. */
 (function (root) {
   'use strict';
+  const imageURL = root.MahjongImageURL || (value => value);
 
   const sheets = Object.freeze({
     wan: Object.freeze({ file: '01-wan-red-crystal-no-label.png', width: 1086, height: 1448 }),
@@ -75,7 +76,7 @@
     const flowerMarker = sheetKey === 'flowers' ? ` data-flower="${key.slice(1)}"` : '';
     // Local SVG viewports crop shared external images without duplicate clip-path IDs.
     // The final 40:56 viewport keeps the existing game's tile geometry unchanged.
-    markup[key] = `<svg class="tile-art" viewBox="0 0 40 56"${flowerMarker} data-crystal-key="${key}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="clip-path:${cornerClip}"><svg x="0" y="0" width="40" height="56" viewBox="${rectangle.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="assets/tiles-crystal/${sheet.file}" width="${sheet.width}" height="${sheet.height}" /></svg>${cornerLabel(key)}</svg>`;
+    markup[key] = `<svg class="tile-art" viewBox="0 0 40 56"${flowerMarker} data-crystal-key="${key}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="clip-path:${cornerClip}"><svg x="0" y="0" width="40" height="56" viewBox="${rectangle.join(' ')}" preserveAspectRatio="none" overflow="hidden"><image href="${imageURL(`assets/tiles-crystal/${sheet.file}`)}" width="${sheet.width}" height="${sheet.height}" /></svg>${cornerLabel(key)}</svg>`;
   }
 
   function render(key) {

@@ -119,7 +119,7 @@ html[data-center-style="bar"] .mahjong-table .turn-beacon { display: none; }
 html[data-center-style="clear"].table-scene.square-table .mahjong-table {
   background:
     radial-gradient(circle at 50% 50%, #040e1ae6 0, #040e1ad0 26%, #040e1a80 40%, #040e1a00 52%),
-    linear-gradient(#071d2133, #06191b33), url('assets/xianxia-table.jpg') center / cover;
+    linear-gradient(#071d2133, #06191b33), url('assets/xianxia-table.webp') center / cover;
 }
 html[data-center-style="clear"].table-scene.square-table .mahjong-table .center-info-panel {
   width: calc(var(--center-size) * 1.3); height: calc(var(--center-size) * 1.3); padding: 12px; gap: 5px; border-radius: 50%;

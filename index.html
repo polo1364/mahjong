@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="cultivation-monster-skills.css?v=monster-skills-1">
 <link rel="stylesheet" href="cultivation-prep-layout.css">
 <link rel="stylesheet" href="cultivation-choice.css">
+<script src="image-assets.js"></script>
 <script src="tile-names.js"></script>
 <script src="crystal-tiles.js"></script>
 <script src="cultivation-skills.js"></script>
@@ -83,7 +84,7 @@
       <p id="startCultivationSaveTime" class="start-save-time" hidden></p>
       </div>
       <figure class="start-hero">
-        <img src="assets/start-screen/home.png" width="1536" height="1024" alt="月夜青玉牌壇上的晶石麻將、上古神兵與遠山仙閣" fetchpriority="high">
+        <img src="assets/start-screen/home.webp" width="1536" height="1024" alt="月夜青玉牌壇上的晶石麻將、上古神兵與遠山仙閣" fetchpriority="high" decoding="async">
         <figcaption><span class="start-path-normal">一般 · 晶石論道</span><i aria-hidden="true"></i><span class="start-path-cultivation">修仙 · 神兵鎮妖</span></figcaption>
       </figure>
     </section>
@@ -93,14 +94,14 @@
       <h2 id="startModesTitle">選擇模式</h2>
       <div class="start-mode-grid">
         <article class="start-mode-card start-normal">
-          <img class="start-mode-art" src="assets/start-screen/normal.png" width="1536" height="1024" alt="月下仙閣中的青玉牌桌與整齊排列的晶石麻將">
+          <img class="start-mode-art" src="assets/start-screen/normal.webp" width="1536" height="1024" alt="月下仙閣中的青玉牌桌與整齊排列的晶石麻將" loading="lazy" decoding="async">
           <div class="start-mode-heading"><div class="start-mode-symbol" aria-hidden="true">和</div><div><span class="start-mode-tag">經典牌局 · 晶石論道</span>
           <h3>一般模式</h3></div></div>
           <p>台灣十六張規則・五行晶石牌面</p>
           <button id="normalModeBtn" class="primary" type="button">進入牌局 <span aria-hidden="true">→</span></button>
         </article>
         <article class="start-mode-card start-cultivation" aria-labelledby="cultivationTitle">
-          <img class="start-mode-art" src="assets/start-screen/cultivation.png" width="1536" height="1024" alt="晶石法陣上的上古神兵與青銅麒麟妖獸">
+          <img class="start-mode-art" src="assets/start-screen/cultivation.webp" width="1536" height="1024" alt="晶石法陣上的上古神兵與青銅麒麟妖獸" loading="lazy" decoding="async">
           <div class="start-mode-heading"><div class="start-mode-symbol" aria-hidden="true">道</div><div><span class="start-mode-tag">五行戰鬥 · 神兵鎮妖</span>
           <h3 id="cultivationTitle">修仙模式</h3></div></div>
           <p>五行技能・共同打怪・傷害競逐</p>

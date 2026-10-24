@@ -1,6 +1,7 @@
 /* Bronze raster battle VFX. No game state, timers, scoring or RNG are owned here. */
 (function (root) {
   'use strict';
+  const imageURL = root.MahjongImageURL || (value => value);
   const P = root.MahjongCultivationPresentation;
   const scriptUrl = document.currentScript.src;
   const asset = new URL('assets/cultivation-vfx/', scriptUrl).href;
@@ -14,7 +15,7 @@
   let imagePromise;
   function loadAssets() { return imagePromise ||= Promise.all(['bronze', 'weapons', 'nature', 'spirits', 'fire-forms', 'water-forms', 'monster'].map(name => new Promise(resolve => {
     const img = new Image(); img.onload = () => { images[name] = img; resolve(true); };
-    img.onerror = () => { console.error('Cultivation VFX image unavailable: ' + name); resolve(false); }; img.src = asset + name + '.png?v=crop-20261023';
+    img.onerror = () => { console.error('Cultivation VFX image unavailable: ' + name); resolve(false); }; img.src = imageURL(asset + name + '.png?v=crop-20261023');
   }))); }
   function loadMonster(speciesId) {
     if (!speciesId) return;
@@ -31,7 +32,7 @@
         resolve(true);
       };
       image.onerror = () => { console.error('Cultivation monster image unavailable: ' + speciesId); resolve(false); };
-      image.src = new URL(species.image, scriptUrl).href;
+      image.src = new URL(imageURL(species.image), scriptUrl).href;
     });
     return entry.promise;
   }

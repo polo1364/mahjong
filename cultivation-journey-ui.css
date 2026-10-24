@@ -1,4 +1,4 @@
-.journey-screen { box-sizing: border-box; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 24px; overflow: auto; border: 0; color: #ebefdf; background: linear-gradient(110deg,#071d25ed,#0b272ee8),url('assets/cultivation-journey/preparation-courtyard.png') center/cover fixed; font: 14px/1.6 "Microsoft JhengHei",sans-serif; }
+.journey-screen { box-sizing: border-box; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 24px; overflow: auto; border: 0; color: #ebefdf; background: linear-gradient(110deg,#071d25ed,#0b272ee8),url('assets/cultivation-journey/preparation-courtyard.webp') center/cover fixed; font: 14px/1.6 "Microsoft JhengHei",sans-serif; }
 .journey-screen::backdrop { background: #03121b; }
 .journey-screen *, .journey-screen *::before, .journey-screen *::after { box-sizing: border-box; }
 .journey-wrap { width: min(1260px,100%); margin: auto; }
@@ -16,6 +16,7 @@
 .journey-hero-option.is-selected span { color: #ffdda4; }
 .journey-hero-detail { display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1fr); align-items: center; gap: 8px; }
 .journey-selected-art { align-self: stretch; display: flex; align-items: center; justify-content: center; min-width: 0; }
+.journey-selected-art picture { display: contents; }
 .journey-selected-art img { width: 120%; max-height: 480px; height: auto; object-fit: contain; }
 .journey-screen h2 { margin: 0 0 12px; color: #eed4a1; font-size: 23px; font-weight: 500; letter-spacing: 2px; }
 .journey-role { color: #abceb9; font-size: 12px; margin: 0 0 4px; }

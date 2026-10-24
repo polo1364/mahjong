@@ -1,11 +1,13 @@
 /* Raster attack choreography driven exclusively by committed combat events. */
 (function(root){'use strict';
+  const imageURL = root.MahjongImageURL || (value => value);
  const K=root.MahjongMonsterSkills,R=root.MahjongMonsterPresentation.recipes,P=root.MahjongCultivationPresentation;
  const base=document.currentScript.src,images=new Map(),sounds=new Set(),stages=new Set(),seen=new Set();
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');let main=null,active=false,preview=null;
  const clamp=t=>Math.max(0,Math.min(1,t)),mix=(a,b,t)=>a+(b-a)*t;
- function load(name,path){if(images.has(name))return images.get(name).promise;const entry={image:null};images.set(name,entry);return entry.promise=new Promise(resolve=>{const i=new Image();i.onload=()=>{entry.image=i;resolve(true);};i.onerror=()=>{console.error('Monster effect image unavailable',path);resolve(false);};i.src=new URL(path,base).href;});}
- const ready=Promise.all([...new Set(Object.values(P.sprites).map(s=>s[0]))].map(a=>load(a,'assets/cultivation-vfx/'+a+'.png')).concat(['ice-fangs','dragon-wave','five-thunder'].map(a=>load(a,'assets/monster-skills/'+a+'.png'))));
+ function load(name,path){if(images.has(name))return images.get(name).promise;const entry={image:null};images.set(name,entry);return entry.promise=new Promise(resolve=>{const i=new Image();i.onload=()=>{entry.image=i;resolve(true);};i.onerror=()=>{console.error('Monster effect image unavailable',path);resolve(false);};i.src=new URL(imageURL(path),base).href;});}
+ let imagePromise;
+ function loadAssets(){return imagePromise ||= Promise.all([...new Set(Object.values(P.sprites).map(s=>s[0]))].map(a=>load(a,'assets/cultivation-vfx/'+a+'.png')).concat(['ice-fangs','dragon-wave','five-thunder'].map(a=>load(a,'assets/monster-skills/'+a+'.png'))));}
  function prefs(){return root.MahjongAudio?.getState()||{enabled:false,volume:0};}
  function stopSounds(owner){for(const a of sounds)if(!owner||a.owner===owner){a.pause();a.remove();sounds.delete(a);}}
  function syncPreferences(){const p=prefs();for(const a of sounds){if(!p.enabled||!p.volume||document.hidden){a.pause();a.remove();sounds.delete(a);}else a.volume=Math.min(1,p.volume*(p.ducked?.22:.48));}}
@@ -81,15 +83,15 @@
   stop(){this.runs=[];cancelAnimationFrame(this.frame);this.frame=0;stopSounds(this);this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.canvas.dataset.running='false';}
   destroy(){this.stop();this.observer.disconnect();stages.delete(this);}
  }
- function sync(state){active=!!state?.cultivation;if(!active){stop();return;}if(!main){const host=document.getElementById('playersGrid');if(!host)return;const canvas=document.createElement('canvas');canvas.id='monsterBattleEffects';canvas.className='cult-battle-effects';canvas.setAttribute('aria-hidden','true');host.append(canvas);main=new Stage(canvas);}const species=root.MahjongCultivationMonsters.get(state.cultivation.monster.speciesId);if(species)load('beast:'+species.id,species.image);}
+ function sync(state){active=!!state?.cultivation;if(!active){stop();return;}loadAssets();if(!main){const host=document.getElementById('playersGrid');if(!host)return;const canvas=document.createElement('canvas');canvas.id='monsterBattleEffects';canvas.className='cult-battle-effects';canvas.setAttribute('aria-hidden','true');host.append(canvas);main=new Stage(canvas);}const species=root.MahjongCultivationMonsters.get(state.cultivation.monster.speciesId);if(species)load('beast:'+species.id,species.image);}
  function consume(effects,before){if(!active||!main||document.hidden)return;for(const e of effects||[]){if(e.type!=='monsterSkill')continue;const id=[e.monsterId,e.seq,e.actionNumber,e.skillId,!!e.reaction].join(':');if(seen.has(id))continue;seen.add(id);if(seen.size>300)seen.delete(seen.values().next().value);main.add(e,effects.filter(h=>h.type==='hurt'&&h.monsterSkillId===e.skillId),before.monster);}}
  function stop(){main?.stop();stopSounds();preview?.close();}function reset(){stop();seen.clear();}
  function showPreview(id){const skill=K.get(id);if(!skill)return;preview?.close();const prior=document.activeElement,d=document.createElement('dialog');d.className='cult-vfx-preview';d.setAttribute('aria-label',skill.name+'攻擊演出');
   const header=document.createElement('header'),title=document.createElement('h2'),close=document.createElement('button'),canvas=document.createElement('canvas'),info=document.createElement('p'),play=document.createElement('button');
   title.textContent=skill.name;close.textContent='關閉 ×';play.textContent='重播招式與音效';info.textContent=K.describe(skill)+'。此處僅預覽演出，不造成遊戲傷害。';header.append(title,close);d.append(header,canvas,info,play);document.body.append(d);d.showModal();const stage=new Stage(canvas,true),species=root.MahjongCultivationMonsters.get(skill.speciesId);
   const run=()=>{stage.stop();stage.add({skillId:id,name:skill.name,targets:skill.type==='all'?[0,1,2,3]:[0]},[{pid:0,amount:skill.damage}],{speciesId:species.id});};
-  const finish=()=>{stage.destroy();d.close();d.remove();preview=null;prior?.focus({preventScroll:true});};preview={close:finish};close.onclick=finish;d.addEventListener('cancel',e=>{e.preventDefault();finish();});play.onclick=run;Promise.all([ready,load('beast:'+species.id,species.image)]).then(()=>{if(d.isConnected)run();});close.focus();
+  const finish=()=>{stage.destroy();d.close();d.remove();preview=null;prior?.focus({preventScroll:true});};preview={close:finish};close.onclick=finish;d.addEventListener('cancel',e=>{e.preventDefault();finish();});play.onclick=run;Promise.all([loadAssets(),load('beast:'+species.id,species.image)]).then(()=>{if(d.isConnected)run();});close.focus();
  }
  document.addEventListener('visibilitychange',()=>{if(document.hidden){stages.forEach(s=>s.stop());stopSounds();}});document.addEventListener('input',syncPreferences);root.addEventListener('resize',()=>stages.forEach(s=>s.layout()));
- root.MahjongMonsterEffects=Object.freeze({sync,consume,stop,reset,showPreview,syncPreferences,loaded:ready});
+ root.MahjongMonsterEffects=Object.freeze({sync,consume,stop,reset,showPreview,syncPreferences,get loaded(){return loadAssets();}});
 })(window);

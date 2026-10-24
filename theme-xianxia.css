@@ -139,13 +139,13 @@ html.feedback-reduced .mahjong-table::after { animation: none; }
 #handBack3 .tile-back, .square-table #meldRail3 .rail-tile.is-back { background-image: var(--xx-talisman-right), linear-gradient(160deg, #f4dc94, #dcb45f 55%, #b98a3c); background-size: 58% auto, 100% 100%; }
 
 /* ---------- Generated artwork (ElevenLabs image, 2026-10-21) replaces the drawn scene ---------- */
-body { background: var(--xx-ink) url('assets/xianxia-bg.jpg') center center / cover fixed no-repeat; }
+body { background: var(--xx-ink) url('assets/xianxia-bg.webp') center center / cover fixed no-repeat; }
 body::before { background: linear-gradient(90deg, #060a1aa6, #060a1a33 55%, #060a1a8c), linear-gradient(0deg, #050816b3, transparent 55%); }
 .mahjong-table {
   /* The carved jade slab already holds the bagua; a soft veil keeps tiles and discards readable. */
   background:
     radial-gradient(ellipse 75% 70% at 50% 50%, #0a1a2a33, #06101c99 100%),
-    url('assets/xianxia-table.jpg') center / cover no-repeat,
+    url('assets/xianxia-table.webp') center / cover no-repeat,
     #0f2a33;
 }
 .mahjong-table::after { display: none; }

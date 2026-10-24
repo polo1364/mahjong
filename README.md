@@ -7,7 +7,7 @@
 - 若裝置沒有旋轉，先關閉系統的直向鎖定。PWA 宣告 `orientation: landscape`，瀏覽器或系統未套用時仍會顯示直式提醒。
 - **Android／桌機 Chrome、Edge**：透過 HTTPS 開啟網站，在瀏覽器選單選擇「安裝應用程式」或「新增至主畫面」。實際選項名稱依瀏覽器而異。
 - **iPhone／iPad Safari**：透過 HTTPS 開啟網站，使用「分享 → 加入主畫面」，再從主畫面開啟並橫放裝置。
-- 第一次需要連線。Service Worker 安裝完成後會快取程式主體；圖片與音效採使用時快取。可離線重新開啟並進入一般模式，但尚未載入的圖片／語音／新修仙場景仍需要連線；不保證完整素材全部離線可用。
+- 第一次需要連線。Service Worker 安裝完成後會快取程式主體、10 張角色縮圖及 5 張常用麻將圖集；其他圖片與音效採使用時快取。可離線重新開啟並進入一般模式，但尚未載入的圖片／語音／新修仙場景仍需要連線；不保證完整素材全部離線可用。
 - 更新版本會等待此網站的舊遊戲分頁全部關閉後啟用，不會強制重載正在玩的牌局。更新前可在設定儲存進度；快取更新不會清除 IndexedDB 或 localStorage。
 - 安裝與離線功能需要 **HTTPS 或本機 localhost／127.0.0.1**；直接雙擊 `index.html` 可遊玩，但無法安裝 PWA，也不會註冊 Service Worker。
 
@@ -204,6 +204,25 @@ node tests/gameplay-audit.cjs --controlled --mobile --sound --voice --style=ink 
 
 ---
 
+## 圖片載入優化（2026-10-24）
+
+- 遊戲場景、角色、怪物、裝備、道具、NPC、牌面與特效改讀 WebP；109 張素材由 15,915,014 bytes 降至 9,329,152 bytes（減少 41.4%）。這是素材合計，並非每次開頁面的下載量。原始 PNG/JPG、資料目錄路徑與存檔保留；PWA 安裝圖示、SVG 及非遊戲使用的 `cultivation-preview/` 維持原格式。
+- 麻將圖集由 2,512,651 bytes 降至 855,170 bytes（9 張合計，減少 66.0%）。WebP 與現有 PNG 尺寸一致，沿用原有 SVG／Canvas 裁切座標；透明度逐像素驗證一致。
+- 選角另用 10 張 256×384 縮圖，合計 351,908 bytes；手機不額外下載隱藏的大圖。首頁模式插圖延後載入，怪物特效只在進入修仙或試放時載入。
+- Chromium、844×390、DPR 2、1.6 Mbit/s／150 ms 延遲、全新快取且停用 Service Worker 的量測：從點修仙模式到 10 張角色圖齊全，由 23.3 秒降至 9.6 秒。PWA 安裝完成後，首次離線選角約 65 ms。這是本機模擬，尚未在實體手機驗證。
+- 更新來源圖片後，執行以下命令重新產生 WebP，再更新 PWA 版本。`sharp` 與 `playwright` 為開發驗證依賴，網站執行不需要 Node.js。
+
+```powershell
+node tools/build-mobile-images.cjs
+node tests/image-assets.cjs
+node tools/build-pwa.cjs
+node tools/build-pwa.cjs --check
+node tests/hero-loading.cjs
+node tests/pwa-browser.cjs
+```
+
+生成工具保留原圖，只新增同目錄 WebP 與角色 `.thumb.webp`；新增圖片請先執行生成工具再部署。瀏覽器驗證涵蓋手機／桌機角色切換、牌桌圖集、特效解碼及離線選角，結果寫入忽略提交的 `artifacts/`。圖片仍受首次連線速度影響；未載入的場景／音效仍需網路。
+
 ## 🖥️ 使用方式
 
 1. 打開 `index.html`，在首頁按「開始遊戲」→「一般模式」才會擲骰、分牌、定莊。
@@ -248,6 +267,7 @@ mahjong/
 ├── cultivation-combat.js # 可重播驗證的獨立戰鬥狀態轉換
 ├── cultivation-ui.js # 怪物／玩家狀態、技能圖鑑與選技預覽
 ├── cultivation.css   # 修仙模式專用響應式樣式
+├── image-assets.js  # 保留資料原圖路徑，顯示時解析 WebP
 ├── styles.css        # 共用介面與響應式排版
 ├── lounge.css        # 月夜牌館視覺樣式
 ├── table-layout.js   # 四家牌架、花牌與棄牌的可用空間配置
@@ -275,11 +295,11 @@ mahjong/
 
 ## 上古神兵 · 修仙戰鬥演出
 
-- 修仙模式使用生成的透明 PNG 戰鬥素材與 Canvas 演出；不以 SVG 或圖示縮放代替攻擊。
+- 修仙模式以生成的透明 PNG 作為來源，遊戲載入 WebP 衍生素材並以 Canvas 演出；不以 SVG 或圖示縮放代替攻擊。
 - 169 種牌組技能與 38 種台型終式都有演出對照，按用途分成 56 種施法造型，包括劍雨、穿刺、地裂、藤縛、火壁、靈泉、四象與山岳鎮落。共用材質，但依招式組合動作、段落和聲音。
 - 設定內可開關特效、調整主音量與減少動態；每張技能卡都有「試放招式 · 試聽」。試放是獨立演武，不會改動牌局。
 - [六招差異對照](artifacts/cultivation-vfx-contrast.html) · [全部招式演武](artifacts/cultivation-vfx-catalog.html) · [製作與驗證報告](artifacts/CULTIVATION_VFX_REPORT.md)。
-- `cultivation-choreography.js` 保存逐招施法造型，`cultivation-presentation.js` 將實際戰鬥結果轉為演出，`cultivation-effects.js` 負責 PNG、動畫與音效。規則、傷害與存檔仍由既有引擎管理。
+- `cultivation-choreography.js` 保存逐招施法造型，`cultivation-presentation.js` 將實際戰鬥結果轉為演出，`cultivation-effects.js` 負責圖片載入、動畫與音效。規則、傷害與存檔仍由既有引擎管理。
 
 ## 🧠 未來可擴充功能
 - 線上對戰（WebSocket）
