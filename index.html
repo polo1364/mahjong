@@ -4174,35 +4174,47 @@ function flowerHTML(pid) {
   return `<div class="flower-row" aria-label="${escapeHTML(playerName(pid))}的花牌">${flowers.slice().sort((a,b)=>a.rank-b.rank).map(t => `<span data-flower-key="${tileKey(t)}" data-flower-player="${pid}" class="tile mini suit-H ${(t.rank-1)%4===seat?'flower-own':''}" title="${keyToText(tileKey(t))}${(t.rank-1)%4===seat?' · 正花':''}">${tileFace(t)}</span>`).join('')}</div>`;
 }
 
+// Render-only memoization: tile identity/order do not change listening results.
+// Keep this outside saved state; changed hands/melds always invalidate the entry.
+const renderedWaits = new WeakMap();
+function updatePlayerWaits(p) {
+  if (p.declaredListen && p.tingLocked) return;
+  const key = p.hand.map(tileKey).sort().join(',') + '|' + p.melds.map(m =>
+    m.type + ':' + m.tiles.map(tileKey).sort().join(',')).join('|');
+  const cached = renderedWaits.get(p);
+  if (cached?.key === key) { p.waitKeys = cached.waits.slice(); return; }
+  const kc = countKongs(p);
+  const totalP = p.hand.length + p.melds.reduce((sum, m) => sum + m.tiles.length, 0);
+  const expFull = 17 + kc;
+  const expEmpty = 16 + kc;
+  let ting = false;
+  const listeningDiscards = new Set();
+  if (totalP === expFull) {
+    // 有摸牌時：測試打出手中任一張後是否能胡
+    const tested = new Set();
+    for (const tile of p.hand) {
+      const name = tileKey(tile);
+      if (tested.has(name)) continue;
+      tested.add(name);
+      if (isListening(p.hand.filter(other => other !== tile), p.melds)) listeningDiscards.add(name);
+    }
+    ting = listeningDiscards.size > 0;
+  } else if (totalP === expEmpty) {
+    // 少一張時：直接檢查是否聽牌
+    ting = isListening(p.hand, p.melds);
+  }
+  if (ting) {
+    p.waitKeys = calcWaitingTiles(p.hand, p.melds);
+  } else {
+    p.waitKeys = [];
+  }
+  renderedWaits.set(p, { key, waits: p.waitKeys.slice(), ting, listeningDiscards });
+}
+
 function renderAll() {
   window.MahjongImages?.watch(S);
-  // 每次重繪前，為所有玩家檢查聽牌狀態並即時計算等待牌。
-  // 聽牌條件：當前總牌數為應該丟牌（17+槓數）或摸牌（16+槓數）時，檢查是否只差一張牌就能胡。
-  for (let i = 0; i < 4; i++) {
-    const p = S.players[i];
-    if (p.declaredListen && p.tingLocked) continue;
-    const kc = countKongs(p);
-    const totalP = p.hand.length + p.melds.reduce((sum, m) => sum + m.tiles.length, 0);
-    const expFull = 17 + kc;
-    const expEmpty = 16 + kc;
-    let ting = false;
-    if (totalP === expFull) {
-      // 有摸牌時：測試打出手中任一張後是否能胡
-      ting = p.hand.some(t => {
-        const test = p.hand.filter(x => x !== t);
-        return isListening(test, p.melds);
-      });
-    } else if (totalP === expEmpty) {
-      // 少一張時：直接檢查是否聽牌
-      ting = isListening(p.hand, p.melds);
-    }
-    if (ting) {
-      p.waitKeys = calcWaitingTiles(p.hand, p.melds);
-    } else {
-      p.waitKeys = [];
-    }
-  }
-  
+  S.players.forEach(updatePlayerWaits);
+
   const sc = document.getElementById('scoreboard');
   // Compose each player's information: name, points, listen state, dealer badge, and dealer streak indicator
   sc.innerHTML = [0, 3, 1, 2].map(i => `<div class="score-row"><span class="score-wind">${currentSeatWind(i)}</span><span class="score-name">${escapeHTML(playerName(i))}${i === 0 ? ' · 你' : ''}${i === S.dealer ? '<span class="dealer-badge">莊</span>' : ''}</span><strong>${S.players[i].points.toLocaleString()}</strong></div>`).join('');
@@ -4377,14 +4389,13 @@ function renderAll() {
     if (totalTilesMe === expectedFull) {
       const canListenAfterDiscard = me.hand.some(tile => {
         if (!canDiscardTile(0, tile)) return false;
-        const testHand = me.hand.filter(t => t !== tile);
-        return isListening(testHand, me.melds);
+        return renderedWaits.get(me)?.listeningDiscards.has(tileKey(tile)) || false;
       });
       if (canListenAfterDiscard) canListenBtn = true;
     }
     // 摸牌後待摸狀態：expectedEmpty，檢查手牌是否已經聽牌
     if (totalTilesMe === expectedEmpty) {
-      canListenBtn = isListening(me.hand, me.melds);
+      canListenBtn = renderedWaits.get(me)?.ting || false;
     }
   }
   document.getElementById('btnListen').disabled = !canListenBtn;

@@ -3,7 +3,7 @@ const fs=require('fs'),path=require('path'),http=require('http'),assert=require(
 const root=path.resolve(__dirname,'..'),baseline=process.argv.includes('--baseline');
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
 let hold=true,fail=false,holdHome=false;const pending=[];
-const critical=url=>/assets\/(tiles-crystal\/.*\.webp|cultivation-journey\/(heroes|monsters)\/.*\.webp)/.test(url);
+const critical=url=>/assets\/((?:cultivation-vfx|monster-skills)\/.*\.webp|tiles-crystal\/.*\.webp|cultivation-journey\/(heroes|monsters)\/.*\.webp)/.test(url);
 const server=http.createServer((req,res)=>{
  const name=decodeURIComponent(new URL(req.url,'http://localhost').pathname),file=path.resolve(root,'.'+(name.endsWith('/')?name+'index.html':name));
  const send=()=>{if(res.destroyed)return;if(!file.startsWith(root+path.sep)||!fs.existsSync(file)){res.writeHead(404).end();return;}if(fail&&critical(name)){res.writeHead(503).end();return;}res.setHeader('Content-Type',mime[path.extname(file)]||'application/octet-stream');fs.createReadStream(file).pipe(res);};

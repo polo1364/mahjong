@@ -22,7 +22,8 @@ test('cultivation suppresses legacy meld and win sounds but retains other cues a
   assert.equal(run('sounds.length'),0);
 });
 
-function player({ pending = false, throws = false } = {}) {
+function player({ pending = false, throws = false, timed = false } = {}) {
+  const timers = new Map(); let timerId = 0;
   const instances = [];
   const events = new Map();
   const windowEvents = new Map();
@@ -44,10 +45,11 @@ function player({ pending = false, throws = false } = {}) {
   const document = { hidden: false, addEventListener: (name, fn) => events.set(name, fn) };
   const window = { Audio: AudioMock, performance: { now: () => time },
     addEventListener: (name, fn) => windowEvents.set(name, fn) };
+  if (timed) { window.setTimeout = (fn, ms) => { timers.set(++timerId, { fn, at: time + ms }); return timerId; }; window.clearTimeout = id => timers.delete(id); }
   const context = vm.createContext({ window, document });
   vm.runInContext(source, context);
   return { api: window.MahjongAudio, instances, document, events, windowEvents,
-    advance: (ms = 1000) => { time += ms; } };
+    advance: (ms = 1000) => { time += ms; for (const [id, timer] of timers) if (timer.at <= time) { timers.delete(id); timer.fn(); } } };
 }
 
 const settle = () => new Promise(resolve => setImmediate(resolve));
@@ -226,4 +228,16 @@ test('voice ducking applies to active and future effects and restores the select
   api.setDucked(false);
   assert.equal(instances[0].volume, .4 * .55 * .9);
   assert.equal(api.getState().volume, .4);
+});
+
+
+test('slow-network effects expire before a late play completion can revive them', async () => {
+  const h = player({ pending: true, timed: true }); h.api.setEnabled(true);
+  h.api.play('discard'); h.advance(301);
+  assert.equal(h.api.getState().active, 0);
+  h.instances[0].requests[0].resolve(); await settle();
+  assert.equal(h.instances[0].paused, true);
+  assert.equal(h.api.getState().lastPlayed, null);
+  h.api.play('pong'); h.instances[0].requests[1].resolve(); await settle(); h.advance(500);
+  assert.equal(h.instances[0].paused, false, 'already-started clips can finish normally');
 });

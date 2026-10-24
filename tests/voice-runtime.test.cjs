@@ -7,7 +7,8 @@ const source = fs.readFileSync(path.join(__dirname, '../feedback-voice.js'), 'ut
 const { game, source: engineSource } = require('./game-harness.cjs');
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
-function voicePlayer() {
+function voicePlayer({ timed = false } = {}) {
+  const timers = new Map(); let timerId = 0;
   const nodes = [], events = new Map(), announcements = [], ducks = [];
   let time = 0;
   class Audio {
@@ -22,8 +23,9 @@ function voicePlayer() {
     MahjongHeroVoices: require('../hero-voices.js'),
     CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init.detail; } },
     dispatchEvent: event => announcements.push(event), addEventListener: (name, fn) => events.set(name, fn) };
+  if (timed) { window.setTimeout = (fn, ms) => { timers.set(++timerId, { fn, at: time + ms }); return timerId; }; window.clearTimeout = id => timers.delete(id); }
   vm.runInNewContext(source, { window, document });
-  return { api: window.MahjongVoice, nodes, document, events, announcements, ducks, advance: ms => { time += ms; } };
+  return { api: window.MahjongVoice, nodes, document, events, announcements, ducks, advance: ms => { time += ms; for (const [id, timer] of timers) if (timer.at <= time) { timers.delete(id); timer.fn(); } } };
 }
 
 test('voice accepts 42 crystal tile names and 30 existing calls without browser speech or game randomness', async () => {
@@ -340,4 +342,16 @@ test('delayed round announcement uses public round-and-seat clips and checks vis
   // First hand of a session is the East round; the second wind is the dealer's seat.
   assert.match(run('announced[0]'), /^round-e[eswn]$/);
   assert.ok(run('voiceStops')>0, 'new hand cancels old local speech');
+});
+
+
+test('a stalled spoken tile expires and releases ducking without replaying late', async () => {
+  const h = voicePlayer({ timed: true }); h.api.setEnabled(true);
+  h.api.play('tile-w1'); h.advance(701);
+  assert.equal(h.api.getState().active, null);
+  assert.equal(h.ducks.at(-1), false);
+  h.nodes[0].requests[0].resolve(); await settle();
+  assert.equal(h.nodes[0].paused, true);
+  assert.equal(h.api.getState().lastPlayed, null);
+  assert.equal(h.announcements.at(-1).detail.type, 'expired');
 });

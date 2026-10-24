@@ -23,7 +23,7 @@
   let active = null;
   let activeHeroId = null;
   let pending = [];
-  let token = 0;
+  let token = 0, startTimer = null;
   let lastPlayed = null;
   let lastPlayedHeroId = null;
 
@@ -39,6 +39,7 @@
     }
   }
   function stopCurrent() {
+    window.clearTimeout?.(startTimer);
     token++;
     active = null;
     activeHeroId = null;
@@ -63,6 +64,7 @@
   }
   function start(cue, media = cue, heroId = null) {
     const current = ++token;
+    const deadline = clock() + (priority(cue) ? 1200 : 700);
     active = cue;
     activeHeroId = heroId;
     const valid = () => token === current && active === cue;
@@ -95,11 +97,15 @@
       audio.src = `assets/audio/${folder}/${media}.mp3${!heroId && media === 'flower' ? '?v=20261020-clear-flower' : ''}`;
       audio.volume = volume * .9;
       duck(true);
+      const expire = () => { if (!valid()) return; stopCurrent(); notify('expired', cue); next(); };
+      startTimer = window.setTimeout?.(expire, Math.max(0, deadline - clock()));
       const started = () => {
         if (!valid() || !available()) {
           if (!active || !available()) try { audio.pause(); } catch (_) { /* Already stopped. */ }
           return;
         }
+        window.clearTimeout?.(startTimer);
+        if (clock() > deadline) { expire(); return; }
         lastPlayed = cue;
         lastPlayedHeroId = heroId;
         failedCues.delete(cue);

@@ -6,7 +6,7 @@
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');let main=null,active=false,preview=null;
  const clamp=t=>Math.max(0,Math.min(1,t)),mix=(a,b,t)=>a+(b-a)*t;
  function load(name,path){if(images.has(name))return images.get(name).promise;const entry={image:null};images.set(name,entry);return entry.promise=new Promise(resolve=>{const i=new Image();i.onload=()=>{entry.image=i;resolve(true);};i.onerror=()=>{console.error('Monster effect image unavailable',path);resolve(false);};i.src=new URL(imageURL(path),base).href;});}
- let imagePromise;
+ let imagePromise,loadEpoch=0;
  function loadAssets(){return imagePromise ||= Promise.all([...new Set(Object.values(P.sprites).map(s=>s[0]))].map(a=>load(a,'assets/cultivation-vfx/'+a+'.png')).concat(['ice-fangs','dragon-wave','five-thunder'].map(a=>load(a,'assets/monster-skills/'+a+'.png'))));}
  function prefs(){return root.MahjongAudio?.getState()||{enabled:false,volume:0};}
  function stopSounds(owner){for(const a of sounds)if(!owner||a.owner===owner){a.pause();a.remove();sounds.delete(a);}}
@@ -14,12 +14,14 @@
  function sound(skill,owner){const p=prefs();if(!p.enabled||!p.volume||document.hidden)return;
   if(sounds.size>=2){const old=sounds.values().next().value;old.pause();old.remove();sounds.delete(old);}
   const a=new Audio(new URL(skill.audio,base).href);a.owner=owner;a.hidden=true;a.dataset.monsterSound=skill.id;a.volume=Math.min(1,p.volume*(p.ducked?.22:.48));
-  const done=()=>{sounds.delete(a);a.remove();};a.addEventListener('ended',done,{once:true});a.addEventListener('error',()=>{owner.canvas.dataset.audioError=skill.id;done();},{once:true});
-  sounds.add(a);document.body.append(a);a.play().catch(()=>{owner.canvas.dataset.audioBlocked='true';done();});owner.canvas.dataset.lastSound=skill.id;
+  const deadline=performance.now()+300,stopLate=()=>{a.pause();sounds.delete(a);a.remove();};
+  const timer=root.setTimeout?.(stopLate,300);
+  const done=()=>{root.clearTimeout?.(timer);sounds.delete(a);a.remove();};a.addEventListener('ended',done,{once:true});a.addEventListener('error',()=>{owner.canvas.dataset.audioError=skill.id;done();},{once:true});
+  sounds.add(a);document.body.append(a);a.play().then(()=>{root.clearTimeout?.(timer);if(!sounds.has(a)||performance.now()>deadline||document.hidden)stopLate();}).catch(()=>{owner.canvas.dataset.audioBlocked='true';done();});owner.canvas.dataset.lastSound=skill.id;
  }
  class Stage{
   constructor(canvas,demo=false){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.demo=demo;this.runs=[];this.frame=0;stages.add(this);this.observer=new ResizeObserver(()=>this.layout());this.observer.observe(canvas);this.layout();}
-  layout(){const b=this.canvas.getBoundingClientRect();this.w=b.width;this.h=b.height;this.dpr=Math.min(2,devicePixelRatio||1);this.canvas.width=Math.max(1,Math.round(this.w*this.dpr));this.canvas.height=Math.max(1,Math.round(this.h*this.dpr));
+  layout(){const b=this.canvas.getBoundingClientRect();this.w=b.width;this.h=b.height;this.dpr=Math.min(2,devicePixelRatio||1);const width=Math.max(1,Math.round(this.w*this.dpr)),height=Math.max(1,Math.round(this.h*this.dpr));if(this.canvas.width!==width||this.canvas.height!==height){this.canvas.width=width;this.canvas.height=height;}
    const rect=node=>{if(!node?.getClientRects().length)return null;const r=node.getBoundingClientRect();return{x:r.left-b.left,y:r.top-b.top,w:r.width,h:r.height};};
    if(this.demo){this.source={x:this.w*.5,y:this.h*.24};this.targets=[{x:this.w*.5,y:this.h*.79},{x:this.w*.16,y:this.h*.57},{x:this.w*.84,y:this.h*.57},{x:this.w*.73,y:this.h*.23}];this.exclusions=[];}
    else{const m=rect(document.getElementById('cultivationMonster'))||{x:this.w*.4,y:this.h*.4,w:140,h:100},size=Math.min(190,Math.max(72,this.w*.17));this.source={x:m.x+m.w+size*.48+9,y:m.y+m.h*.46};if(this.source.x+size/2>this.w-68)this.source={x:m.x+m.w/2,y:Math.max(65,m.y-size*.4-8)};
@@ -28,7 +30,7 @@
    }
   }
   texture(name,x,y,size,rotation=0,alpha=1,stretch=1,beast=null){const sprite=P.sprites[name],entry=images.get(name==='beast'?'beast:'+beast:sprite?sprite[0]:name),img=entry?.image;if(!img)return;
-   let src=[0,0,img.width,img.height];if(sprite){const cw=img.width/4,ch=img.height/2;src=[Math.round(sprite[1]%4*cw),Math.round(Math.floor(sprite[1]/4)*ch),Math.round(cw),Math.round(ch)];}
+   let src=[0,0,img.width,img.height];if(sprite){const cw=img.width/4,ch=img.height/2;const col=sprite[1]%4,row=Math.floor(sprite[1]/4),sx=Math.round(col*cw),sy=Math.round(row*ch);src=[sx,sy,Math.round((col+1)*cw)-sx,Math.round((row+1)*ch)-sy];}
    const aspect=src[3]/src[2];let width=size,height=size*aspect*stretch;
    // Fit the complete rotated silhouette; no texture is cropped to a destination square.
    const co=Math.abs(Math.cos(rotation)),si=Math.abs(Math.sin(rotation)),fit=Math.min(1,(this.w-16)/(co*width+si*height),(this.h-24)/(si*width+co*height));width*=fit;height*=fit;
@@ -69,8 +71,9 @@
    this.runs=this.runs.filter(r=>now-r.start<2200);if(document.hidden){this.stop();return;}
    if(this.demo){c.fillStyle='#091b22';c.fillRect(0,0,this.w,this.h);this.targets.forEach((p,i)=>this.text('道友 '+(i+1),p.x,p.y+31));const beast=this.runs[0]?.monster.speciesId;if(beast)this.texture('beast',this.source.x,this.source.y,68,0,.7,1,beast);}
    c.save();c.beginPath();c.rect(0,0,this.w,this.h);for(const r of this.exclusions)c.rect(r.x-2,r.y-2,r.w+4,r.h+4);c.clip('evenodd');
-   for(const run of this.runs){const t=(now-run.start)/1000;if(t<0)continue;const skill=K.get(run.event.skillId);if(!skill)continue;
-    if(!run.played){run.played=true;sound(skill,this);}const recipe=R[skill.motion];if(root.MahjongCultivationEffects?.enabled===false&&!this.demo)continue;
+   for(const run of this.runs){let t=(now-run.start)/1000;if(t<0)continue;const skill=K.get(run.event.skillId);if(!skill)continue;
+    // A delayed first frame starts picture and sound together; stale attacks stay silent.
+    if(!run.played){if(t>.25&&t<=.5){run.start=now;t=0;}run.played=true;if(t<.25)sound(skill,this);}const recipe=R[skill.motion];if(root.MahjongCultivationEffects?.enabled===false&&!this.demo)continue;
     const targets=run.event.targets.map(pid=>this.targets[pid]).filter(Boolean);
     for(const target of targets){if(reduced.matches){if(t<.35)this.texture(recipe.layers.at(-1).sprite,target.x,target.y,75,0,1,1,run.monster.speciesId);}
      else for(const layer of recipe.layers){if(target!==targets[0]&&['source','source-rise','source-orbit','windup'].includes(layer.path))continue;this.layer(layer,t,target,run.monster.speciesId);}
@@ -84,14 +87,17 @@
   destroy(){this.stop();this.observer.disconnect();stages.delete(this);}
  }
  function sync(state){active=!!state?.cultivation;if(!active){stop();return;}loadAssets();if(!main){const host=document.getElementById('playersGrid');if(!host)return;const canvas=document.createElement('canvas');canvas.id='monsterBattleEffects';canvas.className='cult-battle-effects';canvas.setAttribute('aria-hidden','true');host.append(canvas);main=new Stage(canvas);}const species=root.MahjongCultivationMonsters.get(state.cultivation.monster.speciesId);if(species)load('beast:'+species.id,species.image);}
- function consume(effects,before){if(!active||!main||document.hidden)return;for(const e of effects||[]){if(e.type!=='monsterSkill')continue;const id=[e.monsterId,e.seq,e.actionNumber,e.skillId,!!e.reaction].join(':');if(seen.has(id))continue;seen.add(id);if(seen.size>300)seen.delete(seen.values().next().value);main.add(e,effects.filter(h=>h.type==='hurt'&&h.monsterSkillId===e.skillId),before.monster);}}
- function stop(){main?.stop();stopSounds();preview?.close();}function reset(){stop();seen.clear();}
+ function consume(effects,before){if(!active||!main||document.hidden)return;
+  const required=[...new Set(Object.values(P.sprites).map(s=>s[0])),'ice-fangs','dragon-wave','five-thunder'];
+  if(required.some(name=>!images.get(name)?.image)){const epoch=loadEpoch,requested=performance.now();loadAssets().then(loaded=>{if(loaded.every(Boolean)&&epoch===loadEpoch&&!document.hidden&&performance.now()-requested<1000)consume(effects,before);});return;}
+  for(const e of effects||[]){if(e.type!=='monsterSkill')continue;const id=[e.monsterId,e.seq,e.actionNumber,e.skillId,!!e.reaction].join(':');if(seen.has(id))continue;seen.add(id);if(seen.size>300)seen.delete(seen.values().next().value);main.add(e,effects.filter(h=>h.type==='hurt'&&h.monsterSkillId===e.skillId),before.monster);}}
+ function stop(){loadEpoch++;main?.stop();stopSounds();preview?.close();}function reset(){stop();seen.clear();}
  function showPreview(id){const skill=K.get(id);if(!skill)return;preview?.close();const prior=document.activeElement,d=document.createElement('dialog');d.className='cult-vfx-preview';d.setAttribute('aria-label',skill.name+'攻擊演出');
   const header=document.createElement('header'),title=document.createElement('h2'),close=document.createElement('button'),canvas=document.createElement('canvas'),info=document.createElement('p'),play=document.createElement('button');
   title.textContent=skill.name;close.textContent='關閉 ×';play.textContent='重播招式與音效';info.textContent=K.describe(skill)+'。此處僅預覽演出，不造成遊戲傷害。';header.append(title,close);d.append(header,canvas,info,play);document.body.append(d);d.showModal();const stage=new Stage(canvas,true),species=root.MahjongCultivationMonsters.get(skill.speciesId);
   const run=()=>{stage.stop();stage.add({skillId:id,name:skill.name,targets:skill.type==='all'?[0,1,2,3]:[0]},[{pid:0,amount:skill.damage}],{speciesId:species.id});};
   const finish=()=>{stage.destroy();d.close();d.remove();preview=null;prior?.focus({preventScroll:true});};preview={close:finish};close.onclick=finish;d.addEventListener('cancel',e=>{e.preventDefault();finish();});play.onclick=run;Promise.all([loadAssets(),load('beast:'+species.id,species.image)]).then(()=>{if(d.isConnected)run();});close.focus();
  }
- document.addEventListener('visibilitychange',()=>{if(document.hidden){stages.forEach(s=>s.stop());stopSounds();}});document.addEventListener('input',syncPreferences);root.addEventListener('resize',()=>stages.forEach(s=>s.layout()));
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){loadEpoch++;stages.forEach(s=>s.stop());stopSounds();}});document.addEventListener('input',syncPreferences);root.addEventListener('resize',()=>stages.forEach(s=>s.layout()));
  root.MahjongMonsterEffects=Object.freeze({sync,consume,stop,reset,showPreview,syncPreferences,get loaded(){return loadAssets();}});
 })(window);

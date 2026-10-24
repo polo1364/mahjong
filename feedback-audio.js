@@ -62,6 +62,7 @@
   const hidden = () => document.hidden === true;
 
   function stopVoice(voice) {
+    window.clearTimeout?.(voice.startTimer);
     voice.token = ++sequence;
     voice.active = false;
     voice.audio.onended = null;
@@ -103,6 +104,7 @@
     }
 
     const token = ++sequence;
+    const deadline = time + 300;
     Object.assign(voice, { active: true, cue, priority: config.priority, order: token, token });
     recent.set(cue, time);
     const isCurrent = () => voice.token === token && voice.active;
@@ -111,6 +113,7 @@
       failedCues.add(cue);
       stopVoice(voice);
     };
+    voice.startTimer = window.setTimeout?.(() => { if (isCurrent()) stopVoice(voice); }, 300);
     const started = () => {
       if (!isCurrent() || !enabled || hidden()) {
         // A late play() completion must never revive a stopped sound. Do not
@@ -120,6 +123,8 @@
         }
         return;
       }
+      window.clearTimeout?.(voice.startTimer);
+      if (now() > deadline) { stopVoice(voice); return; }
       failedCues.delete(cue);
       lastPlayed = cue;
     };

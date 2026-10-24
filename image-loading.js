@@ -6,6 +6,9 @@
   const urlsFor = state => {
     const urls = Object.values(MahjongCrystalTiles.sheets).map(sheet => MahjongImageURL(`assets/tiles-crystal/${sheet.file}`));
     if (state?.cultivation) {
+      urls.push(...['bronze', 'weapons', 'nature', 'spirits', 'fire-forms', 'water-forms', 'monster']
+        .map(name => `assets/cultivation-vfx/${name}.webp`));
+      urls.push(...['ice-fangs', 'dragon-wave', 'five-thunder'].map(name => `assets/monster-skills/${name}.webp`));
       for (const player of state.cultivation.players) {
         const hero = window.MahjongCultivationHeroes.get(player.heroId);
         if (hero) urls.push(hero.thumbnail);

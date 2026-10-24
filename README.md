@@ -204,11 +204,29 @@ node tests/gameplay-audit.cjs --controlled --mobile --sound --voice --style=ink 
 
 ---
 
+## 手機操作、音效與特效修正（2026-10-24）
+
+- 畫面重繪沿用相同手牌／副露的聽牌計算結果，牌型變更才重算；快取不寫入存檔，出牌限制仍即時檢查。修仙 HUD 更新後只同步一次特效定位。
+- Chromium、844×390、DPR 3、6 倍 CPU 降速、同一固定牌局連續 12 次重繪的中位數由 78.25 ms 降至 35.90 ms；牌局狀態不變。這是重複重繪的本機量測，不代表實體手機幀率或完整出牌耗時。
+- 音效超過 300 ms 尚未起播就略過；牌名語音期限為 700 ms，動作語音為 1,200 ms。正常起播後，不會因上述起播期限而被截斷，避免慢網路下載完成後補播舊聲音；因此首次連線很慢時可能略過個別聲音。
+- 修仙開打前一併確認 10 張戰鬥特效素材完成下載及解碼；首次進場會等待這些素材，後續沿用快取。修正奇數寬圖集的相鄰格裁切，以及 Canvas 尺寸不變時重設畫布造成的閃爍。切到背景後取消尚未開始的演出。
+- 回歸：全套 935 項單元測試通過，最後調整後另跑相關 56 項通過；Chromium／WebKit 手機尺寸各驗證 35 招怪物預覽、圖集邊界、慢音檔取消及正常重播，沒有裁切越界或頁面錯誤。WebKit 自動化不等於實體 iPhone 驗收。
+
+```powershell
+node --test tests/render-waits.test.cjs tests/audio-runtime.test.cjs tests/voice-runtime.test.cjs tests/cultivation-vfx-runtime.test.cjs tests/cultivation-monster-presentation.test.cjs
+node tests/mobile-media.cjs
+node tests/mobile-media.cjs --desktop
+node tests/mobile-performance.cjs
+node tests/mobile-performance.cjs --after
+```
+
+瀏覽器腳本自行啟動本機服務，需要 Playwright 的 Chromium／WebKit，輸出至忽略提交的 `artifacts/`。效能腳本第一次會保存牌局與 `before` 報告，`--after` 用該牌局重測；真正前後比較須分別在修改前、修改後執行，僅在同一版本連跑不代表改善幅度。
+
 ## 慢速連線與 Safari／PWA 圖片就緒檢查（2026-10-24）
 
 - 牌桌會先確認 5 張牌面圖集、修仙當局 4 位角色縮圖與當前怪物已完成下載及解碼；等待期間顯示進度，發牌完成後不會提前開放操作或讓 AI 繼續走牌。換怪物和讀檔也套用相同檢查。
 - 下載失敗或超過 25 秒時保留牌局暫停，提供「重新載入圖片」與「返回首頁」。已可儲存的牌局沿用既有封存流程，尚未完成開局的牌局不會覆寫為存檔。
-- 已解碼的圖片保留在記憶體，避免頻繁重建牌面與頭像時失去載入參照；小頭像直接沿用選角縮圖。必要圖片完成後才開始載入戰鬥特效。
+- 已解碼的圖片保留在記憶體，避免頻繁重建牌面與頭像時失去載入參照；小頭像直接沿用選角縮圖。修仙必要圖片包含戰鬥特效圖集，就緒後才開始演出。
 - PWA 註冊與更新檢查不再等待 `window.load`（不被尚未載完的圖片拖住）；首次安裝完成不會重載已開始的遊戲。既有版本更新仍沿用首頁更新／牌局中提示儲存再更新的流程。
 - 驗證：Chromium 與 Playwright WebKit 的 844×390 瀏覽器案例，刻意延遲圖片、回傳 503、讀檔後重試；另驗證圖片未完成時已註冊 PWA，以及首次取得控制權不重載牌局。WebKit 自動化不等於實體 iPhone Safari／主畫面 PWA 驗收，也不能代表手機端實際網速。
 

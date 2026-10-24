@@ -12,10 +12,10 @@
   const clamp = n => Math.max(0, Math.min(1, n));
   const lerp = (a, b, t) => a + (b - a) * t;
   const random = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
-  let imagePromise;
+  let imagePromise, loadEpoch = 0;
   function loadAssets() { return imagePromise ||= Promise.all(['bronze', 'weapons', 'nature', 'spirits', 'fire-forms', 'water-forms', 'monster'].map(name => new Promise(resolve => {
     const img = new Image(); img.onload = () => { images[name] = img; resolve(true); };
-    img.onerror = () => { console.error('Cultivation VFX image unavailable: ' + name); resolve(false); }; img.src = imageURL(asset + name + '.png?v=crop-20261023');
+    img.onerror = () => { console.error('Cultivation VFX image unavailable: ' + name); resolve(false); }; img.src = imageURL(asset + name + '.png');
   }))); }
   function loadMonster(speciesId) {
     if (!speciesId) return;
@@ -60,11 +60,17 @@
     voice._owner = owner; voice._gain = item.profile.tier ? 1 : .65;
     voice.playbackRate = item.profile.id === 'secret' ? 1 : .96 + (item.profile.variant % 5) * .02;
     voice.volume = Math.min(1, prefs.volume * (prefs.ducked ? .22 : .48) * voice._gain);
-    const done = () => { voices.delete(voice); voice.remove(); };
+    const deadline = now + 300;
+    const stopLate = () => { voice.pause(); voices.delete(voice); voice.remove(); };
+    const timer = root.setTimeout?.(stopLate, 300);
+    const done = () => { root.clearTimeout?.(timer); voices.delete(voice); voice.remove(); };
     voice.addEventListener('ended', done, { once: true });
     voice.addEventListener('error', () => { owner.canvas.dataset.audioError = cue; done(); }, { once: true });
     document.body.append(voice); voices.add(voice);
-    voice.play().catch(() => { owner.canvas.dataset.audioBlocked = 'true'; done(); });
+    voice.play().then(() => {
+      root.clearTimeout?.(timer);
+      if (!voices.has(voice) || performance.now() > deadline || document.hidden) stopLate();
+    }).catch(() => { owner.canvas.dataset.audioBlocked = 'true'; done(); });
     owner.canvas.dataset.lastSound = cue;
   }
   function rect(node, origin) {
@@ -358,7 +364,7 @@
         const p = elapsed / item.duration;
         if (!run.sounds.has(i) && p >= item.soundAt) {
           run.sounds.add(i);
-          if (!['skill', 'finisherPart', 'kill', 'spawn', 'ailment'].includes(item.type)) playSound(item.art.sound, item, this);
+          if (elapsed - item.duration * item.soundAt < 250 && !['skill', 'finisherPart', 'kill', 'spawn', 'ailment'].includes(item.type)) playSound(item.art.sound, item, this);
         }
         if (!(enabled || this.demo) || painted++ >= 32) continue;
         if (item.type === 'skill' || item.type === 'finisherPart') banners.push([item, p]);
@@ -395,6 +401,13 @@
   function consume(effects, before) {
     if (document.hidden || !effects?.length) return;
     sync({ cultivation: before }); if (!main) return;
+    if (['bronze', 'weapons', 'nature', 'spirits', 'fire-forms', 'water-forms', 'monster'].some(name => !images[name])) {
+      const epoch = loadEpoch, requested = performance.now();
+      loadAssets().then(loaded => {
+        if (loaded.every(Boolean) && epoch === loadEpoch && !document.hidden && performance.now() - requested < 1000) consume(effects, before);
+      });
+      return;
+    }
     const key = `${before.handNumber}:${effects[0].seq}`;
     if (seen.has(key)) return; seen.add(key);
     if (seen.size > 1000) seen.delete(seen.values().next().value);
@@ -429,7 +442,7 @@
       }, identity);
     }
   }
-  function stop() { main?.stop(); }
+  function stop() { loadEpoch++; main?.stop(); }
   function reset() { stop(); seen.clear(); }
   function resultDelay(pace = 1) {
     if (!enabled) return 1000;
@@ -497,7 +510,7 @@
     play.onclick = () => run(false); full.onclick = () => run(true);
     loadAssets().then(() => { if (dialog.isConnected) run(false); }); closeButton.focus();
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { stages.forEach(stage => stage.stop()); stopAudio(); } else stages.forEach(stage=>stage.wake()); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { loadEpoch++; stages.forEach(stage => stage.stop()); stopAudio(); } else stages.forEach(stage=>stage.wake()); });
   document.addEventListener('input', syncPreferences);
   root.addEventListener('resize', () => stages.forEach(stage => stage.layout()));
   const closePreview = () => preview?.close();

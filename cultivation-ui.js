@@ -178,15 +178,13 @@
     currentState = state;
     const active = !!state?.cultivation;
     document.documentElement.classList.toggle('cultivation-mode', active);
-    if (!root.MahjongImages?.isLoading()) {
-      root.MahjongCultivationEffects?.sync(state);
-      root.MahjongMonsterEffects?.sync(state);
-    }
     ensureCatalog();
     document.querySelectorAll('.cult-player-stats').forEach(node => node.remove());
     document.querySelectorAll('.cult-targeted,.cult-weakened').forEach(node => node.classList.remove('cult-targeted', 'cult-weakened'));
     let monsterNode = document.getElementById('cultivationMonster');
     if (!active) {
+      root.MahjongCultivationEffects?.sync(state);
+      root.MahjongMonsterEffects?.sync(state);
       root.MahjongCultivationCatalog?.close();
       monsterNode?.remove();
       document.getElementById('cultivationLog')?.replaceChildren();
@@ -266,7 +264,10 @@
     const announcement = entries[0] ? logText(state, entries[0]) : '';
     if (announcement !== lastAnnouncement) { lastAnnouncement = announcement; live.textContent = announcement; }
     if (activeChoice && state.phase !== 'play') activeChoice(false);
-    if (!root.MahjongImages?.isLoading()) root.MahjongCultivationEffects?.sync(state);
+    if (!root.MahjongImages?.isLoading()) {
+      root.MahjongCultivationEffects?.sync(state);
+      root.MahjongMonsterEffects?.sync(state);
+    }
   }
 
   function ensureCatalog() {
