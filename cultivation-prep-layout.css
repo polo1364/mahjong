@@ -1,0 +1,295 @@
+/* 整備庭院 · fixed-height layout (see cultivation-prep-layout.js). */
+dialog.journey-screen.prep-noscroll { overflow: hidden; padding: 14px 20px; }
+.prep-noscroll .journey-wrap { width: min(1500px, 100%); height: 100%; display: flex; flex-direction: column; gap: 10px; }
+.prep-noscroll .journey-wrap > .journey-party, .prep-noscroll .journey-chapter { display: none; }
+
+/* Header: title + summary on the left, navigation on the right */
+.prep-noscroll .journey-header { flex: none; display: flex; align-items: center; gap: 16px; padding: 0 0 10px; }
+.prep-noscroll .journey-header > div:first-child { flex: 1; min-width: 0; }
+.prep-noscroll .journey-header h1 { font: 700 30px/1.15 "DFKai-SB", "KaiTi", serif; letter-spacing: 6px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.prep-noscroll .journey-header p { margin: 0 0 2px; }
+.prep-noscroll .journey-header .journey-intro { margin: 4px 0 0; font-size: 13px; color: #b8cdc5; letter-spacing: 0; }
+.prep-noscroll .journey-header .journey-footer { flex: none; margin: 0; padding: 0; border: 0; gap: 12px; }
+.prep-noscroll .journey-header .journey-footer > p { max-width: 260px; font-size: 11.5px; text-align: right; }
+.prep-noscroll .journey-footer button { min-height: 44px; border-radius: 999px; padding: 8px 22px; }
+.prep-noscroll .journey-footer button.primary { color: #2a1a08; font-weight: 700; letter-spacing: 2px; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; box-shadow: 0 6px 18px #e2c27e44; }
+
+/* Body: two columns that fill the remaining height */
+.prep-noscroll .journey-preparation-grid { flex: 1; min-height: 0; display: grid !important; grid-template-columns: minmax(300px, .78fr) minmax(0, 1.5fr) !important; gap: 14px; align-items: stretch; grid-template-rows: minmax(0, 1fr) !important; }
+.prep-noscroll .journey-preparation-grid > .prep-left { grid-column: 1 !important; grid-row: 1 !important; }
+.prep-noscroll .journey-preparation-grid > .equip-ui { grid-column: 2 !important; grid-row: 1 !important; align-self: stretch; }
+.prep-left { min-height: 0; display: flex; flex-direction: column; border: 1px solid #e2c27e44; border-radius: 16px; background: linear-gradient(170deg, #0f2a33d9, #06141bdd); overflow: hidden; }
+.prep-left-tabs { flex: none; display: flex; gap: 4px; padding: 8px 8px 0; border-bottom: 1px solid #e2c27e33; }
+.prep-left-tabs button { flex: 1; min-height: 38px; border: 1px solid transparent; border-bottom: 0; border-radius: 10px 10px 0 0; background: none; color: #a9bbb0; font: 700 14px "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; cursor: pointer; }
+.prep-left-tabs button[aria-selected="true"] { color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+.prep-left-body { position: relative; flex: 1; min-height: 0; overflow: hidden; padding: 10px 14px 12px; display: flex; flex-direction: column; }
+.prep-left-body > [data-left-pane] { min-height: 0; border: 0 !important; background: none !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; }
+.prep-left-body > [data-left-pane][hidden] { display: none !important; }
+.prep-left-body .journey-prepared-hero { display: grid !important; grid-template-columns: 110px minmax(0, 1fr) !important; gap: 4px 14px !important; align-content: start; }
+.prep-left-body .journey-prepared-hero > .journey-prepared-art { grid-row: span 3; width: 110px; max-height: 190px !important; object-fit: contain; align-self: start; }
+.prep-left-body .journey-prepared-hero > div { display: contents; }
+.prep-left-body .journey-prepared-hero h2 { margin: 0 0 4px; font: 700 24px/1.2 "DFKai-SB", "KaiTi", serif; letter-spacing: 4px; color: #f3dca4; }
+.prep-left-body .journey-prepared-hero > div > * { grid-column: 2; }
+.prep-left-body .journey-prepared-hero > div > :is(.supply-character, .journey-passive, .journey-counters, .journey-seals, .equip-role-info, .supply-carried, h3, ul, p:not(.journey-role)) { grid-column: 1 / -1; }
+.prep-left-body .journey-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 6px 0; }
+.prep-left-body .journey-stats > div { padding: 6px 8px; border: 1px solid #e2c27e33; border-radius: 10px; background: #ffffff08; text-align: center; }
+.prep-left-body .journey-stats dd { font-size: 20px; }
+.prep-left-body .supply-worn { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.prep-left-body .journey-passive { margin-top: 6px; padding: 8px 12px; border-left: 2px solid #e2c27e; border-radius: 10px; background: linear-gradient(110deg, #e2c27e1f, #ffffff05 70%); }
+.prep-left-body .journey-passive p { font-size: 12.5px; }
+.prep-left-body .journey-road { flex-direction: column; align-items: stretch; }
+.prep-left-body .journey-road > img { width: 100%; height: 150px; object-fit: contain; }
+.prep-left-body .journey-party > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+/* Right column: wallet · tabs · notice · panel (flex) · next-hand items */
+.prep-noscroll .equip-ui { min-height: 0; display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.prep-noscroll .equip-ui > * { flex: none; margin: 0; }
+.prep-noscroll .equip-wallet { padding: 8px 16px; border-radius: 14px; }
+.prep-noscroll .equip-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.prep-noscroll .equip-tabs button { min-height: 42px; padding: 6px 4px; border-radius: 12px; font: 700 15px "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; }
+.prep-noscroll .equip-tabs button[aria-selected="true"] { color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; }
+.prep-noscroll .equip-notice { min-height: 0; font-size: 12px; }
+.prep-noscroll .equip-notice:empty { display: none; }
+.prep-noscroll #equipPanel { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; padding: 10px 12px; border: 1px solid #e2c27e33; border-radius: 14px; background: #06141bb3; display: flex; flex-direction: column; gap: 8px; }
+.prep-noscroll #equipPanel > * { flex: none; margin-top: 0; margin-bottom: 0; }
+.prep-noscroll .supply-prepared { padding: 6px 12px; border-radius: 14px; }
+/* Wins over the compact-card display rules below. */
+dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
+
+/* Pager */
+.prep-pager { position: absolute; left: 10px; right: 10px; bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 14px; padding-top: 6px; border-top: 1px dashed #e2c27e33; background: linear-gradient(transparent, #06141b 30%); }
+.prep-pager button { min-height: 32px; padding: 3px 14px; border-radius: 999px; color: #f3dca4; background: #ffffff0d; border: 1px solid #e2c27e88; cursor: pointer; font: 600 13px "Microsoft JhengHei", sans-serif; }
+.prep-pager button:disabled { opacity: .35; cursor: default; }
+.prep-pager span { min-width: 48px; text-align: center; font: 700 13px "Segoe UI", sans-serif; color: #fff1cf; }
+#equipPanel:has(> .prep-pager), .prep-left-body:has(> .prep-pager) { padding-bottom: 52px; }
+
+/* Compact cards: picture left, text right, actions in one row */
+.prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; gap: 8px !important; }
+.prep-noscroll .supply-card, .prep-noscroll .equip-card {
+  display: grid !important; grid-template-columns: 58px minmax(0, 1fr) !important; gap: 4px 10px !important; align-items: start;
+  margin: 0 !important; padding: 8px 10px !important; min-height: 0 !important; border-radius: 12px !important;
+}
+.prep-noscroll .supply-card > img, .prep-noscroll .supply-card > .item-art-pending, .prep-noscroll .equip-card > img { width: 58px !important; height: 58px !important; object-fit: contain; }
+.prep-noscroll .supply-card h3, .prep-noscroll .equip-card strong { margin: 0 !important; font-size: 15px !important; display: flex; justify-content: space-between; gap: 6px; }
+.prep-noscroll .supply-card small:first-child { font-size: 10.5px; }
+.prep-noscroll .supply-card p, .prep-noscroll .equip-card p, .prep-noscroll .equip-card small { margin: 2px 0 !important; font-size: 12px !important; line-height: 1.45 !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.prep-noscroll .supply-card .supply-recipe { display: block; font-size: 11px !important; color: #a8c7bb; -webkit-line-clamp: 1; }
+.prep-noscroll .supply-card details { font-size: 11px; } .prep-noscroll .supply-card details summary { color: #9fb3bf; cursor: pointer; }
+.prep-noscroll .supply-card .equip-actions, .prep-noscroll .equip-card .equip-actions { display: flex; gap: 6px; margin-top: 4px !important; }
+.prep-noscroll .supply-card button, .prep-noscroll .equip-card button { min-height: 32px !important; padding: 4px 10px !important; font-size: 12.5px !important; border-radius: 999px !important; white-space: nowrap; }
+.prep-noscroll .equip-card .equip-grade { font-size: 11px; }
+.prep-noscroll .equip-npc-intro { display: flex; align-items: center; gap: 10px; }
+.prep-noscroll .equip-npc-intro img { width: 46px !important; height: 52px !important; }
+.prep-noscroll .equip-npc-intro h2 { margin: 0; font-size: 18px; } .prep-noscroll .equip-npc-intro p { margin: 0; font-size: 12px; }
+.prep-noscroll .supply-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.prep-noscroll .supply-toolbar h2 { margin: 0; font-size: 18px; }
+
+/* 行囊配裝: worn row, filters, a two-column list and the comparison card side by side */
+.prep-noscroll .equip-worn { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.prep-noscroll .equip-worn button { min-height: 0 !important; padding: 6px 8px !important; display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 2px 8px; text-align: left; }
+.prep-noscroll .equip-worn img { width: 40px !important; height: 40px !important; grid-row: span 2; }
+.prep-noscroll .equip-filters { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.prep-noscroll .equip-filters select { min-height: 34px; padding: 4px 8px; }
+.prep-noscroll .equip-inventory-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr) !important; gap: 10px; align-items: start; }
+.prep-noscroll .equip-item-list { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 6px !important; align-content: start; }
+.prep-noscroll .equip-item { display: grid !important; grid-template-columns: 40px minmax(0, 1fr) !important; align-items: center; gap: 2px 8px; min-height: 0 !important; padding: 6px 8px !important; text-align: left; writing-mode: horizontal-tb !important; }
+.prep-noscroll .equip-item img { width: 40px !important; height: 40px !important; grid-row: span 2; }
+.prep-noscroll .equip-item * { writing-mode: horizontal-tb !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prep-noscroll .equip-comparison { padding: 10px 12px !important; }
+.prep-noscroll .equip-comparison > .equip-card { margin-bottom: 8px !important; }
+
+/* 雲遊商人 extras and 鑄器師 */
+.prep-noscroll .equip-material { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-radius: 12px; }
+.prep-noscroll .equip-material h3 { margin: 0; font-size: 14px; } .prep-noscroll .equip-material p { margin: 0; font-size: 12px; }
+.prep-noscroll .equip-redemptions { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; gap: 8px !important; }
+.prep-noscroll .equip-redemptions section { display: grid; grid-template-columns: 48px 1fr; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 12px; }
+.prep-noscroll .equip-redemptions img { width: 48px !important; height: 48px !important; }
+.prep-noscroll .equip-redemptions h3 { margin: 0; font-size: 14px; } .prep-noscroll .equip-redemptions p { margin: 0 0 4px; font-size: 11.5px; }
+.prep-noscroll .equip-redemptions button { min-height: 30px; padding: 2px 10px; font-size: 12px; }
+.prep-noscroll .equip-forge-select { margin: 0; }
+.prep-noscroll .equip-forge-grid { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 10px !important; }
+.prep-noscroll .equip-forge-grid > section { padding: 10px 12px !important; }
+.prep-noscroll .equip-forge-rate { padding: 4px 0 !important; } .prep-noscroll .equip-forge-rate strong { font-size: 28px !important; }
+.prep-noscroll .equip-rules { margin: 0 !important; }
+
+/* Shorter screens */
+@media (max-height: 820px) {
+  dialog.journey-screen.prep-noscroll { padding: 10px 16px; }
+  .prep-noscroll .journey-header h1 { font-size: 24px; }
+  .prep-noscroll .journey-header .journey-footer > p { display: none; }
+  .prep-left-body .journey-prepared-hero > .journey-prepared-art { max-height: 140px !important; }
+}
+@media (max-height: 560px) {
+  dialog.journey-screen.prep-noscroll { padding: 6px 10px; }
+  .prep-noscroll .journey-preparation-grid { grid-template-columns: 230px minmax(0, 1fr) !important; }
+  .prep-noscroll .journey-wrap { gap: 6px; }
+  .prep-noscroll .journey-header { padding-bottom: 4px; }
+  .prep-noscroll .journey-header > div:first-child > p:first-child, .prep-noscroll .journey-header .journey-intro { display: none; }
+  .prep-noscroll .journey-header h1 { font-size: 19px; letter-spacing: 3px; }
+  .prep-noscroll .journey-footer button { min-height: 34px; padding: 4px 14px; font-size: 13px; }
+  .prep-noscroll .journey-preparation-grid { grid-template-columns: 230px minmax(0, 1fr) !important; gap: 8px; }
+  .prep-left-tabs button { min-height: 30px; font-size: 12px; letter-spacing: 1px; }
+  .prep-left-body { padding: 6px 8px; }
+  .prep-left-body .journey-prepared-hero { grid-template-columns: 56px minmax(0, 1fr) !important; }
+  .prep-left-body .journey-prepared-hero > .journey-prepared-art { width: 56px; max-height: 80px !important; }
+  .prep-left-body .journey-prepared-hero h2 { font-size: 17px; }
+  .prep-left-body .journey-stats > div { padding: 3px 4px; } .prep-left-body .journey-stats dd { font-size: 15px; }
+  .prep-noscroll .equip-ui { gap: 4px; }
+  .prep-noscroll .equip-wallet { padding: 3px 10px; font-size: 12px; }
+  .prep-noscroll .equip-tabs button { min-height: 30px; font-size: 12px; letter-spacing: 0; }
+  .prep-noscroll #equipPanel { padding: 6px 8px; gap: 5px; }
+  .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid, .prep-noscroll .equip-redemptions { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+  .prep-noscroll .supply-card p, .prep-noscroll .equip-card p, .prep-noscroll .equip-card small { -webkit-line-clamp: 1; }
+  .prep-noscroll .supply-card details { display: none; }
+  .prep-noscroll .supply-prepared { padding: 3px 10px; font-size: 12px; }
+  .prep-noscroll .equip-npc-intro p { display: none; }
+  .prep-pager { bottom: 4px; } .prep-pager button { min-height: 26px; padding: 1px 10px; font-size: 12px; }
+  #equipPanel:has(> .prep-pager), .prep-left-body:has(> .prep-pager) { padding-bottom: 38px; }
+}
+
+/* ---- Denser cards: picture | text | actions ---- */
+.prep-noscroll .supply-card > div, .prep-noscroll .equip-card > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; align-items: start; min-width: 0; }
+.prep-noscroll .supply-card > div > *, .prep-noscroll .equip-card > div > * { grid-column: 1; }
+.prep-noscroll .supply-card > div > .equip-actions { grid-column: 2; grid-row: 1 / span 6; flex-direction: column; align-self: center; margin: 0 !important; }
+.prep-noscroll .equip-card > div > button { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
+.prep-noscroll .supply-card > div > small:first-child { display: none; }
+.prep-noscroll .supply-card > div > details { display: none; }
+@media (min-height: 1000px) { .prep-noscroll .supply-card > div > details { display: block; } }
+.prep-noscroll .supply-card, .prep-noscroll .equip-card { align-items: center; padding: 7px 10px !important; }
+.prep-noscroll .supply-card h3 span { color: #f3dca4; }
+/* Save status floats at the wallet's right end instead of taking a row. */
+.prep-noscroll .equip-ui { position: relative; }
+.prep-noscroll .equip-notice { position: absolute; right: 12px; top: 6px; z-index: 3; max-width: 46%; padding: 3px 10px; border-radius: 999px; background: #0b1d24ee; border: 1px solid #a6b19955; color: #cfe3d6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.prep-noscroll .equip-notice:has(button) { pointer-events: auto; }
+.prep-noscroll .equip-wallet > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.prep-noscroll .equip-wallet { display: flex; align-items: center; gap: 14px; padding-right: 46%; }
+/* Next-hand items: one slim row */
+.prep-noscroll .supply-prepared { display: flex !important; align-items: center; gap: 10px; }
+.prep-noscroll .supply-prepared > div:first-child { flex: 1; min-width: 0; }
+.prep-noscroll .supply-slot { min-height: 0 !important; padding: 4px 10px !important; display: flex; align-items: center; gap: 6px; }
+.prep-noscroll .supply-slot img { width: 30px !important; height: 30px !important; }
+.prep-noscroll #equipPanel > .journey-muted { font-size: 11.5px; }
+@media (max-height: 950px) { .prep-noscroll #equipPanel > .journey-muted { display: none; } }
+
+/* Left column toggle (short screens only) */
+.prep-left-toggle, .prep-left-close { display: none; }
+@media (max-height: 760px) {
+  .prep-left-toggle { display: inline-flex; align-items: center; min-height: 40px; padding: 6px 16px; border-radius: 999px; color: #f3dca4; background: #ffffff0d; border: 1px solid #e2c27e88; font: 700 14px "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; cursor: pointer; }
+  .prep-left-toggle[aria-expanded="true"] { color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+  .prep-noscroll .journey-preparation-grid { grid-template-columns: minmax(0, 1fr) !important; position: relative; }
+  .prep-noscroll .journey-preparation-grid > .equip-ui { grid-column: 1 !important; }
+  .prep-noscroll .journey-preparation-grid > .prep-left { display: none; }
+  .prep-noscroll.prep-left-open .journey-preparation-grid > .prep-left { display: flex; position: absolute; z-index: 6; left: 0; top: 0; bottom: 0; width: min(420px, 92%); box-shadow: 0 18px 40px #000c; }
+  .prep-left-close { display: block; flex: none; width: 34px; border: 0; background: none; color: #f3dca4; font-size: 20px; cursor: pointer; }
+  .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid, .prep-noscroll .equip-redemptions { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; }
+}
+@media (max-height: 560px) {
+  .prep-left-toggle { min-height: 32px; padding: 2px 12px; font-size: 12px; }
+  .prep-noscroll .equip-wallet { padding: 2px 10px; gap: 8px; padding-right: 40%; }
+  .prep-noscroll .equip-wallet > span { display: none; }
+  .prep-noscroll .equip-notice { top: 2px; font-size: 11px; padding: 1px 8px; }
+  .prep-noscroll .supply-card, .prep-noscroll .equip-card { grid-template-columns: 40px minmax(0, 1fr) !important; padding: 4px 8px !important; }
+  .prep-noscroll .supply-card > img, .prep-noscroll .supply-card > .item-art-pending, .prep-noscroll .equip-card > img { width: 40px !important; height: 40px !important; }
+  .prep-noscroll .supply-card h3, .prep-noscroll .equip-card strong { font-size: 13px !important; }
+  .prep-noscroll .supply-card .supply-recipe, .prep-noscroll .equip-card .equip-grade { display: none; }
+  .prep-noscroll .supply-card button, .prep-noscroll .equip-card button { min-height: 26px !important; padding: 2px 8px !important; font-size: 11.5px !important; }
+  .prep-noscroll .supply-card > div > .equip-actions { flex-direction: row; }
+  .prep-noscroll .equip-npc-intro, .prep-noscroll .supply-shop-title { display: none !important; }
+  .prep-noscroll .supply-toolbar h2 { font-size: 14px; }
+  .prep-noscroll .supply-prepared { padding: 2px 10px !important; }
+  .prep-noscroll .supply-prepared small { display: none; }
+  .prep-noscroll .supply-slot { padding: 2px 8px !important; } .prep-noscroll .supply-slot img { width: 22px !important; height: 22px !important; }
+  .prep-noscroll .equip-worn button { padding: 3px 6px !important; } .prep-noscroll .equip-worn img { width: 28px !important; height: 28px !important; }
+  .prep-noscroll .equip-filters select { min-height: 28px; padding: 1px 6px; }
+}
+
+/* ---- 行囊配裝 list: each entry is a compact card row ---- */
+.prep-noscroll .equip-item-list { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important; }
+.prep-noscroll .equip-item { display: block !important; padding: 0 !important; text-align: left; border-radius: 12px; }
+.prep-noscroll .equip-item .equip-card { margin: 0 !important; padding: 6px 8px !important; grid-template-columns: 44px minmax(0, 1fr) !important; background: none !important; border: 0 !important; }
+.prep-noscroll .equip-item .equip-card > img { width: 44px !important; height: 44px !important; }
+.prep-noscroll .equip-item .equip-card p, .prep-noscroll .equip-item .equip-card small { -webkit-line-clamp: 1; }
+.prep-noscroll .equip-item.is-selected { box-shadow: 0 0 0 2px #f3dca4 inset; }
+.prep-noscroll .equip-comparison h3 { margin: 2px 0 4px !important; font-size: 13px; }
+.prep-noscroll .equip-comparison .equip-card > img { width: 44px !important; height: 44px !important; }
+.prep-noscroll .equip-comparison .equip-card { grid-template-columns: 44px minmax(0, 1fr) !important; }
+.prep-noscroll .equip-comparison .equip-delta { margin: 4px 0 !important; font-size: 11.5px; }
+/* Only sets you already have pieces of (rendered open) are listed. */
+.prep-noscroll .equip-comparison .equip-sets details:not([open]) { display: none; }
+.prep-noscroll .equip-comparison .equip-set-showcase { display: none; }
+
+/* Left overlay is solid so the wallet underneath does not show through. */
+.prep-noscroll.prep-left-open .journey-preparation-grid > .prep-left { background: linear-gradient(170deg, #0f2a33, #06141b); }
+@media (max-height: 560px) {
+  .prep-left-body .journey-road > img { display: none; }
+  .prep-noscroll .equip-wallet b { font-size: 12px; } .prep-noscroll .equip-wallet b span { font-size: 18px; }
+  .prep-noscroll .equip-item-list { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; }
+  .prep-noscroll .equip-item .equip-card { grid-template-columns: 32px minmax(0, 1fr) !important; padding: 3px 6px !important; }
+  .prep-noscroll .equip-item .equip-card > img { width: 32px !important; height: 32px !important; }
+  .prep-noscroll .equip-item .equip-card p { display: none; }
+  .prep-noscroll .equip-inventory-layout { grid-template-columns: minmax(0, 1fr) minmax(200px, .8fr) !important; }
+  .prep-noscroll .equip-comparison > .equip-card p, .prep-noscroll .equip-comparison > .equip-card small { display: none; }
+}
+
+/* 行囊 list rows: name, grade and base bonus only; full detail sits in the comparison column. */
+.prep-noscroll .equip-item .equip-card small { display: none; }
+.prep-noscroll .equip-item .equip-card strong { font-size: 14px !important; }
+.prep-noscroll .equip-item .equip-card p { margin: 0 !important; }
+.prep-noscroll .equip-wallet { flex-wrap: nowrap !important; }
+.prep-noscroll .equip-wallet > span { flex: 1 1 auto; }
+@media (max-height: 560px) {
+  .prep-noscroll #equipPanel .equip-worn { display: none; }
+  .prep-noscroll .equip-comparison:not(:has(.equip-card)) { display: none; }
+  .prep-noscroll .equip-inventory-layout:not(:has(.equip-comparison .equip-card)) { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-height: 560px) {
+  .prep-noscroll .supply-card > div { grid-template-columns: minmax(0, 1fr); }
+  .prep-noscroll .supply-card > div > .equip-actions { grid-column: 1; grid-row: auto; flex-direction: row; justify-content: flex-start; }
+  .prep-noscroll .supply-card h3 { white-space: nowrap; }
+  .prep-noscroll .supply-card > div > p { display: none; }
+  .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
+}
+
+/* ---- 鑄器師: one page, the 強化 button always in view ---- */
+.prep-noscroll #equipPanel[aria-label="鑄器師"] { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px 12px; }
+.prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-npc-intro { grid-column: 1; grid-row: 1; }
+.prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-forge-select { grid-column: 2; grid-row: 1; align-self: center; display: flex; align-items: center; gap: 8px; }
+.prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-forge-grid { grid-column: 1 / -1; grid-row: 2; min-height: 0; }
+.prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-rules { grid-column: 1 / -1; grid-row: 3; font-size: 12px; }
+.prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-rules[open] { position: absolute; z-index: 5; left: 10px; right: 10px; bottom: 10px; max-height: 70%; overflow: auto; padding: 10px; border-radius: 12px; background: #081a20f5; border: 1px solid #e2c27e66; }
+.prep-noscroll .equip-forge-grid > section:first-child { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px; min-height: 0; }
+.prep-noscroll .equip-forge-grid > section:first-child > button.primary { min-height: 42px; border-radius: 999px; font-weight: 700; letter-spacing: 2px; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; }
+.prep-noscroll .supply-forge { margin: 0 !important; padding: 8px 12px !important; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 12px; align-content: start; font-size: 12.5px; }
+.prep-noscroll .supply-forge h3 { grid-column: 1 / -1; margin: 0 !important; font-size: 14px; }
+.prep-noscroll .supply-forge label { margin: 0 !important; display: flex; align-items: center; gap: 6px; }
+.prep-noscroll .supply-forge select { min-height: 32px; padding: 2px 8px; }
+.prep-noscroll .supply-forge-quote { grid-column: 1 / -1; margin: 0 !important; font-size: 14px; line-height: 1.5; }
+.prep-noscroll .supply-forge > p:not(.supply-forge-quote), .prep-noscroll .supply-forge small { grid-column: 1 / -1; margin: 0 !important; font-size: 11px; }
+.prep-noscroll .equip-forge-grid .equip-card { padding: 6px 10px !important; }
+.prep-noscroll .equip-transfer { font-size: 12.5px; } .prep-noscroll .equip-transfer h3 { margin: 0 0 4px; font-size: 14px; } .prep-noscroll .equip-transfer p { margin: 0 0 4px; }
+.prep-noscroll .equip-wallet b { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+@media (max-height: 760px) {
+  .prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-npc-intro { display: none; }
+  .prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-forge-select { grid-column: 1 / -1; }
+  .prep-noscroll .supply-forge > p:not(.supply-forge-quote), .prep-noscroll .supply-forge small { display: none; }
+  .prep-noscroll .equip-forge-grid .equip-card p, .prep-noscroll .equip-forge-grid .equip-card small { display: none; }
+}
+@media (max-height: 560px) {
+  .prep-noscroll #equipPanel[aria-label="鑄器師"] { gap: 4px 8px; }
+  .prep-noscroll .equip-forge-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important; gap: 6px !important; }
+  .prep-noscroll .equip-forge-grid > section { padding: 5px 8px !important; }
+  .prep-noscroll .equip-forge-grid .equip-card { grid-template-columns: 32px minmax(0, 1fr) !important; padding: 2px 6px !important; }
+  .prep-noscroll .equip-forge-grid .equip-card > img { width: 32px !important; height: 32px !important; }
+  .prep-noscroll .supply-forge { padding: 4px 8px !important; gap: 2px 8px; }
+  .prep-noscroll .supply-forge h3 { display: none; }
+  .prep-noscroll .supply-forge-quote { font-size: 12px; }
+  .prep-noscroll .equip-forge-grid > section:first-child > button.primary { min-height: 32px; }
+  .prep-noscroll .equip-transfer p:nth-of-type(1) { display: none; }
+  .prep-noscroll #equipPanel[aria-label="鑄器師"] > .equip-rules { display: none; }
+}
+.prep-noscroll .supply-forge label { white-space: nowrap; }
+@media (max-height: 560px) {
+  .prep-noscroll .equip-forge-grid > section:first-child > .equip-card { display: none !important; }
+  .prep-noscroll .equip-forge-grid > section:first-child { grid-template-rows: minmax(0, 1fr) auto; }
+  .prep-noscroll .supply-forge { grid-template-columns: auto minmax(0, 1fr); }
+}
