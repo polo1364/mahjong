@@ -115,4 +115,8 @@ if ($LASTEXITCODE -ne 0) { throw 'round3 summary failed' }
 
 ## 交付狀態
 
-功能、平衡與提交前驗收均已通過，PWA 版本為 `f29953370489fd38`（`2026.10.25-f29953`）。部署目標為 `main` 根目錄的 [GitHub Pages](https://polo1364.github.io/mahjong/)；本文件此版本記錄提交前驗收；發布後另須確認 Pages 建置提交、已發布 PWA 版本，以及隔離 WebKit 844×390 的首頁→開局→修為結算→整備流程。實體 iPhone 與既有主畫面安裝仍未實測。
+功能、平衡與發布驗收均已通過，PWA 版本為 `f29953370489fd38`（`2026.10.25-f29953`）。程式提交 `6b1e68a28f29a890a813032939e017002890ae38` 已推送至 `main`；[Pages 部署 40126348505](https://github.com/polo1364/mahjong/actions/runs/40126348505) 為 `success`，Pages API 為 `built`，完成時間為 2026-10-25 03:41（台北時間）。
+
+[正式網站](https://polo1364.github.io/mahjong/) 回傳的 PWA 版本與本機相同。以全新、隔離的 Playwright WebKit 844×390 context 驗證首頁→修仙選角開局→修為結算→整備「修行」頁，玩家修為入帳 13、三位 AI 為 12／13／13，0 個頁面錯誤及 0 個 HTTP 錯誤資源。此線上測試以 `endDraw()` 結束剛建立的隔離牌局，只證明介面、結算與存檔串接，不算自然對局或平衡證據；Service Worker 在此 context 停用，快取／更新行為由前述 PWA 測試另行驗證。未操作使用者既有存檔。
+
+實體 iPhone／Android 與既有主畫面安裝仍未實測。原始線上紀錄與截圖保留在本機 `artifacts/progression-live.json`、`progression-live-webkit.png`。
