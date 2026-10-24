@@ -35,6 +35,13 @@
 #landscapeTitle { margin: 18px 0; font-size: clamp(22px, 6vw, 30px); color: #f1ead5; }
 #landscapeDescription { font-size: 16px; line-height: 1.8; }
 .landscape-hint { margin-top: 24px; font-size: 13px; line-height: 1.8; color: #a0b8b0; }
+#imageLoading { width: min(440px, calc(100vw - 48px)); box-sizing: border-box; border: 1px solid #c7b883; border-radius: 18px; padding: 24px; background: #102c2a; color: #f1ead5; text-align: center; }
+#imageLoading::backdrop { background: #071717e6; }
+#imageLoading h2 { font-size: 21px; margin: 0 0 16px; }
+#imageLoading progress { width: 100%; accent-color: #c7b883; }
+#imageLoading .image-loading-hint { color: #b7c9c2; font-size: 14px; }
+#imageLoading > div { display: flex; gap: 12px; justify-content: center; }
+#imageLoading button { min-height: 44px; }
 @media (orientation: portrait) {
   /* The reminder is visible even before JavaScript has finished loading. */
   #landscapeNotice:not([open]) { display: grid; place-items: center; }

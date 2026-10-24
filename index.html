@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="cultivation-prep-layout.css">
 <link rel="stylesheet" href="cultivation-choice.css">
 <script src="image-assets.js"></script>
+<script src="image-loading.js"></script>
 <script src="tile-names.js"></script>
 <script src="crystal-tiles.js"></script>
 <script src="cultivation-skills.js"></script>
@@ -897,7 +898,7 @@ function scheduleGame(callback, delay) {
   const timer = setTimeout(() => {
     gameTimers.delete(timer);
     if (S !== state) return;
-    if (window.MahjongPWA?.isPortrait() || document.getElementById('settingsPanel').style.display === 'block') {
+    if (window.MahjongImages?.isLoading() || window.MahjongPWA?.isPortrait() || document.getElementById('settingsPanel').style.display === 'block') {
       scheduleGame(callback, 150);
       return;
     }
@@ -1176,6 +1177,7 @@ function startNewHand(isFirstGame = false, cultivationCarry = null, cultivationO
 
 function beginDealtHand(firstAIDelay) {
   if (!S || S.phase !== 'deal') return;
+  if (window.MahjongImages?.isLoading()) { scheduleGame(() => beginDealtHand(firstAIDelay), 0); return; }
   S.phase = 'play';
   if (S.cultivation) {
     for (let pid = S.dealer, n = 0; n < 4; n++, pid = getNextTurn(pid)) {
@@ -3351,6 +3353,7 @@ function canSelfDraw(pid) {
 }
 
 function stepNext() {
+  if (window.MahjongImages?.isLoading()) { scheduleGame(stepNext, 0); return; }
   if (!S || S.phase !== 'play' || S.waitReact) return;
   if (!settleCultivationEnemy()) return;
   renderAll();
@@ -3812,6 +3815,11 @@ function restoreGame(data, expectedMode) {
   clearReactionButtons();
   updateSettingsDisplay();
   renderAll();
+  if (window.MahjongImages?.isLoading()) { scheduleGame(resumeRestoredHand, 0); return; }
+  resumeRestoredHand();
+}
+
+function resumeRestoredHand() {
   if (S.phase === 'end') {
     if (S.cultivation?.version === 2 && S.cultivation.journey.phase === 'preparation') { showHandsAndContinue(); continueCultivationResult(); }
     else if (S.cultivation?.version === 3 && S.cultivation.journey.phase === 'preparation') showCultivationPreparation();
@@ -4016,6 +4024,7 @@ document.getElementById('returnHomeBtn').onclick = async () => {
     if (canSaveState(S) && !await writeGameSave(gameSaveKey('auto'))) throw new Error('牌局已變更，尚未完成封存。');
     if (S !== state) throw new Error('牌局已變更，保留目前進度。');
     S = null;
+    window.MahjongImages?.reset();
     window.MahjongCultivationJourneyUI?.close();
     window.MahjongCultivationUI?.render(null);
     await window.MahjongStartScreen.showHome();
@@ -4163,6 +4172,7 @@ function flowerHTML(pid) {
 }
 
 function renderAll() {
+  window.MahjongImages?.watch(S);
   // 每次重繪前，為所有玩家檢查聽牌狀態並即時計算等待牌。
   // 聽牌條件：當前總牌數為應該丟牌（17+槓數）或摸牌（16+槓數）時，檢查是否只差一張牌就能胡。
   for (let i = 0; i < 4; i++) {

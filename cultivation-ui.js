@@ -178,8 +178,10 @@
     currentState = state;
     const active = !!state?.cultivation;
     document.documentElement.classList.toggle('cultivation-mode', active);
-    root.MahjongCultivationEffects?.sync(state);
-    root.MahjongMonsterEffects?.sync(state);
+    if (!root.MahjongImages?.isLoading()) {
+      root.MahjongCultivationEffects?.sync(state);
+      root.MahjongMonsterEffects?.sync(state);
+    }
     ensureCatalog();
     document.querySelectorAll('.cult-player-stats').forEach(node => node.remove());
     document.querySelectorAll('.cult-targeted,.cult-weakened').forEach(node => node.classList.remove('cult-targeted', 'cult-weakened'));
@@ -208,7 +210,7 @@
         const portrait = info.querySelector('.seat-portrait');
         if (portrait) {
           portrait.style.backgroundImage = 'none';
-          portrait.innerHTML = `<img src="${escape(imageURL(hero.image))}" alt="" class="cult-hero-portrait">`;
+          portrait.innerHTML = `<img src="${escape(hero.thumbnail)}" alt="" class="cult-hero-portrait">`;
         }
         const name = info.querySelector('.seat-name');
         if (name?.firstChild?.nodeType === 3) name.firstChild.textContent = hero.name;
@@ -264,7 +266,7 @@
     const announcement = entries[0] ? logText(state, entries[0]) : '';
     if (announcement !== lastAnnouncement) { lastAnnouncement = announcement; live.textContent = announcement; }
     if (activeChoice && state.phase !== 'play') activeChoice(false);
-    root.MahjongCultivationEffects?.sync(state);
+    if (!root.MahjongImages?.isLoading()) root.MahjongCultivationEffects?.sync(state);
   }
 
   function ensureCatalog() {
@@ -436,6 +438,10 @@
     if (resultResizePending || !currentState?.cultivation?.ended) return;
     resultResizePending = true;
     requestAnimationFrame(() => { resultResizePending = false; showResult(currentState); });
+  });
+  document.addEventListener('mahjong-images-ready', () => {
+    root.MahjongCultivationEffects?.sync(currentState);
+    root.MahjongMonsterEffects?.sync(currentState);
   });
   root.MahjongCultivationUI = Object.freeze({ render, showResult, chooseSkills, skillPreview, closeChoice: () => { activeChoice?.(false); root.MahjongCultivationEffects?.closePreview?.(); root.MahjongCultivationCatalog?.close(); } });
 })(typeof window !== 'undefined' ? window : globalThis);

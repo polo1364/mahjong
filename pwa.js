@@ -48,6 +48,7 @@
   const idle = () => document.documentElement.classList.contains('start-screen-active')
     || typeof S === 'undefined' || !S || S.phase === 'end';
   let reloading = false, banner = null;
+  let hadController = !!navigator.serviceWorker?.controller;
   function applyUpdate(worker) {
     try { if (typeof autoSaveGame === 'function' && S && S.phase !== 'end') autoSaveGame(); } catch (_) { /* best effort */ }
     worker.postMessage({ type: 'MAHJONG_SKIP_WAITING' });
@@ -78,12 +79,20 @@
     navigator.serviceWorker.addEventListener('message', event => {
       if (event.data?.type === 'MAHJONG_VERSION') showVersion(event.data, event.source !== navigator.serviceWorker.controller);
     });
-    navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloading) return; reloading = true; location.reload(); });
-    window.addEventListener('load', () => {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController) {
+        hadController = true;
+        navigator.serviceWorker.controller?.postMessage({ type: 'MAHJONG_VERSION' });
+        return; // First installation must not reload a game started during download.
+      }
+      if (reloading) return; reloading = true; location.reload();
+    });
+    // Register now: waiting for window.load also waits for every stalled image.
+    (() => {
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
         .then(registration => { watch(registration); navigator.serviceWorker.controller?.postMessage({ type: 'MAHJONG_VERSION' }); })
         .catch(error => console.warn('PWA 離線功能未啟用，仍可線上遊玩。', error));
-    });
+    })();
   } else {
     // Not installed as an app (file:// or http preview): read the label directly.
     const script = document.createElement('script'); script.src = 'pwa-assets.js';
