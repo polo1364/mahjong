@@ -240,7 +240,18 @@
     if(portrait){portrait.setAttribute('role','button');portrait.setAttribute('aria-label','查看怪物技能');portrait.tabIndex=0;portrait.onclick=lookup;portrait.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();lookup();}};}
     const entries = (state.cultivation.log || []).slice(-8).reverse();
     const log = document.getElementById('cultivationLog');
-    if (log) log.innerHTML = entries.length ? entries.map(entry => `<li>${escape(logText(state, entry))}</li>`).join('') : '<li>成功出牌與組牌後，會在這裡記錄戰鬥。</li>';
+    const kindOf = entry => { const type = typeof entry === 'string' ? '' : entry.type;
+      return type === 'damage' ? 'dmg' : type === 'heal' ? 'heal' : type === 'hurt' ? 'hurt' : ['skill', 'finisherPart'].includes(type) ? 'sk'
+        : ['enemy', 'monsterSkill', 'interrupted', 'ailment', 'kill', 'spawn', 'enemyHeal', 'enemyShield'].includes(type) ? 'mon' : 'info'; };
+    if (log) log.innerHTML = entries.length ? entries.map(entry => `<li data-kind="${kindOf(entry)}">${escape(logText(state, entry))}</li>`).join('') : '<li data-kind="info">成功出牌與組牌後，會在這裡記錄戰鬥。</li>';
+    const table = document.getElementById('cultBattleTable');
+    if (table) {
+      const locked = root.MahjongCultivationCombat?.target?.(state.cultivation);
+      table.innerHTML = '<div class="cft-row cft-head"><span>道友</span><span>生命</span><span>傷害</span><span>仇恨</span></div>' + state.cultivation.players.map((player, pid) => {
+        const ratioHp = Math.max(0, Math.min(100, player.hp / (player.maxHp || 1000) * 100));
+        return `<div class="cft-row${pid === locked && state.cultivation.monster?.nextAttack?.type !== 'all' ? ' is-target' : ''}${player.hp === 0 ? ' is-weak' : ''}"><b>${escape(playerName(state, pid))}</b><span class="cft-hp" title="生命 ${number(player.hp)} / ${number(player.maxHp || 1000)}${player.shield > 0 ? ' · 護盾 ' + number(player.shield) : ''}"><i class="${ratioHp <= 35 ? 'is-low' : ''}" style="width:${ratioHp}%"></i>${player.shield > 0 ? `<i class="cft-shield" style="width:${Math.min(100, player.shield / 10)}%"></i>` : ''}</span><em>${number(player.damage)}</em><u>${number(player.aggro)}</u></div>`;
+      }).join('');
+    }
     const statusReference = document.getElementById('cultivationStatusReference');
     if (statusReference) statusReference.innerHTML = `<p>第 ${number(state.cultivation.monster?.index || 1)} 隻 · ${escape(state.cultivation.monster?.name)}：${escape((state.cultivation.monster?.statuses || []).map(status => statusText(status) + '怪物行動').join('、') || '無狀態')}</p>`
       + state.cultivation.players.map((player, pid) => `<p>${escape(playerName(state, pid))}：傷害 ${number(player.damage)}／仇恨 ${number(player.aggro)}；${player.shield > 0 ? `護盾 ${number(player.shield)}／剩 ${number(player.shieldTurns)} 次自身出牌；` : ''}${escape(player.statuses.map(status => statusText(status) + '自身出牌').join('、') || '無其他狀態')}</p>`).join('');
@@ -270,12 +281,38 @@
     // 戰況 sits on the table: a corner card on large screens, a button with a popover on small ones.
     const details = section.querySelector('.cult-log-details');
     const feed = document.createElement('aside'); feed.id = 'cultBattleFeed'; feed.className = 'cult-battle-feed'; feed.setAttribute('aria-label', '戰況');
-    feed.innerHTML = '<button type="button" class="cult-feed-toggle" aria-expanded="false" aria-controls="cultBattleFeedBody"><span class="cult-feed-seal" aria-hidden="true">戰</span><span class="cult-feed-title">戰況</span><span class="cult-feed-more">詳情</span></button><div id="cultBattleFeedBody" class="cult-feed-body"></div>';
-    feed.querySelector('.cult-feed-body').append(...details.querySelectorAll('#cultivationStatusReference, #cultivationLog'));
+    feed.innerHTML = '<button type="button" class="cult-feed-toggle" aria-expanded="false" aria-controls="cultBattleFeedBody" title="拖曳移動 · 雙擊回到預設位置"><span class="cult-feed-grip" aria-hidden="true">⠿</span><span class="cult-feed-seal" aria-hidden="true">戰</span><span class="cult-feed-title">戰況</span><span class="cult-feed-more">詳情</span></button><div id="cultBattleFeedBody" class="cult-feed-body"><div id="cultBattleTable" class="cult-feed-table" role="table" aria-label="道友戰況"></div></div>';
+    feed.querySelector('.cult-feed-body').append(...details.querySelectorAll('#cultivationLog, #cultivationStatusReference'));
     details.remove(); document.body.append(feed);
     const toggle = feed.querySelector('.cult-feed-toggle');
     const setOpen = open => { feed.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open)); feed.querySelector('.cult-feed-more').textContent = open ? '收合' : '詳情'; };
-    toggle.onclick = () => setOpen(!feed.classList.contains('is-open'));
+    const POS_KEY = 'qinghe_cult_feed_pos';
+    const floating = () => !matchMedia('(max-width: 899px), (max-height: 599px)').matches;
+    const clampTo = (x, y) => [Math.min(Math.max(8, x), innerWidth - feed.offsetWidth - 8), Math.min(Math.max(8, y), innerHeight - feed.offsetHeight - 8)];
+    const place = () => {
+      let pos = null; try { pos = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); } catch (_) { /* optional preference */ }
+      if (!floating() || !pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) { feed.style.left = feed.style.top = ''; return; }
+      const [x, y] = clampTo(pos.x * innerWidth, pos.y * innerHeight); feed.style.left = x + 'px'; feed.style.top = y + 'px';
+    };
+    let drag = null, dragged = false;
+    toggle.addEventListener('pointerdown', event => {
+      if (!floating() || event.button !== 0) return;
+      const r = feed.getBoundingClientRect(); drag = { dx: event.clientX - r.left, dy: event.clientY - r.top, sx: event.clientX, sy: event.clientY }; dragged = false;
+      toggle.setPointerCapture?.(event.pointerId);
+    });
+    toggle.addEventListener('pointermove', event => {
+      if (!drag || (!dragged && Math.hypot(event.clientX - drag.sx, event.clientY - drag.sy) < 5)) return;
+      dragged = true; feed.classList.add('is-dragging');
+      const [x, y] = clampTo(event.clientX - drag.dx, event.clientY - drag.dy); feed.style.left = x + 'px'; feed.style.top = y + 'px';
+    });
+    const endDrag = () => {
+      if (!drag) return; drag = null; feed.classList.remove('is-dragging');
+      if (dragged) { const r = feed.getBoundingClientRect(); try { localStorage.setItem(POS_KEY, JSON.stringify({ x: r.left / innerWidth, y: r.top / innerHeight })); } catch (_) { /* optional preference */ } }
+    };
+    toggle.addEventListener('pointerup', endDrag); toggle.addEventListener('pointercancel', endDrag);
+    toggle.addEventListener('dblclick', () => { try { localStorage.removeItem(POS_KEY); } catch (_) { /* optional preference */ } place(); });
+    root.addEventListener('resize', place); requestAnimationFrame(place);
+    toggle.onclick = event => { if (dragged) { dragged = false; event.preventDefault(); return; } setOpen(!feed.classList.contains('is-open')); };
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && feed.classList.contains('is-open')) { setOpen(false); toggle.focus({ preventScroll: true }); } });
     document.addEventListener('pointerdown', event => { if (feed.classList.contains('is-open') && !feed.contains(event.target) && matchMedia('(max-width: 899px), (max-height: 599px)').matches) setOpen(false); });
     const vfxToggle = vfx.querySelector('input'); vfxToggle.checked = root.MahjongCultivationEffects?.enabled !== false;

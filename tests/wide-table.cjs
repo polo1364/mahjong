@@ -7,8 +7,9 @@ const { enterGame } = require('./start-screen-helper.cjs');
 const out = path.join(__dirname, '../artifacts');
 const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
 const viewports = [
-  [1440, 900], [1920, 1080], [943, 889], [844, 390], [568, 320], [390, 844], [320, 568],
-  [640, 900], [660, 900], [1440, 530], [1000, 540], [720, 540], [600, 600], [620, 620], [800, 600]
+  // The game is landscape-only: height >= width shows the rotate notice, so only landscape sizes are laid out.
+  [1440, 900], [1920, 1080], [943, 889], [844, 390], [740, 360], [568, 320],
+  [1440, 530], [1000, 540], [720, 540], [800, 600], [960, 600], [667, 375]
 ];
 const scenarios = [
   { name: 'dense17', hand: 'W7 W7 W8 W8 W9 T7 T7 T8 T8 T9 B7 B8 B9 FE FS FW FN', melds: [], opponentMelds: false },

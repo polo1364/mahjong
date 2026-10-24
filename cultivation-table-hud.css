@@ -386,3 +386,78 @@ html.cultivation-mode #cultivationMonster .cult-monster-lookup { width: auto; ma
   html.cultivation-mode #cultivationMonster .cult-monster-lookup, html.cultivation-mode #cultivationMonster .cult-attack, html.cultivation-mode #cultivationMonster .cult-pips { display: none; }
   html.cultivation-mode #cultivationMonster .cult-boss-intent { padding-right: 10px; }
 }
+
+/* ---------- 1A 剛打亮牌 ---------- */
+.discard-spotlight {
+  position: absolute; z-index: 24; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 8px 5px;
+  border-radius: 12px; background: #050b12e0; border: 1.5px solid #e2c27e; box-shadow: 0 0 18px #e2c27e66, 0 8px 16px #000a; pointer-events: none;
+  animation: spot-in .22s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.discard-spotlight[hidden] { display: none; }
+.discard-spotlight .spot-tile { display: block; width: 42px; height: auto; aspect-ratio: 40 / 56; padding: 0; border-radius: 4px; box-shadow: 0 0 0 2px #fff1c8, 0 0 14px #ffe7a6; }
+.discard-spotlight .spot-tile svg { width: 100%; height: 100%; display: block; }
+.discard-spotlight small { font: 600 11px/1.2 "Microsoft JhengHei", sans-serif; color: #f3dca4; white-space: nowrap; }
+.discard-spotlight:not(.is-live) { opacity: .82; border-color: #e2c27e88; box-shadow: 0 8px 16px #000a; }
+@keyframes spot-in { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .discard-spotlight { animation: none; } }
+html.feedback-reduced .discard-spotlight { animation: none; }
+@media (max-width: 600px), (max-height: 520px) {
+  .discard-spotlight { padding: 4px 5px 3px; border-radius: 9px; }
+  .discard-spotlight .spot-tile { width: 30px; }
+  .discard-spotlight small { font-size: 9.5px; }
+}
+
+/* ---------- 2C 精簡儀表戰況 ---------- */
+@media (min-width: 900px) and (min-height: 600px) { html.cultivation-mode:not(.start-screen-active) .cult-battle-feed { width: 272px; } }
+@media (max-width: 899px), (max-height: 599px) { html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { width: min(320px, calc(100vw - 20px)); } }
+.cult-battle-feed .cult-feed-grip { color: #8f9cb6; font-size: 14px; letter-spacing: -2px; }
+@media (min-width: 900px) and (min-height: 600px) {
+  .cult-battle-feed .cult-feed-toggle { cursor: grab; touch-action: none; }
+  .cult-battle-feed.is-dragging { opacity: .94; box-shadow: 0 18px 40px #000c, 0 0 0 2px #9fd9e688; }
+  .cult-battle-feed.is-dragging .cult-feed-toggle { cursor: grabbing; }
+}
+.cult-feed-table { margin: 2px 0 6px; }
+.cft-row { display: grid; grid-template-columns: 66px minmax(0, 1fr) 42px 34px; align-items: center; gap: 6px; padding: 3px 4px; border-radius: 6px; font: 12px/1.3 "Microsoft JhengHei", sans-serif; }
+.cft-row b { color: #f1e9d4; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cft-row em { font-style: normal; text-align: right; color: #ffb48a; font-variant-numeric: tabular-nums; }
+.cft-row u { text-decoration: none; text-align: right; color: #c9b8ff; font-variant-numeric: tabular-nums; }
+.cft-head { padding-top: 0; padding-bottom: 2px; font-size: 10px; color: #8f9cb6; } .cft-head span:nth-child(n+3) { text-align: right; }
+.cft-hp { position: relative; height: 7px; border-radius: 4px; background: #ffffff14; overflow: hidden; }
+.cft-hp i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, #348772, #8ed9ab); }
+.cft-hp i.is-low { background: linear-gradient(90deg, #b4683c, #edba7a); }
+.cft-hp i.cft-shield { top: auto; height: 2px; background: #9fd9e6; }
+.cft-row.is-target { background: linear-gradient(90deg, #a2412c44, transparent); box-shadow: inset 2px 0 0 #ec8f5a; }
+.cft-row.is-target b::before { content: "◆"; margin-right: 3px; font-size: 9px; color: #ff9b6a; }
+.cft-row.is-weak b { color: #8f9cb6; text-decoration: line-through; }
+.cult-battle-feed #cultivationLog { border-top: 1px dashed #e2c27e2b; padding-top: 4px; }
+.cult-battle-feed #cultivationLog li { display: flex; align-items: center; gap: 7px; padding: 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #c9d6e2; }
+.cult-battle-feed #cultivationLog li::before {
+  position: static; flex: none; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; box-shadow: none;
+  font: 700 10.5px/1 "DFKai-SB", "KaiTi", serif; content: "記"; color: #c9d6e2; background: #ffffff1a;
+}
+.cult-battle-feed #cultivationLog li[data-kind="dmg"]::before { content: "傷"; background: #a2412c; color: #ffe4d6; }
+.cult-battle-feed #cultivationLog li[data-kind="heal"]::before { content: "療"; background: #2f7a5b; color: #dcffee; }
+.cult-battle-feed #cultivationLog li[data-kind="hurt"]::before { content: "受"; background: #6b2430; color: #ffd6dc; }
+.cult-battle-feed #cultivationLog li[data-kind="sk"]::before { content: "技"; background: #b8913e; color: #2a1a08; }
+.cult-battle-feed #cultivationLog li[data-kind="mon"]::before { content: "妖"; background: #5a2a6e; color: #f4dcff; }
+.cult-battle-feed #cultivationLog li:first-child { color: #fff1cf; font-weight: 700; }
+.cult-battle-feed.is-open #cultivationStatusReference { margin: 6px 0 0; padding: 6px 0 0; border-top: 1px dashed #e2c27e33; border-bottom: 0; }
+
+/* ---------- 3C 傷害算式側欄 ---------- */
+.cult-insight {
+  position: fixed; z-index: 70; width: 228px; padding: 10px 12px 11px; border-radius: 14px; pointer-events: none;
+  border: 1.5px solid #e2c27e; background: linear-gradient(165deg, #12234af5, #0a1129f8); box-shadow: 0 16px 36px #000c;
+  color: #dce6ee; font: 12px/1.45 "Microsoft JhengHei", sans-serif;
+}
+.cult-insight[hidden] { display: none; }
+.cult-insight h6 { margin: 0 0 4px; font: 700 15px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 1px; color: #f3dca4; }
+.cult-insight .ins-sub { margin: -2px 0 6px; color: #9fd9e6; font-size: 12px; }
+.cult-insight .ins-line { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; color: #c9d6ef; }
+.cult-insight .ins-line b { color: #fff1cf; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cult-insight .ins-line b.up { color: #8ff0b0; } .cult-insight .ins-line b.down { color: #ff9b8a; }
+.cult-insight .ins-detail { padding: 1px 0 1px 10px; position: relative; color: #d3dde4; font-size: 11.5px; }
+.cult-insight .ins-detail::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; transform: rotate(45deg); background: #e2c27e; }
+.cult-insight .ins-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px; padding-top: 6px; border-top: 1px solid #e2c27e44; }
+.cult-insight .ins-total span { color: #f3dca4; font-weight: 700; } .cult-insight .ins-total b { font: 800 22px/1 "Segoe UI", sans-serif; color: #fff1cf; }
+.cult-insight .ins-combo { margin-top: 5px; font-size: 11.5px; color: #9fd9e6; } .cult-insight .ins-combo b { color: #f3dca4; }
+@media (max-width: 700px) { .cult-insight { width: min(300px, calc(100vw - 24px)); } }

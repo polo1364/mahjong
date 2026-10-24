@@ -196,7 +196,8 @@ function check(value, message) { assert.ok(value, message); result.checks.push(m
     check(await page.locator('#overlay').isVisible(), 'Game result keeps the shared overlay');
     await page.evaluate(() => { hideReactionPanel(); });
 
-    for (const [width, height] of [[1440, 900], [390, 844], [320, 568], [844, 390]]) {
+    // Landscape only: portrait sizes are covered by the rotate notice.
+    for (const [width, height] of [[1440, 900], [1000, 540], [740, 360], [844, 390]]) {
       await page.setViewportSize({ width, height });
       await open();
       const geometry = await page.locator('#tableMenu').evaluate(element => {
