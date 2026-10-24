@@ -216,7 +216,7 @@
           name.classList.add('cult-hero-detail-trigger');
           name.title = `${playerName(state, pid)} · ${hero.role} · 查看角色與被動`;
           name.setAttribute('role', 'button'); name.setAttribute('aria-haspopup', 'dialog'); name.tabIndex = 0;
-          const show = () => { information(`${hero.name} · ${hero.role}`, `<div class="role-sheet"><figure class="role-portrait"><img src="${escape(imageURL(hero.image))}" alt="${escape(hero.name)}"></figure><div class="role-main">${root.MahjongCultivationJourneyUI.heroDetails(hero) + root.MahjongCultivationJourneyUI.passiveState(currentState.cultivation.players[pid], currentState.cultivation.monster.id) + (root.MahjongCultivationEquipmentUI?.roleInfo(currentState.cultivation.players[pid]) || '')}</div></div>`, 'cult-role-sheet');
+          const show = () => { information(`${hero.name} · ${hero.role}`, `<div class="role-sheet"><figure class="role-portrait"><img src="${escape(imageURL(hero.image))}" alt="${escape(hero.name)}"></figure><div class="role-main">${root.MahjongCultivationJourneyUI.heroDetails(hero, currentState.cultivation.players[pid]) + root.MahjongCultivationJourneyUI.passiveState(currentState.cultivation.players[pid], currentState.cultivation.monster.id) + (root.MahjongCultivationEquipmentUI?.roleInfo(currentState.cultivation.players[pid]) || '')}</div></div>`, 'cult-role-sheet');
             // Only sets with pieces worn (rendered open) are shown on the status sheet.
             document.querySelectorAll('#cultivationInformation .equip-sets details:not([open])').forEach(node => node.remove());
             document.querySelectorAll('#cultivationInformation .equip-sets:empty').forEach(node => node.remove()); };

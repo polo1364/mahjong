@@ -81,7 +81,7 @@ test('stealth retargets live highest aggro; top-aggro skill protects its guarant
 });
 test('guard scopes to whole charge, no double counter on multi-hit, canceled attacks consume nothing',()=>{
  let s=monster(carry(fresh(),['guard','barrier']),'stoneback-boar.charge');s.monster.nextAttack.cancelled=true;let r=enemy(s);A.equal(r.effects.some(e=>e.type==='item'),false);
- s=monster(carry(fresh(),['guard']),'stoneback-boar.charge');r=enemy(s);A.equal(r.effects.find(e=>e.type==='hurt').amount,96);
+ s=monster(carry(fresh(),['guard']),'stoneback-boar.charge');r=enemy(s);A.equal(r.effects.find(e=>e.type==='hurt').amount,110);
  s=monster(carry(fresh(),['guard']),'frostfang-wolf.bite');r=enemy(s);A.equal(r.effects.some(e=>e.type==='item'),false);
 });
 test('edge applies only once to one complete skill including finisher; no basic or followup consumption',()=>{

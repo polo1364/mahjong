@@ -414,7 +414,7 @@
           (ps.fireMonsterId !== null && !int(ps.fireMonsterId, 1, state.monster.id))) fail("passive state");
     }
     const m = state.monster, species = Monsters.get(m?.speciesId);
-    if (!species || m.tier !== species.tier || m.name !== species.name || m.maxHp !== species.hp || m.armor !== species.armor ||
+    if (!species || m.tier !== species.tier || m.name !== species.name || (m.maxHp !== species.hp && m.maxHp !== species.legacyHp) || m.armor !== species.armor ||
         (m.speciesId !== "five-phase-sovereign" && m.element !== species.element) ||
         !int(m.attacks) || !int(m.heals, 0, 2) || !int(m.shields, 0, 2)) fail("journey monster");
     if (m.speciesId === "five-phase-sovereign" && m.element !== ELEMENTS[Math.floor(m.attacks / 2) % 5]) fail("boss rotation");
@@ -587,6 +587,8 @@
       state.monster = previous ? copy(previous.monster) : null;
       state.players.forEach((p, pid) => {
         p.heroId = previous ? previous.players[pid].heroId : pid === 0 ? options.heroId : pool[pid - 1];
+        // Each hero has its own life pool; a hand always starts at full life.
+        p.hp = p.maxHp = Heroes.get(p.heroId).hp || 1000;
         p.equipment = previous ? copy(previous.players[pid].equipment) : { weapon: null, armor: null, accessory: null };
         p.passiveState = passiveState();
       });
@@ -2246,8 +2248,9 @@
       if (
         !p ||
         p.pid !== index ||
-        p.maxHp !== 1000 ||
-        !number(p.hp, 0, 1000) ||
+        // Saves from before per-hero life keep 1,000 until their hand ends.
+        ![1000, state.version >= 2 && Heroes.get(p.heroId)?.hp].includes(p.maxHp) ||
+        !number(p.hp, 0, p.maxHp) ||
         !number(p.shield, 0, 1000) ||
         !int(p.shieldTurns, 0, 100) ||
         !number(p.shieldAbsorbed) ||
@@ -2409,7 +2412,7 @@
         const damage = start.damage, hp = start.hp, shield = start.shield, aggro = start.aggro;
         cast(forecast, pid, { id: 'estimate-next', element: 'neutral', effects: [{op:'damage',amount:200}] }, []);
         const end = actor(forecast, pid);
-        return end.damage - damage + (end.hp - hp) * (0.4 + (1 - before.hp / 1000)) * danger
+        return end.damage - damage + (end.hp - hp) * (0.4 + (1 - before.hp / before.maxHp)) * danger
           + (end.shield - shield) * .35 * danger - (end.aggro - aggro) * .015;
       };
       nextSkillValue = .75 * (futureGain(simulated) - futureGain(state));
@@ -2440,7 +2443,7 @@
     return (
       projected.damage -
       reference.damage +
-      (projected.hp - reference.hp) * (0.4 + (1 - before.hp / 1000)) * danger +
+      (projected.hp - reference.hp) * (0.4 + (1 - before.hp / before.maxHp)) * danger +
       (projected.shield - reference.shield) * 0.35 * danger +
       aggroValue + nextSkillValue + penalty(reference) - penalty(projected)
     );

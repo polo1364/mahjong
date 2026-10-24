@@ -10,6 +10,8 @@ function fixture(skill,hero='yun-zhiwei'){
  // Keep character identity uniqueness while giving the target neutral stats in assertions below.
  const heroes=require('../cultivation-heroes.js').all.filter(h=>h.id!==hero);
  s.players.slice(1).forEach((p,i)=>{p.heroId=heroes[i].id;p.passiveState.counterReady=false;});
+ // Swapped heroes keep the neutral 1,000 life these exact-damage assertions are written against.
+ s.players.forEach(p=>{p.hp=p.maxHp=1000;});
  if(m.tier==='boss')s.monster.attacks=2*['metal','wood','water','fire','earth'].indexOf(s.monster.element);
  s.monster.nextAttack={type:skill.type,damage:skill.damage,charged:skill.charged,ailment:null,cancelled:false,controlUsed:false,sealAilment:false,skillId:skill.id,monsterId:s.monster.id,actionNumber:s.monster.attacks+1,sealed:false};
  return s;

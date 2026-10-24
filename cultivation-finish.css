@@ -84,3 +84,9 @@ html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-s
   .cfs-index { width: 20px; height: 20px; font-size: 11px; }
   .cfs-seal-card { padding: 6px 10px; } .cfs-seal-card li { font-size: 12px; } .cfs-note { font-size: 11px; }
 }
+
+/* Stat cards: equipment gain next to the value (角色資訊 and 整備庭院). */
+.journey-stats dd { position: relative; }
+.journey-stat-gain { margin-left: 4px; font-style: normal; font-size: .58em; font-weight: 700; color: #8fe0a8; vertical-align: super; }
+.journey-stat-gain.is-down { color: #ff9d8a; }
+.journey-stats-note { margin: 2px 0 0; font-size: 12px; }

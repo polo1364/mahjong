@@ -249,6 +249,9 @@ const all = [
     "image": "assets/cultivation-journey/monsters/five-phase-sovereign.png"
   }
 ];
+// 2026-10 rebalance: tougher monsters per tier and harder hits. legacyHp lets saves from before it finish their hand.
+const LIFE={small:1.35,elite:1.3,miniboss:1.25,boss:1.25},ATTACK=1.15;
+all.forEach(m=>{m.legacyHp=m.hp;m.hp=Math.round(m.hp*LIFE[m.tier]/50)*50;m.single=Math.round(m.single*ATTACK);m.all=Math.round(m.all*ATTACK);});
 const skills=typeof module!=="undefined"&&module.exports?require('./cultivation-monster-skills.js'):root.MahjongMonsterSkills;
 all.forEach(m=>{m.skillIds=Object.freeze(skills?skills.forSpecies(m.id).map(s=>s.id):[]);Object.freeze(m);}); const api=Object.freeze({all:Object.freeze(all),get:(id)=>all.find(monster=>monster.id===id)||null});
 root.MahjongCultivationMonsters=api; if(typeof module!=="undefined" && module.exports) module.exports=api;

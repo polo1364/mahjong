@@ -28,11 +28,23 @@
     dialog.showModal();
     return dialog;
   }
-  function stats(hero) {
-    return `<dl class="journey-stats">${Object.entries(statNames).map(([key, name]) => `<div><dt>${name}</dt><dd>${esc(hero.stats[key])}<small>%</small></dd></div>`).join('')}</dl>`;
+  // Hero base stats with the player's equipment (always-on bonuses only; conditional effects resolve per move).
+  function statValues(hero, player) {
+    const E = root.MahjongCultivationEquipment, base = hero.stats;
+    if (!player?.economy || !E) return { ...base };
+    return { damage: base.damage * E.factor(player, 'damage'), defense: 200 - (200 - base.defense) * E.factor(player, 'taken'),
+      healing: base.healing * E.factor(player, 'heal'), shield: base.shield * E.factor(player, 'shield') };
   }
-  function heroDetails(hero) {
-    return `<p class="journey-role">${esc(hero.role)} · 生命 1,000</p><h2>${esc(hero.name)}</h2>${stats(hero)}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
+  function stats(hero, player) {
+    const values = statValues(hero, player);
+    return `<dl class="journey-stats">${Object.entries(statNames).map(([key, name]) => {
+      const value = Number(values[key].toFixed(1)), gain = Number((value - hero.stats[key]).toFixed(1));
+      return `<div${gain ? ` title="基礎 ${hero.stats[key]}%"` : ''}><dt>${name}</dt><dd>${esc(value)}<small>%</small>${gain ? `<em class="journey-stat-gain${gain < 0 ? ' is-down' : ''}">${gain > 0 ? '+' : ''}${esc(gain)}</em>` : ''}</dd></div>`;
+    }).join('')}</dl>`;
+  }
+  function heroDetails(hero, player) {
+    const life = player ? `${Number(player.hp).toLocaleString('en-US')} / ${Number(player.maxHp).toLocaleString('en-US')}` : Number(hero.hp || 1000).toLocaleString('en-US');
+    return `<p class="journey-role">${esc(hero.role)} · 生命 ${life}</p><h2>${esc(hero.name)}</h2>${player?.economy ? '<p class="journey-muted journey-stats-note">含裝備常駐加成；條件效果另依招式結算。</p>' : ''}${stats(hero, player)}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
   }
   function chooseHero(onChoose, onCancel) {
     const heroes = root.MahjongCultivationHeroes.all;
@@ -136,5 +148,5 @@
     dialog.querySelector('#journeyTitle').focus({ preventScroll: true });
     dialog.scrollTop = 0;
   }
-  root.MahjongCultivationJourneyUI = Object.freeze({ chooseHero, showPreparation, close, heroDetails, passiveState });
+  root.MahjongCultivationJourneyUI = Object.freeze({ chooseHero, showPreparation, close, heroDetails, passiveState, statValues });
 })(typeof window !== 'undefined' ? window : globalThis);

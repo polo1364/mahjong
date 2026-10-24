@@ -293,3 +293,38 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
   .prep-noscroll .equip-forge-grid > section:first-child { grid-template-rows: minmax(0, 1fr) auto; }
   .prep-noscroll .supply-forge { grid-template-columns: auto minmax(0, 1fr); }
 }
+
+/* ---- Phone landscape: full descriptions instead of clipped one-liners; pages take the overflow ---- */
+@media (max-height: 560px) {
+  /* 雲遊商人: three cards per row, buy button beside the name, every line of the effect below it. */
+  .prep-noscroll .equip-shop-grid { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important; }
+  .prep-noscroll .equip-shop-grid .equip-card > div > button { grid-row: 1 / span 2; align-self: start; }
+  .prep-noscroll .equip-shop-grid .equip-card > div > :is(p, small) { grid-column: 1 / -1; }
+  .prep-noscroll .equip-shop-grid .equip-card { grid-template-columns: 44px minmax(0, 1fr) !important; padding: 6px 10px !important; }
+  .prep-noscroll .equip-shop-grid .equip-card > img { width: 44px !important; height: 44px !important; }
+  .prep-noscroll .equip-shop-grid .equip-card .equip-grade { display: block; font-size: 10.5px; color: #9fb3bf; }
+  .prep-noscroll .equip-shop-grid .equip-card p, .prep-noscroll .equip-shop-grid .equip-card small { display: block !important; -webkit-line-clamp: unset; overflow: visible; margin: 1px 0 0 !important; font-size: 11.5px !important; line-height: 1.4 !important; }
+  .prep-noscroll .equip-shop-grid .equip-card small { color: #c9d8cf; }
+  /* 道具行囊: three per row with the effect text shown; the header row shrinks to make room for two rows. */
+  .prep-noscroll .supply-toolbar h2 { font-size: 13px; letter-spacing: 1px; }
+  .prep-noscroll .supply-toolbar select { min-height: 26px; padding: 0 6px; font-size: 12px; }
+  .prep-noscroll .supply-toolbar label { font-size: 12px; }
+  .prep-noscroll .supply-card > div { grid-template-columns: minmax(0, 1fr) auto; }
+  .prep-noscroll .supply-card > div > .equip-actions { grid-column: 2; grid-row: 1 / span 4; flex-direction: column; align-self: center; gap: 4px; margin: 0 !important; }
+  .prep-noscroll .supply-card > div > .equip-actions button { min-height: 24px !important; padding: 1px 9px !important; font-size: 11px !important; }
+  .prep-noscroll .supply-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; }
+  .prep-noscroll .supply-card > div > p { display: block !important; -webkit-line-clamp: unset; overflow: visible; margin: 1px 0 2px !important; font-size: 11px !important; line-height: 1.4 !important; color: #c9d8cf; }
+  /* 行囊配裝: the base bonus line comes back under each name. */
+  .prep-noscroll .equip-item .equip-card p { display: block !important; font-size: 11px !important; color: #b8cdc5; }
+  /* 角色・征途 overlay: nearly full width, the 角色 page flows into two columns so it fits on one page. */
+  .prep-noscroll.prep-left-open .journey-preparation-grid > .prep-left { width: min(880px, 96%); }
+  .prep-left-body > .journey-prepared-hero[data-left-pane]:not([hidden]) { display: block !important; height: 100%; column-count: 2; column-gap: 18px; column-fill: auto; }
+  .prep-left-body .journey-prepared-hero > .journey-prepared-art { float: left; margin: 0 10px 4px 0; }
+  .prep-left-body .journey-prepared-hero > div > * { break-inside: avoid; }
+  .prep-left-body .journey-prepared-hero .supply-character { clear: both; padding-top: 4px; }
+  .prep-left-body .journey-prepared-hero .journey-passive { margin-top: 0; }
+}
+
+/* Wallet: only seals you hold are listed, and they wrap instead of being cut off. */
+.prep-noscroll .equip-wallet > span { white-space: normal; overflow: visible; font-size: 12px; line-height: 1.35; color: #e6d9f2; }
+.prep-noscroll .equip-wallet > span:empty { display: none; }

@@ -186,7 +186,7 @@ test('start next carries exact party and seals while resetting per-hand values',
   assert.equal(run('S.cultivation.players.map(p=>p.characterId).join() === identities'), true);
   assert.equal(run('S.cultivation.players[2].activeSeals.length'), 1);
   // Opening flowers cast once after the reset, so inspect the committed pre-deal combat state.
-  assert.equal(run('freshCombat.players.every(p=>p.hp===1000 && p.damage===0 && p.aggro===0)'), true);
+  assert.equal(run('freshCombat.players.every(p=>p.hp===p.maxHp && p.maxHp>=900 && p.damage===0 && p.aggro===0)'), true);
   assert.equal(run('S.cultivation.version'), 3);
   assert.equal(run('S.cultivation.players.every(p=>p.economy && p.equipmentState)'), true);
 });

@@ -71,7 +71,7 @@ test('Mu chow healing has own multiplier and three-use quota',()=>{
 
 test('Su stores only effective non-natural healing, consumes on basic with caps',()=>{
   let s=fixture('su-lingheng');s.players[0].hp=990;s=meld(s,'T.chow.234');
-  assert.equal(s.players[0].passiveState.stored,1.5);assert.equal(s.players[0].hp,1000);
+  assert.equal(s.players[0].passiveState.stored,1.5);assert.equal(s.players[0].hp,s.players[0].maxHp);
   const quota=s.players[0].passiveState.generated;s=meld(s,'T.chow.234');assert.equal(s.players[0].passiveState.generated,quota);
   s=basic(s);assert.equal(s.players[0].passiveState.stored,0);
   for(let i=0;i<4;i++){s.players[0].hp=100;s=meld(s,'T.pong.666');s=basic(s);}
@@ -83,8 +83,8 @@ test('Su stores only effective non-natural healing, consumes on basic with caps'
 test('Yue defense multiplies existing reduction and extra 3 percent only while top living target',()=>{
   let s=fixture('yue-zhenshan');s.players[0].aggro=100;
   s.players[0].statuses=[{kind:'reduceDamage',value:.25,duration:2}];
-  let r=enemy(s);assert.equal(1000-r.state.players[0].hp,Math.round(100*.94*.97*.75));
-  s.players[1].aggro=101;r=enemy(s,{type:'all'});assert.equal(1000-r.state.players[0].hp,Math.round(100*.94*.75));
+  let r=enemy(s);assert.equal(s.players[0].maxHp-r.state.players[0].hp,Math.round(100*.94*.97*.75));
+  s.players[1].aggro=101;r=enemy(s,{type:'all'});assert.equal(s.players[0].maxHp-r.state.players[0].hp,Math.round(100*.94*.75));
 });
 
 test('Luo stores real shield absorption only, bounded generated quota; expiry/strip do not generate',()=>{
@@ -149,7 +149,7 @@ for(const tier of ['small','elite','miniboss','boss']) test(`${tier} draw/hu/def
     const snapshot=JSON.stringify(s),preview=C.journeyPreview(s);assert.equal(JSON.stringify(s),snapshot);
     const prep=C.prepare(s);assert.equal(prep.journey.phase,'preparation');assert.equal(s.journey.phase,'result');assert.equal(prep.rng,s.rng);
     const next=C.create(999,prep);assert.equal(next.monster.speciesId,preview.nextMonsterId);assert.equal(next.journey.phase,'combat');assert.equal(next.monster.hp,next.monster.maxHp);
-    assert.deepEqual(next.players.map(p=>p.heroId),s.players.map(p=>p.heroId));assert.ok(next.players.every(p=>p.hp===1000&&p.damage===0&&p.shield===0));
+    assert.deepEqual(next.players.map(p=>p.heroId),s.players.map(p=>p.heroId));assert.ok(next.players.every(p=>p.hp===H.get(p.heroId).hp&&p.maxHp===p.hp&&p.damage===0&&p.shield===0));
     if(['small','elite'].includes(tier))assert.equal(next.monster.speciesId,id);
     if(tier==='miniboss'){assert.equal(next.monster.tier,'small');assert.equal(next.journey.pendingMinibossId,id);assert.equal(next.journey.minibossKills,1);for(let i=0;i<8;i++)s=kill(i===0?next:s);assert.equal(s.monster.speciesId,id);}
     if(tier==='boss'){assert.equal(next.monster.tier,'elite');assert.equal(next.journey.minibossKills,0);}
@@ -178,7 +178,7 @@ for(const species of M.all) test(`catalog spawn and third-action behavior: ${spe
 
 test('monster heal/shield quotas are two; cancelled special gives no effect',()=>{
   for(const id of ['binding-vine','forest-vine-demon','nether-vine-queen','sand-construct']){
-    let s=fixture('yun-zhiwei',id);for(let i=0;i<10;i++){s.players.forEach(p=>{p.hp=1000;p.weak=false;});s.monster.hp=200;s=enemy(s,{damage:0}).state;}
+    let s=fixture('yun-zhiwei',id);for(let i=0;i<10;i++){s.players.forEach(p=>{p.hp=p.maxHp;p.weak=false;});s.monster.hp=200;s=enemy(s,{damage:0}).state;}
     assert.equal(id==='sand-construct'?s.monster.shields:s.monster.heals,2);
     s=fixture('yun-zhiwei',id,2);s.monster.hp=200;s=enemy(s,{cancelled:true}).state;assert.equal(s.monster.heals+s.monster.shields,0);
   }
@@ -190,8 +190,8 @@ test('BOSS cycles five elements every two counted actions including cancelled, w
 });
 
 test('charged interruption and sealing use V2 base 125 percent, no legacy scaling',()=>{
-  let s=fixture('yun-zhiwei','golden-tiger',1);s=enemy(s,{cancelled:true}).state;assert.equal(s.monster.nextAttack.damage,200);
-  s=meld(s,'T.exposed.3333');assert.equal(s.monster.nextAttack.charged,false);assert.equal(s.monster.nextAttack.damage,160);
+  let s=fixture('yun-zhiwei','golden-tiger',1);s=enemy(s,{cancelled:true}).state;assert.equal(s.monster.nextAttack.damage,Math.round(M.get('golden-tiger').single*1.25));
+  s=meld(s,'T.exposed.3333');assert.equal(s.monster.nextAttack.charged,false);assert.equal(s.monster.nextAttack.damage,M.get('golden-tiger').single);
   s=fixture('yun-zhiwei','golden-tiger',1);s=enemy(s,{cancelled:true}).state;s=meld(s,'T.chow.678');assert.equal(s.monster.nextAttack.cancelled,true);
 });
 

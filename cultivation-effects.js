@@ -460,7 +460,7 @@
   function previewEvents(id, healthy = false) {
     const C = root.MahjongCultivationCombat, F = root.MahjongCultivationFinishers, S = root.MahjongCultivationSkills;
     const state = C.create(21023), p = state.players[0];
-    state.monster.hp = state.monster.maxHp = 20000; p.hp = healthy ? 1000 : 380; p.shield = 160; p.shieldTurns = 4; p.aggro = 600; p.damageTaken = 350;
+    state.monster.hp = state.monster.maxHp = 20000; p.hp = healthy ? p.maxHp : 380; p.shield = 160; p.shieldTurns = 4; p.aggro = 600; p.damageTaken = 350;
     p.statuses = [{ kind: 'burn', negative: true, duration: 3, value: 30 }];
     state.monster.nextAttack.charged = true;
     state.monster.statuses = [{ op: 'dot', kind: 'burn', owner: 0, element: 'fire', amount: 40, ticks: 3 }, { kind: 'defenseUp', value: .2, duration: 3 }];

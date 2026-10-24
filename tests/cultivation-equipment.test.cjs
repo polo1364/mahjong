@@ -49,9 +49,9 @@ test('counter-only traits exclude followup and apply to actual reaction',()=>{
 
 test('armor additive top/AoE traits, separate hero defense, dot ordinary reduction only',()=>{
   let s=species(fixture('yue-zhenshan'),'whetgold-rat');give(s,'zhenyue-armor',5,10);s.players[0].aggro=100;
-  assert.equal(1000-enemy(s).state.players[0].hp,Math.round(100*.94*.97*.93));
-  s.players[1].aggro=101;assert.equal(1000-enemy(s,'all').state.players[0].hp,Math.round(100*.94*.94));
-  s=species(fixture(),'whetgold-rat');give(s,'liuyun-robe');s.players[0].aggro=100;assert.equal(1000-enemy(s,'all').state.players[0].hp,96);assert.equal(1000-enemy(s).state.players[0].hp,98);
+  assert.equal(s.players[0].maxHp-enemy(s).state.players[0].hp,Math.round(100*.94*.97*.93));
+  s.players[1].aggro=101;assert.equal(s.players[0].maxHp-enemy(s,'all').state.players[0].hp,Math.round(100*.94*.94));
+  s=species(fixture(),'whetgold-rat');give(s,'liuyun-robe');s.players[0].aggro=100;assert.equal(s.players[0].maxHp-enemy(s,'all').state.players[0].hp,96);assert.equal(s.players[0].maxHp-enemy(s).state.players[0].hp,98);
 });
 
 test('equipment and hero heal storage independent caps, no overflow/natural/self-equipment heal storage',()=>{

@@ -37,8 +37,9 @@ const rows = [
  ['five-phase-sovereign','earth','鎮獄山印','single',176,'earth','mountain-seal',null,{shield:60}],
  ['five-phase-sovereign','thunder','五相劫雷','all',119,'neutral','five-thunder',null,{charged:true}]
 ];
+// 2026-10 rebalance: every monster skill hits 15% harder (matches ATTACK in cultivation-monsters.js).
 const all=rows.map(([speciesId,key,name,type,damage,element,motion,ailment,extra])=>Object.freeze({
- id:speciesId+'.'+key,speciesId,name,type,damage,element,motion,
+ id:speciesId+'.'+key,speciesId,name,type,damage:Math.round(damage*1.15),element,motion,
  hits:1,charged:false,heal:0,shield:0,strip:0,riposte:0,...extra,
  ailment:ailment?Object.freeze(ailment):null,audio:'assets/monster-skills/'+speciesId+'.'+key+'.mp3'
 }));

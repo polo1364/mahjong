@@ -5,6 +5,7 @@ const all = [
     "id": "shen-gufeng",
     "name": "沈孤鋒",
     "role": "劍修",
+    "hp": 950,
     "stats": {
       "damage": 104,
       "defense": 100,
@@ -21,6 +22,7 @@ const all = [
     "id": "chi-ling",
     "name": "赤綾",
     "role": "火修",
+    "hp": 900,
     "stats": {
       "damage": 105,
       "defense": 98,
@@ -37,6 +39,7 @@ const all = [
     "id": "mu-canglan",
     "name": "沐滄瀾",
     "role": "水修",
+    "hp": 950,
     "stats": {
       "damage": 102,
       "defense": 98,
@@ -53,6 +56,7 @@ const all = [
     "id": "su-lingheng",
     "name": "蘇靈蘅",
     "role": "醫修",
+    "hp": 1000,
     "stats": {
       "damage": 96,
       "defense": 100,
@@ -69,6 +73,7 @@ const all = [
     "id": "yue-zhenshan",
     "name": "岳鎮山",
     "role": "體修",
+    "hp": 1200,
     "stats": {
       "damage": 98,
       "defense": 106,
@@ -85,6 +90,7 @@ const all = [
     "id": "luo-xuanyu",
     "name": "洛玄玉",
     "role": "盾修",
+    "hp": 1100,
     "stats": {
       "damage": 96,
       "defense": 102,
@@ -101,6 +107,7 @@ const all = [
     "id": "tie-wujiu",
     "name": "鐵無咎",
     "role": "反擊",
+    "hp": 1100,
     "stats": {
       "damage": 100,
       "defense": 104,
@@ -117,6 +124,7 @@ const all = [
     "id": "ye-shuying",
     "name": "夜疏影",
     "role": "隱修",
+    "hp": 900,
     "stats": {
       "damage": 102,
       "defense": 98,
@@ -133,6 +141,7 @@ const all = [
     "id": "yun-zhiwei",
     "name": "雲知微",
     "role": "術修",
+    "hp": 1000,
     "stats": {
       "damage": 100,
       "defense": 100,
@@ -149,6 +158,7 @@ const all = [
     "id": "hua-jianlu",
     "name": "花見鹿",
     "role": "花修",
+    "hp": 1000,
     "stats": {
       "damage": 100,
       "defense": 100,
