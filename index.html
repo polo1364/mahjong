@@ -4081,6 +4081,9 @@ function askRestoreAutoSave(saveTime) {
   });
 }
 
+// A successful retry must also replace DOM images that previously failed.
+document.addEventListener('mahjong-images-ready', () => { if (S) renderAll(); });
+
 window.addEventListener('DOMContentLoaded', () => {
   window.MahjongStartScreen.init({
     loadAutoSave,

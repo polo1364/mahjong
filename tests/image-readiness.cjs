@@ -40,6 +40,7 @@ const server=http.createServer((req,res)=>{
     fail=false;await retryPage.locator('#imageLoading [data-retry]').click();
     await retryPage.waitForFunction(()=>!MahjongImages.isLoading());await retryPage.evaluate(()=>cancelGameTimers());
     assert.equal(await retryPage.locator('#imageLoading').evaluate(d=>d.open),false);
+    await retryPage.waitForFunction(()=>[...document.querySelectorAll('.cult-hero-portrait')].every(img=>img.complete&&img.naturalWidth),null,{timeout:3000});
     reports.push({engine:name,restoreFailurePaused:true,retryPassed:true});await retryContext.close();
     if(name==='chromium'){
      hold=true;holdHome=true;const installed=await browser.newContext({viewport:{width:844,height:390}}),installedPage=await installed.newPage();

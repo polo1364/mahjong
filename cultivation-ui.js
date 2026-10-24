@@ -439,9 +439,5 @@
     resultResizePending = true;
     requestAnimationFrame(() => { resultResizePending = false; showResult(currentState); });
   });
-  document.addEventListener('mahjong-images-ready', () => {
-    root.MahjongCultivationEffects?.sync(currentState);
-    root.MahjongMonsterEffects?.sync(currentState);
-  });
   root.MahjongCultivationUI = Object.freeze({ render, showResult, chooseSkills, skillPreview, closeChoice: () => { activeChoice?.(false); root.MahjongCultivationEffects?.closePreview?.(); root.MahjongCultivationCatalog?.close(); } });
 })(typeof window !== 'undefined' ? window : globalThis);
