@@ -19,7 +19,8 @@
   function levelText(skill, level) { return `${Math.round(skill.values[level - 1] * 100)}%`; }
   const skillKinds = {basic:'普攻傷害',active:'組牌、花技與終式傷害',counter:'反擊傷害',heal:'治療量',shield:'護盾取得量',aggro:'新增仇恨降低'};
   function skillEffect(skill, level) {
-    const amount = `${skill.kind === 'aggro' ? '−' : '+'}${levelText(skill, level)}`;
+    // The label already says 降低, so the reduction is written without a minus sign.
+    const amount = `${skill.kind === 'aggro' ? '' : '+'}${levelText(skill, level)}`;
     return `${skillKinds[skill.kind] || skill.kind} ${amount}`;
   }
   function aiSummary(combat) {

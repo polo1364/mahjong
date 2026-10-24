@@ -120,3 +120,13 @@ if ($LASTEXITCODE -ne 0) { throw 'round3 summary failed' }
 [正式網站](https://polo1364.github.io/mahjong/) 回傳的 PWA 版本與本機相同。以全新、隔離的 Playwright WebKit 844×390 context 驗證首頁→修仙選角開局→修為結算→整備「修行」頁，玩家修為入帳 13、三位 AI 為 12／13／13，0 個頁面錯誤及 0 個 HTTP 錯誤資源。此線上測試以 `endDraw()` 結束剛建立的隔離牌局，只證明介面、結算與存檔串接，不算自然對局或平衡證據；Service Worker 在此 context 停用，快取／更新行為由前述 PWA 測試另行驗證。未操作使用者既有存檔。
 
 實體 iPhone／Android 與既有主畫面安裝仍未實測。原始線上紀錄與截圖保留在本機 `artifacts/progression-live.json`、`progression-live-webkit.png`。
+
+## 2026-10-25 Claude 複查
+
+- 讀過 `cultivation-progression*.js` 與戰鬥引擎的養成／試煉改動；試煉結局、獨立存檔、相加加成、仇恨下限 0.75、AI 突破與重複結算防護皆與方案一致，未發現邏輯錯誤。
+- 單元測試 962/962（`progression-store.test.cjs` 需可載入 playwright）；`tests/progression-browser.cjs` Chromium 21 項通過，WebKit 因本機未安裝未執行。
+- 實際遊玩（942×435 手機橫式、1440×900）：兩局修為入帳、功法配置、角色資訊、首頁、渡劫開始、重新整理後繼續、通過後返回整備（築基、金幣 +100）皆正常，無頁面錯誤。
+- 修正：
+  - 手機橫式功法配置視窗需捲動才看到第 6 個功法與「保存配置」→ 改為兩欄，一個畫面放下。
+  - 斂息訣效果寫成「新增仇恨降低 −6%」→ 改為「降低 6%」。
+  - 結算畫面的本局修為排在最下方，手機要捲動才看到 → 移到結算標題列。

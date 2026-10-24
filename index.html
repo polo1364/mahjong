@@ -4715,7 +4715,8 @@ function showHandsAndContinue() {
   window.MahjongCultivationUI?.showResult(S);
   if (S.cultivation && window.MahjongProgressionFlow) {
     const host=document.createElement('div');host.className='progression-result';
-    panel.querySelector('.result-footer').before(host);window.MahjongProgressionFlow.result(host,S);
+    // Under the result title so the hand's cultivation reward is seen without scrolling on phones.
+    (panel.querySelector('.rs-head')||panel.querySelector('.result-footer')).append(host);window.MahjongProgressionFlow.result(host,S);
   }
   panel.style.display = 'block';
   document.getElementById('overlay').style.display = 'block';

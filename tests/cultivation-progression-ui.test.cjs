@@ -103,7 +103,7 @@ test('skill editor describes every effect and shows negative aggro percentage', 
   UI.preparation(node,{players:[{progression:profile}]},{profile,onConfigure:async()=>profile});
   await node.click('[data-progression-edit]');
   const html = dialog.firstElementChild.innerHTML;
-  for (const effect of ['普攻傷害 +4%','組牌、花技與終式傷害 +4%','反擊傷害 +8%','治療量 +5%','護盾取得量 +5%','新增仇恨降低 −6%']) assert.ok(html.includes(effect), effect);
+  for (const effect of ['普攻傷害 +4%','組牌、花技與終式傷害 +4%','反擊傷害 +8%','治療量 +5%','護盾取得量 +5%','新增仇恨降低 6%']) assert.ok(html.includes(effect), effect);
   UI.close(); delete global.document;
 });
 
