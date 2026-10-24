@@ -70,7 +70,9 @@
       key[0] === 'H' ? ['春', '夏', '秋', '冬', '梅', '蘭', '竹', '菊'][Number(key.slice(1)) - 1] : '';
     if (!label) return '';
     const color = suitColor || (key[0] === 'H' ? '#345b43' : '#304a66');
-    return `<text data-crystal-label="${key}" x="5" y="11.3" font-family="Microsoft JhengHei,PingFang TC,sans-serif" font-size="9" font-weight="700" fill="${color}">${label}</text>`;
+    // The white dragon's blue frame occupies the usual corner; use its blank inner corner.
+    const position = key === 'DB' ? 'x="11" y="19" font-size="8"' : 'x="5" y="11.3" font-size="9"';
+    return `<text data-crystal-label="${key}" ${position} font-family="Microsoft JhengHei,PingFang TC,sans-serif" font-weight="700" fill="${color}">${label}</text>`;
   }
   for (const [key, [sheetKey, rectangle, legacyLabel]] of Object.entries(sourceTiles)) {
     const sheet = sheets[sheetKey];
