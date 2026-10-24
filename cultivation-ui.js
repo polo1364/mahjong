@@ -319,6 +319,29 @@
     vfxToggle.addEventListener('change', () => root.MahjongCultivationEffects?.setEnabled(vfxToggle.checked));
   }
 
+  // Card dressing for the choice dialog: real tiles (claimed tile lifted), role tags, values as a list,
+  // a live outcome estimate and a number-key badge. Purely presentational.
+  const roleNames = { attack: '攻擊', heal: '治療', defense: '防禦', counter: '反擊', aggro: '仇恨', control: '控制', support: '輔助' };
+  function decorateChoice(button, option, index) {
+    const skill = findSkill(option.action, option.keys || option.key);
+    const keys = option.keys || (option.key ? Array(option.action === 'pong' ? 3 : ['exposed', 'concealed', 'added', 'kong'].includes(option.action) ? 4 : 1).fill(option.key) : []);
+    let lifted = false;
+    const tiles = keys.map(key => { const claimed = !lifted && key === option.claimed; if (claimed) lifted = true;
+      return `<span class="ccv-tile${claimed ? ' is-claimed' : ''}">${root.MahjongCrystalTiles?.render(key) || escape(key)}</span>`; }).join('');
+    button.insertAdjacentHTML('afterbegin', `<kbd class="ccv-key" aria-hidden="true">${index + 1}</kbd>${tiles ? `<span class="ccv-tiles">${tiles}</span>` : ''}`);
+    const values = button.querySelector('.cult-skill-values');
+    if (values) values.outerHTML = `<ul class="cult-skill-values">${values.textContent.split('；').filter(Boolean).map(text => `<li>${escape(text)}</li>`).join('')}</ul>`;
+    if (!skill) return;
+    const roles = root.MahjongCultivationCatalog?.roles?.(skill.effects) || [];
+    button.querySelector('.cult-skill-heading')?.insertAdjacentHTML('afterend', roles.length ? `<span class="ccv-roles">${roles.map(r => `<i data-role="${r}">${roleNames[r] || r}</i>`).join('')}</span>` : '');
+    button.dataset.element = skill.element;
+    const event = /^[WTB]$/.test(skill.family) ? { type: 'meld', pid: 0, action: skill.action, keys: [...skill.combo].map(n => skill.family + n) } : { type: 'meld', pid: 0, action: skill.action, key: skill.combo };
+    const sim = root.MahjongCultivationInsight?.simulate?.(0, event);
+    if (!sim) return;
+    const fmt = v => typeof v === 'object' && v ? (v.lo === v.hi ? `${v.lo}` : `${v.lo}～${v.hi}`) : `${v}`, top = v => (typeof v === 'object' && v ? v.hi : v) || 0;
+    const parts = [top(sim.damage) > 0 ? `<b data-k="dmg">傷害 ${fmt(sim.damage)}</b>` : '', top(sim.heal) > 0 ? `<b data-k="heal">回復 ${fmt(sim.heal)}</b>` : '', top(sim.shield) > 0 ? `<b data-k="shield">護盾 ${fmt(sim.shield)}</b>` : ''].filter(Boolean);
+    button.insertAdjacentHTML('beforeend', `<span class="ccv-estimate"><small>現在施放</small>${parts.join('') || '<b>輔助效果</b>'}</span>`);
+  }
   function chooseSkills(options, onChoose, onCancel) {
     if (!Array.isArray(options) || options.length === 0) return;
     if (activeChoice) activeChoice(false);
@@ -326,6 +349,8 @@
     const dialog = document.createElement('dialog'); dialog.className = 'cult-choice'; dialog.id = 'cultivationChoice';
     dialog.setAttribute('aria-labelledby', 'cultivationChoiceTitle');
     dialog.innerHTML = `<header><div><p>組牌 · 施法</p><h2 id="cultivationChoiceTitle">選擇這一招</h2></div><button type="button" class="cult-choice-cancel" aria-label="取消技能選擇">取消 ×</button></header><p>選擇合法牌組後立即施放。取消會返回牌桌，不消耗牌。</p><div class="cult-choice-options">${options.map((option, index) => `<button type="button" class="cult-choice-option" data-option="${index}"><span class="cult-choice-label">${escape(option.label || `${actions[option.action] || '組牌'} · ${(option.keys || [option.key]).filter(Boolean).map(k => root.MahjongTileNames?.getName?.(k) || k).join(' ')}`)}</span>${skillPreview(option)}</button>`).join('')}</div>`;
+    dialog.classList.add('cult-choice-v2'); dialog.dataset.count = String(options.length);
+    dialog.querySelectorAll('[data-option]').forEach(button => { try { decorateChoice(button, options[Number(button.dataset.option)], Number(button.dataset.option)); } catch (_) { /* decoration is optional */ } });
     document.body.append(dialog);
     let done = false;
     const close = (cancelled = true, selected = null) => {
@@ -345,6 +370,8 @@
     dialog.querySelectorAll('[data-option]').forEach(button => button.addEventListener('click', () => close(false, options[Number(button.dataset.option)])));
     dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
     dialog.addEventListener('keydown', event => {
+      const pick = Number(event.key);
+      if (pick >= 1 && pick <= options.length && !event.ctrlKey && !event.altKey && !event.metaKey) { event.preventDefault(); close(false, options[pick - 1]); return; }
       if (event.key !== 'Tab') return;
       const buttons = [...dialog.querySelectorAll('button:not(:disabled)')];
       const next = buttons.indexOf(document.activeElement) + (event.shiftKey ? -1 : 1);

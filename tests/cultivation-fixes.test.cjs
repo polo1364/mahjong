@@ -227,3 +227,54 @@ test('new gear auto-equips into an empty slot and never replaces worn gear', () 
   assert.equal(s.players[0].equipment[slot], first.uid);
   assert.ok(s.players[0].economy.inventory.some(i => i.uid === second.uid));
 });
+
+// Damage variance (2026-10-24): every hit rolls 90–110% on its own RNG stream.
+test('damage variance rolls each hit within 90-110%, replays identically and leaves monster patterns alone', () => {
+  const run = (variance, seed) => {
+    let s = C.create(seed, null, { heroId: 'yun-zhiwei', equipment: true, damageVariance: variance });
+    const hits = [], hurts = [], telegraphs = [];
+    for (let i = 0; i < 40 && !s.ended; i++) {
+      const r = sendFx(s, { type: 'discard', pid: i % 4, key: 'W' + (1 + i % 9) }); s = r.state;
+      hits.push(...r.effects.filter(e => e.type === 'damage' && e.source === 'basic').map(e => e.amount));
+      if (s.enemyDue && !s.ended) { telegraphs.push(s.monster.nextAttack.type); const e = sendFx(s, { type: 'enemy', monsterId: s.monster.id }); s = e.state; hurts.push(...e.effects.filter(x => x.type === 'hurt').map(x => x.amount)); }
+    }
+    return { hits, hurts, telegraphs, s };
+  };
+  const fixed = run(false, 77), a = run(true, 77), b = run(true, 77);
+  assert.deepEqual(a, b);                                   // same seed, same rolls
+  assert.deepEqual(a.telegraphs, fixed.telegraphs);         // monster patterns unchanged
+  assert.ok(new Set(a.hits).size > new Set(fixed.hits).size); // damage actually varies
+  assert.ok(a.hurts.some((n, i) => n !== fixed.hurts[i]));
+  const [lo, hi] = C.damageRollRange; assert.deepEqual([lo, hi], [0.9, 1.1]);
+  // Pinned roll reproduces the fixed engine exactly, so the range is centred on the old numbers.
+  const pinned = C.withDamageRoll(1, () => run(true, 77));
+  assert.deepEqual(pinned.hits, fixed.hits);
+  assert.equal(C.validate(a.s), true);
+  const bad = JSON.parse(JSON.stringify(a.s)); bad.damageRng = 0;
+  assert.throws(() => C.validate(bad), /damage variance/);
+  // Later hands of a varied journey keep varying.
+  const next = C.create(78, C.apply(a.s, { id: a.s.seq + 1, type: 'finish', reason: 'draw' }).state);
+  assert.equal(next.damageVariance, 1);
+});
+
+test('equipment bonuses: every piece changes damage, taken damage, heal, shield and aggro exactly as described', () => {
+  const E = require(path.join(__dirname, '../cultivation-equipment.js'));
+  const send1 = (s, e) => C.withDamageRoll(1, () => C.apply(s, { id: s.seq + 1, ...e }));
+  for (const cat of E.all) {
+    const s = C.create(4242, null, { heroId: 'yun-zhiwei', equipment: true, monsterSkillVersion: 0 });
+    s.monster.shield = 0; s.players.forEach((p, i) => { p.aggro = i ? 50 : 0; p.statuses = []; });
+    const p = s.players[0], grade = cat.setId ? 4 : 3, item = { uid: 'p0-' + (++p.economy.serial), catId: cat.id, grade, level: 4, locked: false };
+    p.economy.inventory.push(item); p.equipment[cat.slot] = item.uid;
+    const b = E.bonuses(p), armor = 1 - s.monster.armor, el = C.elementMultiplier(C.tileElement('W1'), s.monster.element);
+    const basic = send1(s, { type: 'discard', pid: 0, key: 'W1' });
+    const dealt = basic.effects.find(e => e.type === 'damage' && e.source === 'basic').amount;
+    assert.ok(Math.abs(dealt - 50 * el * armor * (1 + b.damage + b.basic)) <= 1, cat.id + ' damage');
+    assert.ok(Math.abs(basic.state.players[0].aggro - dealt * (1 - b.aggro)) <= 1, cat.id + ' aggro');
+    const hit = JSON.parse(JSON.stringify(s)); hit.players[0].aggro = 999; hit.enemyDue = hit.monster.id; hit.discardCount = 4;
+    Object.assign(hit.monster.nextAttack, { type: 'single', damage: 200, cancelled: false, charged: false });
+    const hurt = send1(hit, { type: 'enemy' }).effects.find(e => e.type === 'hurt' && e.pid === 0);
+    assert.ok(Math.abs(hurt.amount - 200 * (1 - b.taken - b.topTaken)) <= 1, cat.id + ' taken');
+    const h = JSON.parse(JSON.stringify(s)); h.players[0].hp = 500;
+    assert.ok(Math.abs(send1(h, { type: 'flower', pid: 0, key: 'H1' }).effects.find(e => e.type === 'heal').amount - 100 * (1 + b.heal)) <= 1, cat.id + ' heal');
+  }
+});

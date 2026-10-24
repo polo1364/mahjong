@@ -1,0 +1,86 @@
+/* 選擇這一招 · lacquer-and-gold card dialog (matches the premium chow / restore dialogs). */
+dialog.cult-choice.cult-choice-v2 {
+  --el: #e2c27e;
+  width: min(1040px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); padding: 22px 26px 22px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 12px; color: #e9eef6; font: 14px/1.6 "Microsoft JhengHei", sans-serif;
+  border: 1.5px solid #e2c27e; border-radius: 22px;
+  background: radial-gradient(ellipse 80% 45% at 50% 0%, #2b3f7a66, transparent 70%), linear-gradient(170deg, #121c40, #0a1130 55%, #070b1e);
+  box-shadow: inset 0 0 0 5px #0b1230, inset 0 0 0 6px #e2c27e40, 0 30px 90px #000d;
+  animation: ccv-in .28s cubic-bezier(.2, .9, .3, 1) both;
+}
+@keyframes ccv-in { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+dialog.cult-choice-v2::backdrop { background: #02060fcc; backdrop-filter: blur(3px); }
+.cult-choice-v2 > header { display: flex; align-items: center; justify-content: center; position: relative; padding-bottom: 4px; }
+.cult-choice-v2 > header > div { text-align: center; }
+.cult-choice-v2 > header p { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0; font: 600 12px/1 "Microsoft JhengHei", sans-serif; letter-spacing: 6px; color: #9fd9e6; }
+.cult-choice-v2 > header p::before, .cult-choice-v2 > header p::after { content: ""; width: 54px; height: 1px; background: linear-gradient(90deg, transparent, #e2c27e); }
+.cult-choice-v2 > header p::after { background: linear-gradient(90deg, #e2c27e, transparent); }
+.cult-choice-v2 h2 { margin: 8px 0 0; font: 700 30px/1.2 "DFKai-SB", "KaiTi", serif; letter-spacing: 8px; padding-left: 8px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cult-choice-v2 .cult-choice-cancel { position: absolute; right: 0; top: 0; min-height: 40px; padding: 6px 18px; border-radius: 999px; color: #f3dca4; background: #ffffff0d; border: 1px solid #e2c27e88; cursor: pointer; }
+.cult-choice-v2 .cult-choice-cancel:hover { background: #e2c27e22; }
+.cult-choice-v2 > p { margin: 0; text-align: center; font-size: 13px; color: #a9b6cc; }
+
+.cult-choice-v2 .cult-choice-options { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 14px; min-height: 0; overflow: hidden; }
+.cult-choice-v2[data-count="1"] .cult-choice-options { --cols: 1; max-width: 380px; margin: 0 auto; width: 100%; }
+.cult-choice-v2[data-count="2"] .cult-choice-options { --cols: 2; }
+.cult-choice-v2[data-count="4"] .cult-choice-options { --cols: 4; }
+.cult-choice-v2 .cult-choice-option {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 6px; min-width: 0; padding: 14px 14px 12px; text-align: left; cursor: pointer;
+  color: inherit; border-radius: 16px; border: 1px solid #e2c27e44; border-top: 3px solid var(--el);
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, color-mix(in srgb, var(--el) 20%, transparent), transparent 75%), linear-gradient(170deg, #16224a, #0b1330);
+  box-shadow: 0 10px 24px #0007; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.cult-choice-v2 .cult-choice-option[data-element="fire"] { --el: #ff9b6a; } .cult-choice-v2 .cult-choice-option[data-element="water"] { --el: #7cc6ef; }
+.cult-choice-v2 .cult-choice-option[data-element="wood"] { --el: #8fdc9f; } .cult-choice-v2 .cult-choice-option[data-element="metal"] { --el: #f0dfa0; }
+.cult-choice-v2 .cult-choice-option[data-element="earth"] { --el: #d6b385; }
+.cult-choice-v2 .cult-choice-option:hover, .cult-choice-v2 .cult-choice-option:focus-visible {
+  outline: none; transform: translateY(-4px); border-color: #f3dca4; box-shadow: 0 0 0 2px #f3dca466, 0 16px 30px #000a, 0 0 26px color-mix(in srgb, var(--el) 40%, transparent);
+}
+.cult-choice-v2 .ccv-key { position: absolute; left: 10px; top: 10px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; font: 700 12px "Segoe UI", sans-serif; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); box-shadow: 0 2px 4px #0008; }
+.cult-choice-v2 .cult-choice-label { order: -1; align-self: center; font-size: 11.5px; letter-spacing: 1px; color: #8f9cb6; }
+.cult-choice-v2 .ccv-tiles { order: -2; display: flex; justify-content: center; align-items: flex-end; gap: 4px; padding: 10px 0 4px; }
+.cult-choice-v2 .ccv-tile { display: block; width: 46px; aspect-ratio: 40 / 56; border-radius: 4px; background: #dbe6ee; overflow: hidden; box-shadow: 0 4px 8px #000a; }
+.cult-choice-v2 .ccv-tile svg { display: block; width: 100%; height: 100%; }
+.cult-choice-v2 .ccv-tile.is-claimed { transform: translateY(-8px); box-shadow: 0 0 0 2px #f3dca4, 0 0 16px #ffe7a6, 0 8px 12px #000a; }
+.cult-choice-v2 .cult-skill-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.cult-choice-v2 .cult-skill-heading strong { font: 700 22px/1.25 "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; color: #f3dca4; }
+.cult-choice-v2 .cult-skill-heading > span { flex: none; padding: 1px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: #1a1206; background: var(--el); }
+.cult-choice-v2 .ccv-roles { display: flex; flex-wrap: wrap; gap: 4px; }
+.cult-choice-v2 .ccv-roles i { font-style: normal; padding: 0 9px; border-radius: 999px; font-size: 11px; line-height: 1.7; color: #f3dca4; background: #e2c27e1a; border: 1px solid #e2c27e55; }
+.cult-choice-v2 .ccv-roles i[data-role="attack"] { color: #ffc2a6; border-color: #ec8f5a77; background: #a2412c26; }
+.cult-choice-v2 .ccv-roles i[data-role="heal"] { color: #b9f5d4; border-color: #5fd39a77; background: #2f7a5b26; }
+.cult-choice-v2 .ccv-roles i[data-role="defense"] { color: #bfe9ee; border-color: #9fd9e677; background: #2b6a7a26; }
+.cult-choice-v2 .cult-skill-description { font-size: 13.5px; line-height: 1.6; color: #e9e4d4; }
+.cult-choice-v2 ul.cult-skill-values { list-style: none; margin: 0; padding: 6px 10px; border-radius: 10px; background: #ffffff08; border: 1px solid #ffffff12; }
+.cult-choice-v2 ul.cult-skill-values li { position: relative; padding: 2px 0 2px 14px; font-size: 12.5px; color: #fff1cf; }
+.cult-choice-v2 ul.cult-skill-values li::before { content: ""; position: absolute; left: 2px; top: 10px; width: 6px; height: 6px; transform: rotate(45deg); background: #e2c27e; }
+.cult-choice-v2 .ccv-estimate { margin-top: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding-top: 8px; border-top: 1px dashed #e2c27e44; }
+.cult-choice-v2 .ccv-estimate small { color: #9fb3bf; font-size: 11.5px; }
+.cult-choice-v2 .ccv-estimate b { font: 800 15px "Segoe UI", "Microsoft JhengHei", sans-serif; color: #fff1cf; }
+.cult-choice-v2 .ccv-estimate b[data-k="dmg"] { color: #ffb48a; } .cult-choice-v2 .ccv-estimate b[data-k="heal"] { color: #8ff0b0; } .cult-choice-v2 .ccv-estimate b[data-k="shield"] { color: #9fd9e6; }
+@media (prefers-reduced-motion: reduce) { dialog.cult-choice-v2, .cult-choice-v2 .cult-choice-option { animation: none; transition: none; } }
+
+/* Narrower screens: two per row, then one; short screens trim secondary lines. */
+@media (max-width: 860px) { .cult-choice-v2 .cult-choice-options { --cols: 2 !important; } }
+@media (max-height: 700px) {
+  dialog.cult-choice.cult-choice-v2 { padding: 12px 16px; gap: 8px; }
+  .cult-choice-v2 > p { display: none; }
+  .cult-choice-v2 h2 { font-size: 22px; margin-top: 4px; }
+  .cult-choice-v2 .cult-choice-option { padding: 8px 10px; gap: 4px; }
+  .cult-choice-v2 .ccv-tiles { padding: 6px 0 2px; } .cult-choice-v2 .ccv-tile { width: 34px; }
+  .cult-choice-v2 .cult-skill-heading strong { font-size: 18px; }
+  .cult-choice-v2 .cult-skill-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 12.5px; }
+  .cult-choice-v2 ul.cult-skill-values li { font-size: 11.5px; }
+}
+@media (max-height: 520px) {
+  .cult-choice-v2 .cult-choice-options { --cols: var(--count-cols, 3) !important; gap: 8px; }
+  .cult-choice-v2[data-count="2"] .cult-choice-options { --count-cols: 2; }
+  .cult-choice-v2 > header p, .cult-choice-v2 .cult-choice-label, .cult-choice-v2 .cult-skill-description, .cult-choice-v2 .ccv-roles { display: none; }
+  .cult-choice-v2 h2 { font-size: 18px; margin: 0; letter-spacing: 4px; }
+  .cult-choice-v2 .cult-choice-cancel { min-height: 32px; padding: 2px 12px; }
+  .cult-choice-v2 .ccv-tile { width: 28px; } .cult-choice-v2 .ccv-tile.is-claimed { transform: translateY(-5px); }
+  .cult-choice-v2 .cult-skill-heading strong { font-size: 16px; letter-spacing: 1px; }
+  .cult-choice-v2 ul.cult-skill-values { padding: 3px 8px; } .cult-choice-v2 ul.cult-skill-values li { font-size: 11px; padding: 0 0 0 12px; }
+  .cult-choice-v2 ul.cult-skill-values li:nth-child(n+3) { display: none; }
+  .cult-choice-v2 .ccv-estimate { padding-top: 4px; } .cult-choice-v2 .ccv-estimate b { font-size: 13px; }
+}

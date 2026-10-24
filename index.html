@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="cultivation-table-hud.css">
 <link rel="stylesheet" href="cultivation-monster-skills.css?v=monster-skills-1">
 <link rel="stylesheet" href="cultivation-prep-layout.css">
+<link rel="stylesheet" href="cultivation-choice.css">
 <script src="tile-names.js"></script>
 <script src="crystal-tiles.js"></script>
 <script src="cultivation-skills.js"></script>
@@ -1121,7 +1122,8 @@ function startNewHand(isFirstGame = false, cultivationCarry = null, cultivationO
     const entropy = new Uint32Array(1);
     if (window.crypto?.getRandomValues) window.crypto.getRandomValues(entropy);
     else entropy[0] = Date.now() >>> 0;
-    S.cultivation = window.MahjongCultivationCombat.create(entropy[0] || 1, cultivationCarry, cultivationOptions);
+    // Every hit rolls within 90–110%; journeys started before this keep fixed damage until their next hand.
+    S.cultivation = window.MahjongCultivationCombat.create(entropy[0] || 1, cultivationCarry, { ...cultivationOptions, damageVariance: true });
   }
   dealTiles();
   const firstAIDelay = S.dealer !== 0 && !flowerWinCandidate() ? 400 + Math.random() * 400 : 0;
@@ -2547,7 +2549,7 @@ function handleChowClick() {
   if (S.cultivation) {
     const state = S;
     window.MahjongCultivationUI.chooseSkills(chowReact.patterns.map(pattern => ({
-      action: 'chow', keys: pattern.map(rank => chowReact.tile.suit + rank), value: pattern
+      action: 'chow', keys: pattern.map(rank => chowReact.tile.suit + rank), value: pattern, claimed: tileKey(chowReact.tile)
     })), option => {
       if (S === state && S.waitReact?.includes(chowReact)) commitPlayerReaction(chowReact, option.value);
     });

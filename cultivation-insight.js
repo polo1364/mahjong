@@ -13,6 +13,15 @@
 
   // Run one event on a copy of the combat state and report what the acting player gains.
   function simulate(pid, event) {
+    const combat = C(), state = game()?.cultivation; if (!state || state.ended) return null;
+    if (state.damageVariance !== 1 || !combat.withDamageRoll) return once(pid, event, null);
+    const [lo, hi] = combat.damageRollRange;
+    const low = combat.withDamageRoll(lo, () => once(pid, event, null)), high = combat.withDamageRoll(hi, () => once(pid, event, null));
+    if (!low || !high) return null;
+    const span = key => ({ lo: low[key], hi: high[key] });
+    return { ...high, damage: span('damage'), basic: span('basic'), heal: span('heal'), shield: span('shield'), ranged: true };
+  }
+  function once(pid, event) {
     const state = game()?.cultivation; if (!state || state.ended) return null;
     try {
       const copy = JSON.parse(JSON.stringify(state));
@@ -31,6 +40,8 @@
     if (/^[WTB]$/.test(skill.family)) return { type: 'meld', pid, action: skill.action, keys: [...skill.combo].map(n => skill.family + n) };
     return { type: 'meld', pid, action: skill.action, key: skill.combo };
   }
+  const top = v => (typeof v === 'object' && v ? v.hi : v) || 0;
+  const fmt = v => typeof v === 'object' && v ? (v.lo === v.hi ? String(v.lo) : `${v.lo}～${v.hi}`) : String(v);
   function line(label, value, tone = '') { return `<div class="ins-line"><span>${label}</span><b class="${tone}">${value}</b></div>`; }
   function total(label, value) { return `<div class="ins-total"><span>${label}</span><b>${value}</b></div>`; }
 
@@ -46,12 +57,12 @@
     if (p.equipmentState?.stored > 0) rows.push(line('裝備儲傷', '+' + Math.round(p.equipmentState.stored), 'up'));
     rows.push(line(`${elements[element] || '無'}屬 → ${elements[m.element] || ''}屬妖`, '×' + mult, mult > 1 ? 'up' : mult < 1 ? 'down' : ''));
     if (hero && hero.stats.damage !== 100) rows.push(line(`${hero.name} 傷害`, hero.stats.damage + '%', hero.stats.damage > 100 ? 'up' : 'down'));
-    const gear = root.MahjongCultivationEquipment?.factor?.(p, 'damage');
+    const gear = root.MahjongCultivationEquipment?.factor?.(p, 'damage', { basic: true });
     if (gear && Math.abs(gear - 1) > .001) rows.push(line('裝備加成', '+' + (Math.round((gear - 1) * 1000) / 10) + '%', 'up'));
     if (armorCut > 0) rows.push(line(`怪物護甲 ${Math.round(armorCut * 100)}%`, '×' + (Math.round((1 - armorCut) * 100) / 100), 'down'));
     if (m.shield > 0) rows.push(line(`怪物護盾 ${m.shield}`, '先吸收', 'down'));
     const combos = possibleSkills(key).slice(0, 2).map(x => `<div class="ins-combo">可組 ${esc(x.label)} → <b>${esc(x.skill.name)}</b> ${x.text}</div>`).join('');
-    return { title: `打出 ${esc(root.MahjongTileNames?.getName(key) || key)}`, body: rows.join('') + total('預估傷害', sim.basic) + combos };
+    return { title: `打出 ${esc(root.MahjongTileNames?.getName(key) || key)}`, body: rows.join('') + (sim.ranged ? line('浮動', '90%～110%') : '') + total('預估傷害', fmt(sim.basic)) + combos };
   }
   // Melds this tile could still complete from your hand: pong/kong with copies held, chow with both partners held.
   function possibleSkills(key) {
@@ -72,9 +83,9 @@
   }
   function effectText(sim) {
     const parts = [];
-    if (sim.damage > 0) parts.push(`≈ ${sim.damage} 傷害`);
-    if (sim.heal > 0) parts.push(`回復 ${sim.heal}`);
-    if (sim.shield > 0) parts.push(`護盾 ${sim.shield}`);
+    if (top(sim.damage) > 0) parts.push(`${fmt(sim.damage)} 傷害`);
+    if (top(sim.heal) > 0) parts.push(`回復 ${fmt(sim.heal)}`);
+    if (top(sim.shield) > 0) parts.push(`護盾 ${fmt(sim.shield)}`);
     return parts.join('・') || '輔助效果';
   }
   function skillCard(pid, skill, source, cast) {
@@ -83,10 +94,10 @@
     const sim = simulate(pid, meldEvent(pid, skill));
     const m = g.cultivation.monster, mult = C().elementMultiplier(skill.element, m.element);
     const rows = [line('屬性', `${elements[skill.element] || '無'} → ${elements[m.element] || ''}妖 ×${mult}`, mult > 1 ? 'up' : mult < 1 ? 'down' : '')];
-    if (sim?.heal > 0) rows.push(line('回復', sim.heal, 'up'));
-    if (sim?.shield > 0) rows.push(line('護盾', sim.shield, 'up'));
+    if (sim && top(sim.heal) > 0) rows.push(line('回復', fmt(sim.heal), 'up'));
+    if (sim && top(sim.shield) > 0) rows.push(line('護盾', fmt(sim.shield), 'up'));
     return { title: `${esc(owner)} · ${esc(source)}`, sub: `${esc(skill.name)}${cast ? '（已施放）' : ''}`,
-      body: details + rows.join('') + total(sim && sim.damage > 0 ? '現在施放約' : '現在施放', sim ? (sim.damage > 0 ? sim.damage : effectText(sim)) : '—') };
+      body: details + rows.join('') + total(sim && top(sim.damage) > 0 ? '現在施放' : '現在施放', sim ? (top(sim.damage) > 0 ? fmt(sim.damage) : effectText(sim)) : '—') };
   }
   function secretCard(pid) {
     return { title: `${esc(seatName(pid))} · 暗槓`, sub: '秘術', body: '<div class="ins-detail">牌型與技能於結算後公開。</div>' };

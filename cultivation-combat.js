@@ -120,6 +120,22 @@
   const integer = (value, fallback) =>
     Number.isFinite(value) ? Math.round(value) : fallback;
   const actor = (state, pid) => state.players[pid];
+  // Damage variance: every hit (players, monsters, counters, DoT, finishers, equipment) is scaled by
+  // a roll in [DAMAGE_ROLL_MIN, DAMAGE_ROLL_MAX] drawn from state.damageRng. Previews pin the roll.
+  const DAMAGE_ROLL_MIN = 0.9, DAMAGE_ROLL_MAX = 1.1;
+  let rollOverride = null;
+  function damageRoll(state) {
+    if (state.damageVariance !== 1) return 1;
+    if (rollOverride !== null) return rollOverride;
+    let x = state.damageRng >>> 0;
+    x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+    state.damageRng = x >>> 0 || 0x2545f491;
+    return DAMAGE_ROLL_MIN + (DAMAGE_ROLL_MAX - DAMAGE_ROLL_MIN) * (state.damageRng / 4294967296);
+  }
+  function withDamageRoll(value, fn) {
+    const before = rollOverride; rollOverride = value;
+    try { return fn(); } finally { rollOverride = before; }
+  }
   function random(state) {
     let x = state.rng >>> 0;
     x ^= x << 13;
@@ -555,6 +571,10 @@
       kills: [],
       log: [],
     };
+    if (previous?.damageVariance === 1 || options.damageVariance === true) {
+      state.damageVariance = 1;
+      state.damageRng = (previous?.damageVariance === 1 ? previous.damageRng : (state.rng ^ 0x5bd1e995) >>> 0) || 0x2545f491;
+    }
     if (v2) {
       state.monsterSkillVersion = options.monsterSkillVersion === 0 ? 0 : 1;
       const pool = Heroes.all.map(h => h.id).filter(id => id !== options.heroId);
@@ -884,7 +904,7 @@
       let itemBonus=0;
       if(ctx.itemEdgePending){useItem(state,p,'edge',output);ctx.itemEdgePending=false;ctx.itemEdge=true;}
       if(ctx.itemEdge&&ctx.itemHits>0){itemBonus=Math.min(ctx.itemPerHit,ctx.itemBudget);ctx.itemBudget-=itemBonus;ctx.itemHits--;}
-      const damage = Math.max(0, Math.round((amount + flat + itemBonus) * multiplier));
+      const damage = Math.max(0, Math.round((amount + flat + itemBonus) * multiplier * damageRoll(state)));
       flat = 0;
       if (effect.shieldDamage)
         m.shield = Math.max(0, (m.shield || 0) - effect.shieldDamage);
@@ -1485,7 +1505,7 @@
         : 0;
     if (reduction && reductionValue) used(p, reduction);
     let dealt = Math.round(
-      amount * (1-itemReduction) *
+      amount * (1-itemReduction) * damageRoll(state) *
         heroFactor(state, p, "taken") *
         (state.version === 3 ? Equipment.factor(p, 'taken', {top:!dot && target(state) === pid, aoe:!dot && attackType === 'all'}) : 1) *
         (state.version >= 2 && !dot && passive(p, "yue-zhenshan") && target(state) === pid ? 0.97 : 1) *
@@ -2283,6 +2303,7 @@
     for (const status of m.statuses) statusCheck(status, null, true);
     const a = m.nextAttack;
     if(state.monsterSkillVersion!==undefined && (state.version<2 || ![0,1].includes(state.monsterSkillVersion)))fail('monster skill version');
+    if(state.damageVariance!==undefined && (state.damageVariance!==1 || !int(state.damageRng,1,4294967295)))fail('damage variance');
     if(state.monsterSkillVersion===1){
       const skill=MonsterSkills.get(a?.skillId);
       const validAction=a && (a.actionNumber===m.attacks+1 || (state.ended&&a.actionNumber===m.attacks));
@@ -2432,7 +2453,10 @@
     validate,
     ranking,
     target,
-    estimate,
+    // AI and previews value skills at the average roll so their choices do not wobble.
+    estimate: (...args) => withDamageRoll(1, () => estimate(...args)),
+    withDamageRoll,
+    damageRollRange: Object.freeze([DAMAGE_ROLL_MIN, DAMAGE_ROLL_MAX]),
     tileElement,
     elementMultiplier,
     statusLabels: Object.freeze(
