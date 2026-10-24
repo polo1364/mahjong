@@ -1,0 +1,42 @@
+{
+  "style": "C 上古神兵",
+  "rasterOnly": true,
+  "images": [
+    {
+      "id": "weapons",
+      "prompt": "Create a production GAME COMBAT VFX TEXTURE ATLAS, NOT a skill icon sheet. Match the reference image ancient Chinese bronze relic realistic 3D painterly volumetric material style. Transparent background. Strict uniform 4 columns by 2 rows, 8 square cells, overall 2:1 aspect ratio, every effect completely isolated with at least 12% empty transparent margin within its cell. No visible grid, borders, labels, text, UI, frames, scenery, or ground. TOP ROW: 1 a horizontal bronze flying sword pointing right with a gold energy wake; 2 a broad silver-gold crescent slash; 3 a vertical branching golden thunderbolt; 4 an explosive star of shattered metal sparks. BOTTOM ROW: 5 two curved bronze energy chains as a binding vortex; 6 an abstract circular ancient bronze sealing glyph made of angular strokes NOT readable text; 7 a spreading pale gold piercing beam horizontal; 8 a white-gold sacred burst with tapered rays. Each cell contains only one isolated raw combat effect, no circular icon container. Antique bronze metallic microdetail, weighty sparks, jade emissive cores, high contrast and sharp edges with soft transparent outer falloff. Keep assets fully separated, not touching cell boundaries. Reference only dictates material and polish; create the requested new subjects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9f383087-5d51-40c0-835b-c4832b6b05db.png"
+    },
+    {
+      "id": "nature",
+      "prompt": "Create a production GAME COMBAT VFX TEXTURE ATLAS, NOT a skill icon sheet. Match the reference image ancient Chinese bronze relic realistic 3D painterly volumetric material style. Transparent background. Strict uniform 4 columns by 2 rows, 8 square cells, overall 2:1 aspect ratio, every effect completely isolated with at least 12% empty transparent margin within its cell. No visible grid, borders, labels, text, UI, frames, scenery, or ground. TOP ROW: 1 luminous emerald thorn vines curling in a spiral; 2 a healing jade lotus with upward green motes; 3 a turquoise icy spear pointing right; 4 a crescent wave of blue water. BOTTOM ROW: 5 a purple-green poisonous mist plume; 6 a sparse swirling ring of gold-edged leaves; 7 a concentrated jade green root projectile pointing right; 8 a dome of green healing light with small drifting petals. Each cell contains only one isolated raw combat effect, no circular icon container. Antique bronze metallic microdetail, weighty sparks, jade emissive cores, high contrast and sharp edges with soft transparent outer falloff. Keep assets fully separated, not touching cell boundaries. Reference only dictates material and polish; create the requested new subjects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e2d9c2cb-db85-4a04-9ed8-fff0ec0ac064.png"
+    },
+    {
+      "id": "spirits",
+      "prompt": "Create a production GAME COMBAT VFX TEXTURE ATLAS, NOT a skill icon sheet. Match the reference image ancient Chinese bronze relic realistic 3D painterly volumetric material style. Transparent background. Strict uniform 4 columns by 2 rows, 8 square cells, overall 2:1 aspect ratio, every effect completely isolated with at least 12% empty transparent margin within its cell. No visible grid, borders, labels, text, UI, frames, scenery, or ground. TOP ROW: 1 a sweeping ethereal golden phoenix flame silhouette; 2 an emerald serpentine dragon made of magical energy; 3 a silver-gold leaping tiger energy silhouette; 4 a turquoise tortoise shell barrier spirit. BOTTOM ROW: 5 a hovering ancient bronze bell emitting warm gold radiance; 6 a dark violet smoky concealment vortex; 7 a cluster of five small brilliant elemental energy orbs with no ornaments; 8 a vertical gold pillar of heavenly light dissolving in luminous dust. Each cell contains only one isolated raw combat effect, no circular icon container. Antique bronze metallic microdetail, weighty sparks, jade emissive cores, high contrast and sharp edges with soft transparent outer falloff. Keep assets fully separated, not touching cell boundaries. Reference only dictates material and polish; create the requested new subjects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-b6f76397-0b0b-4a7a-a175-3abdc6101a91.png"
+    },
+    {
+      "id": "fire-forms",
+      "prompt": "Generate a high resolution transparent RGBA production VFX atlas, exactly 4 columns by 2 rows of equal square cells, isolated combat effect textures for a Chinese xianxia ancient divine bronze weapons game. Rich realistic game spell effects, bronze sculptural details, bright readable silhouettes, avoid icon panels, circles or UI frames. Entire background must be truly transparent. Keep each effect entirely within its own cell and 14 percent empty margin around every cell. No lettering. The eight effects in reading order: 1 a tall twisting ancient bronze and crimson fire tornado, 2 an erupting lava crater blasting upward with rock shards, 3 a blazing spherical meteor with a long diagonal tail, 4 a huge curved bronze red execution blade slash, 5 a wide rectangular solid wall of flame and bronze defensive slabs, 6 a restorative red lotus with golden flame petals, 7 a smoky ember cloud with disappearing sparks, 8 a brilliant solar disc with a dark bronze core and solar flares. Each is one large coherent image that will be animated on a game battlefield; they must look radically different from one another. Crisp edges, detailed particles. Use the supplied reference only for bronze material style and visual quality.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-02923fb7-205d-42a6-893b-9f1eeb169efc.png"
+    },
+    {
+      "id": "water-forms",
+      "prompt": "Generate a high resolution transparent RGBA production VFX atlas, exactly 4 columns by 2 rows of equal square cells, isolated combat effect textures for a Chinese xianxia ancient divine bronze weapons game. Rich realistic game spell effects, bronze sculptural details, bright readable silhouettes, avoid icon panels, circles or UI frames. Entire background must be truly transparent. Keep each effect entirely within its own cell and 14 percent empty margin around every cell. No lettering. The eight effects in reading order: 1 a long serpentine turquoise water dragon flowing to the right, 2 a tall falling waterfall crashing into a foaming pool, 3 a jagged upright pale blue iceberg prison, 4 a gigantic bright blue crescent wave, 5 a broad curved translucent water defensive wall with bronze ribs, 6 a fountain spiraling upward with healing droplets, 7 a pale white blue mist cloud with dissipating droplets, 8 a long narrow straight icy piercing lance. Each is one large coherent image that will be animated on a game battlefield; they must look radically different from one another. Crisp edges, detailed particles. Use the supplied reference only for bronze material style and visual quality.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e59cb411-d451-44a4-8b1a-22208a2d4cad.png"
+    }
+  ],
+  "reused": [
+    "assets/cultivation-preview/bronze-atlas.png",
+    "assets/cultivation-preview/monster.png"
+  ],
+  "soundSources": "art-source/cultivation-vfx/audio/provenance.json",
+  "cropRepair": {
+    "source": "art-source/cultivation-vfx/crop-repair.json",
+    "replacesAllSixAtlases": true,
+    "previousAssetsBackupSuffix": ".bak.crop-20261023",
+    "validation": "artifacts/cultivation-vfx-crop-checks.json"
+  }
+}

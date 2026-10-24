@@ -1,0 +1,20 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.join(__dirname,'..');
+const T=require('../artifacts/cultivation-preview-timeline.js');
+const results=[];
+function check(name,fn){fn();results.push({name,pass:true});}
+check('fire: one impact and three burn ticks',()=>{assert.equal(T.stateAt('fire',.69).damage,0);assert.equal(T.stateAt('fire',.7).damage,75);assert.equal(T.stateAt('fire',3.2).damage,165);assert.equal(T.stateAt('fire',3.2).hits,4);});
+check('heal: actual recovery precedes attack',()=>{assert.equal(T.stateAt('heal',.55).hp,820);assert.equal(T.stateAt('heal',1).damage,0);assert.equal(T.stateAt('heal',2.5).damage,102);});
+check('full health: no attack event and no damage',()=>{assert.equal(T.stateAt('heal',2.5,true).hp,1000);assert.equal(T.stateAt('heal',2.5,true).damage,0);assert.equal(T.eventsFor('heal',true).some(e=>e.type==='hit'),false);});
+check('shield: absorb 280 and counter exactly twice',()=>{const s=T.stateAt('ward',2.7);assert.equal(s.shield,0);assert.equal(s.hp,450);assert.equal(s.counters,2);assert.equal(s.damage,180);assert.equal(T.stateAt('ward',1.3).shield,120);});
+check('finisher: five separate hits',()=>{const events=T.eventsFor('mountain');assert.equal(events.length,5);assert.equal(new Set(events.map(e=>e.at)).size,5);assert.equal(T.stateAt('mountain',2.5).damage,600);});
+check('seeking/replaying does not accumulate damage',()=>{for(const id of Object.keys(T.skills)){const a=T.stateAt(id,100);T.stateAt(id,0);assert.deepEqual(T.stateAt(id,100),a);}});
+check('all events ordered within their animation duration',()=>{for(const id of Object.keys(T.skills)){let prev=-1;for(const e of T.eventsFor(id)){assert(e.at>=prev);assert(e.at<=T.skills[id].duration);prev=e.at;}}});
+check('12 icons, 3 atlases, monster and 12 audio samples exist',()=>{for(const style of ['jade','ink','bronze']){for(const skill of Object.keys(T.skills)){for(const ext of ['png','mp3'])assert(fs.statSync(path.join(root,'assets/cultivation-preview',`${style}-${skill}.${ext}`)).size>1000);}assert(fs.statSync(path.join(root,'assets/cultivation-preview',style+'-atlas.png')).size>1000);assert(fs.statSync(path.join(root,'assets/cultivation-preview',style+'-heal-full.mp3')).size>1000);}assert(fs.statSync(path.join(root,'assets/cultivation-preview/monster.png')).size>1000);});
+check('preview contains no SVG or persistent game storage calls',()=>{for(const file of ['cultivation-style-preview.html','cultivation-style-preview.js','cultivation-style-preview.css','cultivation-preview-timeline.js']){const s=fs.readFileSync(path.join(root,'artifacts',file),'utf8');assert(!/<svg|data:image\/svg|localStorage|sessionStorage|indexedDB/.test(s));}});
+check('bad skill IDs rejected',()=>assert.throws(()=>T.eventsFor('invalid')));
+const report={checks:results.length,passed:results.length,scope:'isolated presentation preview; no live game simulation',results};
+fs.writeFileSync(path.join(root,'artifacts/cultivation-style-preview-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

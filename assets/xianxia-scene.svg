@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <!-- Original vector scene for the 雀仙門 theme: night sky, karst peaks, cloud sea, floating pavilion. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#070a1c"/>
+      <stop offset=".45" stop-color="#16193d"/>
+      <stop offset=".75" stop-color="#1d3a52"/>
+      <stop offset="1" stop-color="#2a5560"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1230 190) scale(330)">
+      <stop offset="0" stop-color="#f6eccb" stop-opacity=".55"/>
+      <stop offset=".35" stop-color="#b9b6e8" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#b9b6e8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="peakFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4f78"/><stop offset="1" stop-color="#1c2b46" stop-opacity="0"/></linearGradient>
+    <linearGradient id="peakMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22324f"/><stop offset="1" stop-color="#14203a" stop-opacity=".1"/></linearGradient>
+    <linearGradient id="peakNear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101a2c"/><stop offset="1" stop-color="#0a1120"/></linearGradient>
+    <linearGradient id="sword" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ff3ff" stop-opacity="0"/><stop offset=".8" stop-color="#bdf6ff" stop-opacity=".75"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+    <filter id="mist" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <g fill="#e9e6ff" opacity=".7">
+    <circle cx="120" cy="80" r="1.4"/><circle cx="260" cy="150" r="1"/><circle cx="410" cy="60" r="1.6"/><circle cx="560" cy="120" r="1"/>
+    <circle cx="700" cy="40" r="1.3"/><circle cx="860" cy="110" r="1"/><circle cx="980" cy="58" r="1.5"/><circle cx="1460" cy="90" r="1.2"/>
+    <circle cx="1530" cy="200" r="1"/><circle cx="340" cy="240" r="1.1"/><circle cx="640" cy="210" r="1"/><circle cx="1080" cy="250" r="1.2"/>
+  </g>
+  <circle cx="1230" cy="190" r="330" fill="url(#moonGlow)"/>
+  <circle cx="1230" cy="190" r="74" fill="#f4ead0"/>
+  <path d="M1196 168q20-14 38 0M1250 214q14 8 26-4" stroke="#d9cba5" stroke-width="5" fill="none" opacity=".5"/>
+  <!-- sword light crossing the sky -->
+  <path d="M180 330L930 150" stroke="url(#sword)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M180 330L930 150" stroke="#8ff0ff" stroke-width="14" stroke-linecap="round" opacity=".12" filter="url(#soft)"/>
+  <path d="M922 146l26-2-20 14z" fill="#f4feff"/>
+  <!-- far karst peaks -->
+  <path d="M0 640L70 520Q95 420 130 520L190 470Q220 360 255 470L320 560L390 430Q420 330 450 430L520 600L600 480Q640 380 675 480L760 620L850 500Q880 410 915 500L990 610L1080 470Q1110 380 1145 470L1210 560L1300 420Q1330 330 1365 420L1440 590L1520 480Q1560 400 1600 470V1000H0Z" fill="url(#peakFar)" opacity=".85"/>
+  <ellipse cx="500" cy="600" rx="520" ry="60" fill="#c7d6f2" opacity=".14" filter="url(#mist)"/>
+  <ellipse cx="1250" cy="640" rx="480" ry="70" fill="#c7d6f2" opacity=".12" filter="url(#mist)"/>
+  <!-- floating island with pavilion -->
+  <g transform="translate(1180 420)">
+    <path d="M-120 40Q0 20 120 40L80 70Q30 120 0 170Q-30 120 -80 70Z" fill="#1a2740"/>
+    <path d="M-120 40Q0 20 120 40" stroke="#5e7fa8" stroke-width="2" fill="none" opacity=".6"/>
+    <rect x="-52" y="-6" width="104" height="44" fill="#22324d"/>
+    <path d="M-78 -6Q-40 -16 0 -40Q40 -16 78 -6Q60 -12 0 -26Q-60 -12 -78 -6Z" fill="#2c3f60"/>
+    <path d="M-62 -34Q-30 -40 0 -62Q30 -40 62 -34Q46 -38 0 -50Q-46 -38 -62 -34Z" fill="#2c3f60"/>
+    <rect x="-14" y="8" width="28" height="30" fill="#f2c76e" opacity=".75"/>
+    <circle r="1.6" cx="0" cy="-64" fill="#f2c76e"/>
+    <path d="M-84 52Q-60 90 -70 140M70 60Q90 100 76 150" stroke="#8fb7d8" stroke-width="1.4" fill="none" opacity=".35"/>
+  </g>
+  <!-- cranes -->
+  <g fill="none" stroke="#d6dcef" stroke-width="2.2" stroke-linecap="round" opacity=".55">
+    <path d="M300 250q14-12 28 0q14-12 28 0"/><path d="M360 280q10-9 20 0q10-9 20 0"/><path d="M250 290q8-7 16 0q8-7 16 0"/>
+  </g>
+  <!-- mid peaks -->
+  <path d="M0 760L90 640Q120 560 150 640L230 720L300 600Q335 500 370 600L460 740L560 650Q590 590 620 650L700 760L1000 760L1080 640Q1115 560 1150 640L1240 730L1330 620Q1365 540 1400 620L1500 760L1600 700V1000H0Z" fill="url(#peakMid)"/>
+  <path d="M120 640q12 20 4 60M340 600q14 24 6 70M1120 640q10 22 4 60M1370 620q14 26 6 70" stroke="#3e5a80" stroke-width="2" fill="none" opacity=".5"/>
+  <!-- pines on the near ridge -->
+  <g fill="#0c1424">
+    <path d="M60 820l18-60l18 60zM50 850l28-70l28 70z"/>
+    <path d="M1490 830l16-56l16 56zM1480 860l26-70l26 70z"/>
+  </g>
+  <!-- near ridge and cloud sea -->
+  <path d="M0 860Q160 790 330 840Q520 900 760 860Q1010 815 1240 850Q1420 880 1600 830V1000H0Z" fill="url(#peakNear)"/>
+  <g filter="url(#mist)" fill="#dfe8ff">
+    <ellipse cx="260" cy="900" rx="360" ry="60" opacity=".18"/>
+    <ellipse cx="820" cy="930" rx="420" ry="70" opacity=".16"/>
+    <ellipse cx="1380" cy="900" rx="360" ry="60" opacity=".18"/>
+  </g>
+  <path d="M0 930Q120 905 240 925T480 925T720 925T960 925T1200 925T1440 925T1600 920" stroke="#cdd8f4" stroke-width="2" fill="none" opacity=".18"/>
+</svg>

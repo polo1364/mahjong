@@ -1,0 +1,21 @@
+const {test}=require('node:test');
+const A=require('node:assert/strict');
+const {game}=require('./game-harness.cjs');
+test('real game preparation, next hand, save restore and new journey preserve item ownership exactly',async()=>{
+ const {run}=game(187,{cultivation:true,heroId:'shen-gufeng'});
+ run(`startNewSession('cultivation',{freshJourney:true});cancelGameTimers();
+ window.MahjongCultivationJourneyUI.showPreparation=()=>{};writeGameSave=async()=>true;
+ S.cultivation=window.MahjongCultivationCombat.apply(S.cultivation,{id:S.cultivation.seq+1,type:'finish',reason:'draw'}).state;S.phase='end';continueCultivationResult();`);
+ await run('cultivationPreparationSave');
+ run(`S.cultivation.players[0].economy.items.counts={heal:2,edge:2};
+ S.cultivation=window.MahjongCultivationEconomy.transact(S.cultivation,{commandId:'prepare-items',pid:0,type:'item-prepare',ids:['heal','edge']}).state;
+ startNewSession('cultivation');cancelGameTimers();`);
+ A.equal(run('S.cultivation.handNumber'),2);A.equal(run('S.cultivation.players[0].economy.items.counts.heal'),1);A.equal(run('S.cultivation.players[0].economy.items.carried.length'),2);
+ run(`let saved={gameState:clone(S),rules:clone(RULES),seatNames:seatNames.slice(),randomNames:randomNames.slice(),dealerStreak};
+ const beforeItems=JSON.stringify(S.cultivation.players.map(p=>p.economy.items));restoreGame(saved,'cultivation');cancelGameTimers();`);
+ A.equal(run('JSON.stringify(S.cultivation.players.map(p=>p.economy.items))===beforeItems'),true);
+ run(`S.cultivation=window.MahjongCultivationCombat.apply(S.cultivation,{id:S.cultivation.seq+1,type:'finish',reason:'draw'}).state;S.phase='end';continueCultivationResult();`);
+ await run('cultivationPreparationSave');A.equal(run('S.cultivation.players[0].economy.items.counts.heal'),2);A.equal(run('S.cultivation.players[0].economy.items.carried.length'),0);
+ run(`startNewSession('cultivation',{freshJourney:true});cancelGameTimers();`);
+ A.equal(run('S.cultivation.players.every(p=>Object.keys(p.economy.items.counts).length===0&&p.economy.items.carried.length===0)'),true);
+});

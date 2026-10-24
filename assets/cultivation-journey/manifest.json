@@ -1,0 +1,294 @@
+{
+  "status": "generated-integrated",
+  "tool": "built-in image_gen",
+  "date": "2026-10-23",
+  "assets": [
+    {
+      "id": "shen-gufeng",
+      "category": "heroes",
+      "name": "沈孤鋒",
+      "prompt": "Edit this approved character image. Preserve the exact face, pose, intricate bronze armor, teal/white robes, sword and full silhouette. Remove ALL background haze, halo and smoke around the character. Background must be fully alpha transparent with clean cutout edges. Keep head and whole crown and all clothing inside safe margins. Exact portrait 2:3, 1024x1536 or larger. Do not add scenery or text.",
+      "ref": "D:/Download/github/mahjong/artifacts/cultivation-journey-art-v1/shen-gufeng.png",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-fb6f8e88-002c-45c3-82bf-fd1076c30c47.png",
+      "file": "assets/cultivation-journey/heroes/shen-gufeng.png"
+    },
+    {
+      "id": "chi-ling",
+      "category": "heroes",
+      "name": "赤綾",
+      "ref": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-5b40b133-f86d-4a08-b5b6-c7c58675e06b.png",
+      "prompt": "Edit the image: ZOOM OUT drastically. Make this woman only 65 percent of canvas height, entire figure including shoes visible, all hair and red ribbon loops INSIDE canvas with 15 percent empty TRANSPARENT margin on ALL FOUR SIDES. Reconstruct missing bottom clothes and shoes. Preserve face, outfit, red ribbon weapon and realistic xianxia style. Remove ALL background glow and haze. PNG isolated cutout alpha background. Actual transparent empty canvas, not a dark colored rectangle. Aspect 2:3, 1024x1536. NO CROP. No text.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-010a916b-8ee4-481a-9f85-1a663a5e3637.png",
+      "file": "assets/cultivation-journey/heroes/chi-ling.png"
+    },
+    {
+      "id": "mu-canglan",
+      "category": "heroes",
+      "name": "沐滄瀾",
+      "prompt": "A single full-body Chinese male water cultivator character game sprite, distant view, character occupies only 65% of canvas height with 15% completely transparent empty margin at top bottom left right. Include full feet, hair, robe, all fingertips and entire weapon. Ancient Divine Armaments realistic painted 3D style matching high-end Chinese xianxia game, antique bronze details, jade rings, black iron. Adult elegant man with long blue-black hair tied back, navy and moon-white layered robes, small turquoise water ring weapon held vertically beside waist. Calm friendly expression and asymmetrical shoulder mantle. No scenic background, no fog or halo behind body, no text, no panel. TRANSPARENT PNG. Exact aspect2:3 resolution1024x1536 or larger. Sharp facial features. Not anime, vector or SVG. Keep weapon inside body silhouette, restrained cyan glow.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e107723a-96ea-47de-a938-109df70ed170.png",
+      "file": "assets/cultivation-journey/heroes/mu-canglan.png"
+    },
+    {
+      "id": "su-lingheng",
+      "category": "heroes",
+      "name": "蘇靈蘅",
+      "ref": "D:/Download/github/mahjong/artifacts/cultivation-journey-art-v1/su-lingheng.png",
+      "prompt": "Preserve this approved adult female healer's face, jade white robes, large medicine gourd and delicate foliage jewelry. Reframe portrait to EXACT2:3 output1024x1536 or higher. Make subject slightly smaller, entire crown and all sleeves/gourd/garment edges enclosed with at least10% transparent empty margins. Add space above and below rather than cropping. Transparent background, clean isolated character cutout, remove background haze. No lettering.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-45c9c89e-a2eb-4809-bab0-f8ee8f47fe80.png",
+      "file": "assets/cultivation-journey/heroes/su-lingheng.png"
+    },
+    {
+      "id": "yue-zhenshan",
+      "category": "heroes",
+      "name": "岳鎮山",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Adult broad muscular Chinese male tank warrior, sturdy mature square face and short neatly tied hair with bronze crest. Very wide heavy black-iron armor with bronze mountain forms, ochre waist cloth, thick jade-inlaid gauntlets. No weapon: closed fists and monumental triangular armored silhouette. Full boots visible. Grounded calm power, amber highlights.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-3a421965-3048-4bd3-9d99-2d86806de1ed.png",
+      "file": "assets/cultivation-journey/heroes/yue-zhenshan.png"
+    },
+    {
+      "id": "luo-xuanyu",
+      "category": "heroes",
+      "name": "洛玄玉",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Adult Chinese woman jade shield cultivator, silver hair in elegant pinned-up hairstyle, serene and resolved expression. Pale jade green and black robes under silver-bronze lamellar shoulder armor. Holding a COMPLETE large polygonal translucent carved jade shield vertically in front of one side of her body; shield's all corners visible with ample margin. Black jade boots. Broad shield shape, fine gold edging, soft jade highlights.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-31debafb-307c-4996-9fd5-034a47747e2b.png",
+      "file": "assets/cultivation-journey/heroes/luo-xuanyu.png"
+    },
+    {
+      "id": "tie-wujiu",
+      "category": "heroes",
+      "name": "鐵無咎",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Tall mature Chinese male veteran warrior with weathered face, tied-back salt-and-pepper hair, dark steel lamellar armor and muted burgundy fabric. Holding a complete short broad bronze halberd DIAGONALLY inside the canvas; blade and shaft tip fully visible, do not extend weapon beyond canvas. Strong forward-facing stance, battle-worn iron surfaces, restrained gold edges. Different from bulky tank: lean angular silhouette and clearly distinctive long crescent halberd.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e873c11a-4356-47e2-aa16-8f37feba534c.png",
+      "file": "assets/cultivation-journey/heroes/tie-wujiu.png"
+    },
+    {
+      "id": "ye-shuying",
+      "category": "heroes",
+      "name": "夜疏影",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Adult Chinese woman stealth cultivator, charcoal hood drawn back showing face, dark plum and black fitted layered robes, two short complete curved shadow daggers held low pointing inward near her hips, pale jade accents and thin bronze bracers. Agile compact silhouette, cool violet edge light, mysterious serious expression. Black bob-length hair with one long braid. No oversized flowing ribbons. Fully visible boots.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-2ff75f20-28df-4395-a90d-4c083bd32bda.png",
+      "file": "assets/cultivation-journey/heroes/ye-shuying.png"
+    },
+    {
+      "id": "yun-zhiwei",
+      "category": "heroes",
+      "name": "雲知微",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Adult Chinese male talisman scholar, sophisticated oval face, neat hair bun, pearl gray and blue-green scholarly robes, antique bronze rotating circular talisman disc held in both hands at chest height. Several small blank etched jade tokens attached around disc, intricate geometric engraving but NO legible writing. Tall layered sleeves, slender silhouette, restrained warm golden light in the disc.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-27662127-af69-4584-a28e-6b3c4bcdb3bb.png",
+      "file": "assets/cultivation-journey/heroes/yun-zhiwei.png"
+    },
+    {
+      "id": "hua-jianlu",
+      "category": "heroes",
+      "name": "花見鹿",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Adult Chinese female flower cultivator, playful yet graceful face, warm dark hair in two looped buns with delicate flowering twig ornaments. Ivory and rose-pink layered robes with jade leaf shoulder pieces. Holds a complete blossoming branch curving beside her body, white plum and pale gold flowers, small bronze gourd ornament at waist. Clearly botanical rounded silhouette. No animal companion or other character.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-93cb51a3-2d6f-486c-acda-1493cd7cfa9a.png",
+      "file": "assets/cultivation-journey/heroes/hua-jianlu.png"
+    },
+    {
+      "id": "whetgold-rat",
+      "category": "monsters",
+      "name": "礪金鼠",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024, creature centered small enough to show entire silhouette. Small squat giant rat monster in side three-quarter view, strong incisors carved of whetstone, coarse silver-black fur, iron mineral armor plates on arched back, tiny brass rivets and copper whiskers. Long segmented METAL TAIL curves forward beside body completely inside canvas. Four clawed feet, pointed ears. Metal element, subdued gold highlights. Animal rat anatomy, not humanoid.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-082f2de4-54f3-4aed-ac28-bada527a4fc2.png",
+      "file": "assets/cultivation-journey/monsters/whetgold-rat.png"
+    },
+    {
+      "id": "bladefeather-crow",
+      "category": "monsters",
+      "name": "刃羽鴉",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024, creature centered small enough to show entire silhouette. A raven monster with fully spread blade-like blackiron feather wings, bronze-edged overlapping flight feathers, jagged pointed beak, two curled clawfeet. Smaller body wide wing silhouette in low flight. Both ENTIRE wing tips within frame and very wide transparent border. Golden eyes, silver metallic feather edges. No smoke, no floor.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-436f7ac8-eeeb-4ab2-bdbc-7c7ed2384145.png",
+      "file": "assets/cultivation-journey/monsters/bladefeather-crow.png"
+    },
+    {
+      "id": "binding-vine",
+      "category": "monsters",
+      "name": "纏枝木妖",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024, creature centered small enough to show entire silhouette. Stocky twisted tree-root monster, hunched trunk face with two jade glowing eyes, thick tangled branching arms, four root legs like a walking bonsai, aged bronze ritualbands around trunk. Asymmetric short thorn branches, scattered vivid green leaves, WHOLE roots and crown visible. Nonhuman gnarled wooden creature, no humanoid clothing.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-06a417a5-d9cd-4351-b134-7198a3360970.png",
+      "file": "assets/cultivation-journey/monsters/binding-vine.png"
+    },
+    {
+      "id": "moss-flower",
+      "category": "monsters",
+      "name": "青苔花妖",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024, creature centered small enough to show entire silhouette. Low rounded carnivorous flower creature growing from mossy stone bulb, one giant pale jade flower crown opens like five petal jaws, several curled leaf tentacles and thin root feet. Soft moss and turquoise dew details. Small antique bronze collar at base. Distinct broad blossom silhouette, not a tree, not humanoid. Entire petals and curling roots inside margins.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-3d7d4617-0467-4e69-8452-4cdfe221d605.png",
+      "file": "assets/cultivation-journey/monsters/moss-flower.png"
+    },
+    {
+      "id": "coldpool-spirit",
+      "category": "monsters",
+      "name": "寒潭水靈",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT, all appendages inside central70percent. A floating small water elemental formed of coiled translucent turquoise water, faceless jade mask at center, two curling watery arms and a tapering spiral droplet tail. Ancient bronze broken ritual ring around upper body. No humanoid legs, distinct fluid teardrop silhouette. All splashes stay close to body. Completely empty transparent background.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-f8bab1b2-8db9-47ea-871c-673c52114007.png",
+      "file": "assets/cultivation-journey/monsters/coldpool-spirit.png"
+    },
+    {
+      "id": "frostfang-wolf",
+      "category": "monsters",
+      "name": "霜牙狼",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT, all appendages inside central70percent. Fullbody icy wolf in low prowling posture, pale silver fur, sharp blue crystal fangs, frost crystalline ridge along back, dark bronze collar and small jade armor patches. Four distinct legs, complete bushy tail CURLED alongside flank not extending to edge. Animal anatomy, fierce ice-blue eyes, no huge fog.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-ea863083-dc24-465c-a19b-2bc4af66654b.png",
+      "file": "assets/cultivation-journey/monsters/frostfang-wolf.png"
+    },
+    {
+      "id": "embertail-fox",
+      "category": "monsters",
+      "name": "赤尾狐",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT, all appendages inside central70percent. A sleek red fox with three large curling tails encircling its own body, flame red and charcoal fur, bronze forehead crest with red gemstone, golden clever eyes. Entire fox paws ears and all three tail tips clearly inside generous margins. Ember highlights at tails kept compact. Distinct lithe animal shape, not wolf or lion.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-8ee0b5f8-6836-4238-8b62-ad3bdf8291aa.png",
+      "file": "assets/cultivation-journey/monsters/embertail-fox.png"
+    },
+    {
+      "id": "molten-shell-beetle",
+      "category": "monsters",
+      "name": "熔甲蟲",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT, all appendages inside central70percent. Massive low six-legged rhinoceros beetle monster, black basalt shell split by red molten seams, heavy bronze carapace rims, one short curved horn and two mandibles, six articulated armored legs. Full insect body in3/4 view, round squat silhouette, hot amber core through cracks. No floor, no lava pool.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-3f340850-8320-4a08-a42e-d88b4481ce4c.png",
+      "file": "assets/cultivation-journey/monsters/molten-shell-beetle.png"
+    },
+    {
+      "id": "stoneback-boar",
+      "category": "monsters",
+      "name": "岩背豕",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT, all appendages inside central70percent. Stocky wild boar monster with huge layered granite slabs on broad back, dark coarse bristles underneath, jade-inlaid bronze tusk sleeves, small ears, short legs and thick hooves, short curlytail. Weathered stone, ochre amber crystal veins. Complete boar silhouette all tusks/hooves inside transparent border. Nonhumanoid animal.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-393471f8-e117-4256-ba8b-795a7188cbf8.png",
+      "file": "assets/cultivation-journey/monsters/stoneback-boar.png"
+    },
+    {
+      "id": "sand-construct",
+      "category": "monsters",
+      "name": "砂魄傀儡",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT subject centered with no appendage touching canvas boundaries. A small eerie floating sand golem, four separate weathered sandstone blocks assembled around a shining amber crystal core, wide blunt fists, faceless angular stone head with single slit. Bronze ancient joint bracelets suspend detached limbs. Crumbling rock feet, just a few compact grains, solid readable asymmetrical geometric structure. Not humanoid armor and not animal. Whole figure including feet.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-ba5c54d0-4d1b-41da-9ce5-eb2de20a146c.png",
+      "file": "assets/cultivation-journey/monsters/sand-construct.png"
+    },
+    {
+      "id": "golden-tiger",
+      "category": "monsters",
+      "name": "金魄白虎",
+      "ref": "D:/Download/github/mahjong/artifacts/cultivation-journey-art-v1/golden-tiger.png",
+      "prompt": "Edit approved fullbody white tiger asset preserving its anatomy, white fur, bronze gold jade armor and pose. Make canvas exact3:2 landscape1536x1024 or larger. Reframe animal SMALLER with15% transparent margin all around. Tail currently almost touches right edge: curl it inward beside rear leg and show complete tailtip. Keep entire claws ears whiskers and armor spikes visible. Transparent PNG without background. No text.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-369aebb3-ada8-4895-b277-d3ae4736c2d2.png",
+      "file": "assets/cultivation-journey/monsters/golden-tiger.png"
+    },
+    {
+      "id": "forest-vine-demon",
+      "category": "monsters",
+      "name": "森羅藤妖",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT subject centered with no appendage touching canvas boundaries. Elite towering forest demon distinct from small tree creature: immense many-armed woody serpentine vine body, SIX long branching arms folded inward in an arch, hollow carved wooden mask and jade core, crown of tangled roots, dark emerald ivy and ancient bronze ceremonial bands. Its root skirt coils into a circular base without floor. Broad symmetrical temple-gate silhouette, every branch enclosed.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9bfe1548-d4a9-429f-b62f-44d02b1269c9.png",
+      "file": "assets/cultivation-journey/monsters/forest-vine-demon.png"
+    },
+    {
+      "id": "abyss-jiaolong",
+      "category": "monsters",
+      "name": "玄淵蛟龍",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT subject centered with no appendage touching canvas boundaries. Elite Chinese water jiaolong, long serpentine dragon coiled into a compact S-shaped ring, dark blue-green scales with bronze ridgeline, two antler horns, jade eyes, short four claw limbs, long whiskers CURLED inside canvas. Entire coiled tail and both horns visible. Deepwater turquoise restrained highlights, NO wings, no scene or waterfloor.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-956e7261-b3d4-4f89-b0c7-35dcd20cb35e.png",
+      "file": "assets/cultivation-journey/monsters/abyss-jiaolong.png"
+    },
+    {
+      "id": "blazing-lion",
+      "category": "monsters",
+      "name": "焚天獅獸",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  EXACT landscape3:2 canvas1536x1024. ZOOMED OUT subject centered with no appendage touching canvas boundaries. Elite colossal lion beast with a thick circular mane formed of dark red hair and sculpted bronze flame shapes, open snarling mouth, black iron and gold shoulder plates, red crystal chest. Standing powerful fourlegged animal, complete paws and curled tail fully inside image. Fiery orange accents kept tightly on mane. Different from fox: heavy stocky feline muscular silhouette.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1b7c62b4-11eb-4ede-8149-4efe47224ba6.png",
+      "file": "assets/cultivation-journey/monsters/blazing-lion.png"
+    },
+    {
+      "id": "mountain-colossus",
+      "category": "monsters",
+      "name": "鎮山岩魁",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  Full body, EXACT portrait2:3 canvas1024x1536. Keep all armor tips and weapons comfortably inside frame. Elite giant blocky mountain golem, immense square basalt shoulders with ancient stone pagoda carvings, huge overlapping stone breastplate with bronze seal and amber crystal core, two colossal rock fists held down, short pillar legs. Compact broad square fortress silhouette, moss patches, weathered bronze seams. No human face, tiny luminous amber eyes in stone slit.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-d300cce5-9125-4433-8f62-17dd5ea0c7dc.png",
+      "file": "assets/cultivation-journey/monsters/mountain-colossus.png"
+    },
+    {
+      "id": "blackarmor-general",
+      "category": "monsters",
+      "name": "玄甲鎮岳將",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  Full body, EXACT portrait2:3 canvas1024x1536. Keep all armor tips and weapons comfortably inside frame. Fearsome ancient Chinese armored miniboss general, faceless black iron helmet, sweeping bronze horns curled inward, massive rectangular jade-and-bronze shield on one arm and a heavy SHORT war mace held vertically on other, entire weapons visible. Wide terracotta and black lamellar armor, amber gem breastplate, heavy boots and dark torn cape. Commanding tall rectangular silhouette, not humanoid stone golem.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-fbaacbf1-ada4-48d6-bd32-322edc0f8840.png",
+      "file": "assets/cultivation-journey/monsters/blackarmor-general.png"
+    },
+    {
+      "id": "nether-vine-queen",
+      "category": "monsters",
+      "name": "九幽藤姬",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  Full body, EXACT portrait2:3 canvas1024x1536. Keep all armor tips and weapons comfortably inside frame. Elegant ominous adult Chinese plant queen miniboss, pale face and green eyes, black hair woven with bronze thorn crown. Lower body is a thick spiral root dress merging into six curling vine tendrils, upperbody dark emerald ceremonial robes, long leaf-shaped bronze claws. Poison-green luminous lotus at heart, purple flowers among roots. All crown branches and tendrils enclosed. Distinct regal female silhouette.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-541edc44-52f9-481c-8f53-07346199ff1a.png",
+      "file": "assets/cultivation-journey/monsters/nether-vine-queen.png"
+    },
+    {
+      "id": "crimson-sword-demon",
+      "category": "monsters",
+      "name": "赤霄劍魔",
+      "prompt": "High-end Chinese xianxia RPG monster game asset, Ancient Divine Armaments art direction, painterly realistic 3D illustration, sharp tactile antique bronze, jade inlays and black iron, restrained elemental luminescence. One standalone creature FULL BODY with all horns, ears, limbs, wings, tail and weapon tips entirely visible, centered at 75% canvas with generous 10% transparent safe border on every edge. Genuine transparent alpha background, clean cutout. No text, labels, floor, scene, watermark, frame, checkerboard or background fog. Not SVG, not vector, not cartoon.  Full body, EXACT portrait2:3 canvas1024x1536. Keep all armor tips and weapons comfortably inside frame. Menacing adult Chinese male sword demon miniboss, long silver hair, masked lowerface, narrow black iron armor and crimson tattered cape, one complete bronze-black sword held across body. Five floating SHORT swords arrayed in a compact fan behind shoulders, ALL tips visible within central75% canvas. Dark gold sharp geometry and subtle red aura on blades, no background halo.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-a577f19a-d04a-48b4-b53f-8b29901dd796.png",
+      "file": "assets/cultivation-journey/monsters/crimson-sword-demon.png"
+    },
+    {
+      "id": "five-phase-sovereign",
+      "category": "monsters",
+      "name": "五相劫尊",
+      "ref": "D:/Download/github/mahjong/artifacts/cultivation-journey-art-v1/five-phase-sovereign.png",
+      "prompt": "Edit this approved finalboss image, preserve identity: masked armored god, ancient bronze black iron and jade armor, complete fiveelement ring behind it and five colored gems. Reframe EXACTportrait2:3,1024x1536 or larger. ZOOM OUT so entire ring including highest spike, crown, arms, all armor and feet are completely visible and have 12percent transparent empty space at EVERY boundary. Transparent alpha PNG, no background scenic haze or text. Preserve great detail.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-b99f2370-7b05-47cd-aabd-7255cf51df91.png",
+      "file": "assets/cultivation-journey/monsters/five-phase-sovereign.png"
+    },
+    {
+      "id": "preparation-courtyard",
+      "category": "",
+      "name": "山門整備庭院",
+      "ref": "D:/Download/github/mahjong/artifacts/cultivation-journey-art-v1/preparation-courtyard.png",
+      "opaque": true,
+      "prompt": "Create a high resolution production version of this approved Chinese xianxia courtyard scene preserving architecture and composition. Requested exact2048x1152 resolution,16:9. Serene mountain temple preparation camp at bluehour, dark teal roofed shrine and open courtyard center, welcoming bronze lantern merchant stall LEFT, blackiron alchemy smith furnace glowing orange RIGHT, distant floating mountains and jade bamboo, uppermiddle calm negative space for UI. Ancient Divine Armaments painterlyrealistic gameenvironment, rich antique bronze jade accents, textured paving. No people, no text or signs, no UI. Refine sharp fine details at maximum resolution, fullbleed opaque image.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-dad06a47-b6f4-412a-bc79-738db0ea4671.png",
+      "file": "assets/cultivation-journey/preparation-courtyard.png"
+    },
+    {
+      "id": "merchant",
+      "category": "npcs",
+      "name": "雲遊商人",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Friendly elderly Chinese traveling merchant man, smiling lined face and small gray beard, round dark teal cap, muted teal and ochre patchwork silk coat, bronze abacus held in hands, jade beads and rolled cloth bundles hanging from waist, sturdy wooden backpack fully inside frame. Recognizable merchant appearance, not warrior, no weapon, no text.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-dc19f2b7-5154-423d-8e07-d82904c6fb97.png",
+      "file": "assets/cultivation-journey/npcs/merchant.png"
+    },
+    {
+      "id": "blacksmith",
+      "category": "npcs",
+      "name": "鑄器師",
+      "prompt": "Single full-body Chinese xianxia RPG character, realistic detailed painterly 3D game illustration. Ancient Divine Armaments style with antique bronze, jade and black iron intricate materials. Distant view, complete character from hair ornament to shoes occupies 70 percent of canvas, empty transparent margins on EVERY side, include every garment/weapon tip. Portrait exact 2:3 at1024x1536. Genuine transparent PNG background. No text or scenes, no backdrop haze, no outer glow, no vignette. Strong middle-aged Chinese woman master blacksmith, confident weathered face, short tied-back hair, dark practical tunic with copper leather apron, bronze armbrace, sturdy boots. Complete SHORT forging hammer resting on shoulder, small jade furnace charm at belt. All hammer silhouette visible. Restrained orange reflection on metal, no forge/scenery or othercharacters.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-8779eb3e-d1a4-4523-8c79-fdb1831ba62c.png",
+      "file": "assets/cultivation-journey/npcs/blacksmith.png"
+    },
+    {
+      "id": "weapon",
+      "category": "slots",
+      "name": "武器空欄",
+      "prompt": "Single game UI empty-equipment-slot emblem illustration, raster PNG alpha transparent, Chinese xianxia Ancient Divine Armaments style. A clean simple dark bronze and jade engraved recessed silhouette plate, low contrast gray-jade as an EMPTY slot placeholder, not an actual equipped item. Square1024x1024. One central emblem with generous20% clear alpha border. No letters, label, numbers, text, SVG or background. Subtle worn blackiron and antique bronze edge, not bright gold loot or jewel. Emblem depicts a single upright jian sword recessed engraved silhouette, complete hilt and blade, visually clear even small. Simple engraving with subdued bronze bevel.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1c33023e-cf41-4393-8b0f-89d112e2967b.png",
+      "file": "assets/cultivation-journey/slots/weapon.png"
+    },
+    {
+      "id": "armor",
+      "category": "slots",
+      "name": "防具空欄",
+      "prompt": "Single game UI empty-equipment-slot emblem illustration, raster PNG alpha transparent, Chinese xianxia Ancient Divine Armaments style. A clean simple dark bronze and jade engraved recessed silhouette plate, low contrast gray-jade as an EMPTY slot placeholder, not an actual equipped item. Square1024x1024. One central emblem with generous20% clear alpha border. No letters, label, numbers, text, SVG or background. Subtle worn blackiron and antique bronze edge, not bright gold loot or jewel. Emblem depicts one simple symmetrical ancient Chinese chest armor breastplate recessed silhouette, shoulder guards and cuirass, visibly different from sword or pendant.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-f73f6f7e-8150-45b1-8476-50f7d7d01e1f.png",
+      "file": "assets/cultivation-journey/slots/armor.png"
+    },
+    {
+      "id": "accessory",
+      "category": "slots",
+      "name": "飾品空欄",
+      "prompt": "Single game UI empty-equipment-slot emblem illustration, raster PNG alpha transparent, Chinese xianxia Ancient Divine Armaments style. A clean simple dark bronze and jade engraved recessed silhouette plate, low contrast gray-jade as an EMPTY slot placeholder, not an actual equipped item. Square1024x1024. One central emblem with generous20% clear alpha border. No letters, label, numbers, text, SVG or background. Subtle worn blackiron and antique bronze edge, not bright gold loot or jewel. Emblem depicts one circular bi-jade pendant recessed silhouette with small hanging knot and short tassel, clearly accessory, simple dark jade ring and bronze edge.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-62268af2-f037-46ad-b984-e97e5020b5ea.png",
+      "file": "assets/cultivation-journey/slots/accessory.png"
+    }
+  ]
+}

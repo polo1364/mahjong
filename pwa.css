@@ -1,0 +1,41 @@
+#landscapeNotice {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  color: #f1ead5;
+  background: radial-gradient(ellipse at 50% 35%, #183d3a, #0a171a 75%);
+  text-align: center;
+  overflow: auto;
+  overscroll-behavior: contain;
+  z-index: 2147483647;
+}
+#landscapeNotice[open] { display: grid; place-items: center; }
+#landscapeNotice::backdrop { background: #0a171a; }
+.landscape-card { width: min(100%, 420px); margin: auto; }
+.landscape-phone {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 52px;
+  margin: 0 auto 32px;
+  border: 2px solid #c7b883;
+  border-radius: 12px;
+  color: #c7b883;
+  font: 36px/1 sans-serif;
+}
+.landscape-brand { color: #bbaa78; font-size: 14px; letter-spacing: .3em; }
+#landscapeTitle { margin: 18px 0; font-size: clamp(22px, 6vw, 30px); color: #f1ead5; }
+#landscapeDescription { font-size: 16px; line-height: 1.8; }
+.landscape-hint { margin-top: 24px; font-size: 13px; line-height: 1.8; color: #a0b8b0; }
+@media (orientation: portrait) {
+  /* The reminder is visible even before JavaScript has finished loading. */
+  #landscapeNotice:not([open]) { display: grid; place-items: center; }
+}

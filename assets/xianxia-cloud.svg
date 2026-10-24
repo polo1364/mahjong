@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="120" viewBox="0 0 180 120">
+<!-- Original auspicious-cloud (祥雲) motif tile. -->
+<g fill="none" stroke="#a9d8e6" stroke-opacity=".07" stroke-width="2" stroke-linecap="round">
+<path d="M20 70q0-18 18-18q4-14 20-12q14-12 28 2q16-2 18 14q12 4 8 16H24q-6-2-4-2z"/>
+<path d="M38 60q6-8 14-2M66 48q8-6 14 2"/>
+<path d="M110 30q0-12 12-12q4-10 14-8q10-8 18 2q10 0 12 10q8 4 4 10h-56q-4-1-4-2z"/>
+<path d="M120 112q0-12 12-12q4-10 14-8q10-8 18 2q10 0 12 10"/>
+</g></svg>

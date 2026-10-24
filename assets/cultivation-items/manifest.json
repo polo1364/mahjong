@@ -1,0 +1,125 @@
+{
+  "generator": "imagegen",
+  "style": "上古神兵：古銅、玄鐵、青玉；透明背景點陣素材",
+  "assets": [
+    {
+      "id": "barrier",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-096592e9-f734-4a8c-915c-a3918b716776.png",
+      "name": "玉障符",
+      "file": "assets/cultivation-items/barrier.png",
+      "sha256": "dc20622691675ee2aa4ff2e746162dc8f526c4d92476cc77b74d00d2f590699d"
+    },
+    {
+      "id": "cleanse",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e9185f0f-a69c-475c-800c-eefad55a4d82.png",
+      "name": "清心丹",
+      "file": "assets/cultivation-items/cleanse.png",
+      "sha256": "fd7e2ea986f26546b8e2cea049d4d74f21707e912cfb3f537a24c048908a2ef5"
+    },
+    {
+      "id": "stealth",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-7ebc11c4-d9c4-465c-aed5-2f1096cd7308.png",
+      "name": "匿影香",
+      "file": "assets/cultivation-items/stealth.png",
+      "sha256": "4e3c5c25e2bc6c197f4f0e5ddb69ecb68a45d872acdbf6db7c1d32610dd4b115"
+    },
+    {
+      "id": "edge",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-ec729f9e-6672-4afa-b188-88d69b2e628f.png",
+      "name": "銳芒符",
+      "file": "assets/cultivation-items/edge.png",
+      "sha256": "59ccc56f548b5bb4c1cbc9a6407c57174b776b14bb2e969677358da201acab2c"
+    },
+    {
+      "id": "guard",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-a20fed3a-144e-48a4-a853-e52aec1d7e32.png",
+      "name": "護元符",
+      "file": "assets/cultivation-items/guard.png",
+      "sha256": "4e43a962928337b433a94a3d17a810410074c244c69db199934b8ba57d32f104"
+    },
+    {
+      "id": "metal",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-127ed899-6b06-4507-9b74-ebdad2af76d1.png",
+      "name": "金魄屑",
+      "file": "assets/cultivation-items/metal.png",
+      "sha256": "0407b1fec2e78ec03452af7bd0113da12ae10ec12572d9766481c875ae1d07e6"
+    },
+    {
+      "id": "wood",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1b8a38ed-bce6-41d6-a137-d891f1d9e707.png",
+      "name": "木靈芽",
+      "file": "assets/cultivation-items/wood.png",
+      "sha256": "b4de09d5322a63c13f985e95efbb0ee5e557626c68b14f429902e61628f26f49"
+    },
+    {
+      "id": "water",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-5a3807fc-de5a-4d35-9f11-26bffc67d38c.png",
+      "name": "水靈露",
+      "file": "assets/cultivation-items/water.png",
+      "sha256": "de3b2e368753140b53dd80042687a95ec5632f30a3020bac899aca5cea87fa67"
+    },
+    {
+      "id": "fire",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-bdb297a4-6660-4ad3-a732-bfa35340f1aa.png",
+      "name": "火靈燼",
+      "file": "assets/cultivation-items/fire.png",
+      "sha256": "02ec6d27aae46957ecf63a40579373348a279cfc226c0b4f66ba1d225f1ab855"
+    },
+    {
+      "id": "earth",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-d0872dba-3902-4b34-8084-304bd896a355.png",
+      "name": "地脈砂",
+      "file": "assets/cultivation-items/earth.png",
+      "sha256": "a6eca33da0a327d0d82fb3b5f8433608de2f4e29c055129441bf10d282426bc8"
+    },
+    {
+      "id": "shard",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-2bf3bd16-bf05-4425-88e8-b7ebbb749811.png",
+      "name": "劫晶碎片",
+      "file": "assets/cultivation-items/shard.png",
+      "sha256": "f279e1fe03768ca88e69fe3e54dd2a75aff2686f11b4a4f155f36c25d3e32aa4"
+    },
+    {
+      "id": "armor-stone",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-5573458f-db10-440b-ba53-3db71e69d643.png",
+      "name": "鍛甲石",
+      "file": "assets/cultivation-items/armor-stone.png",
+      "sha256": "5249f114550914fdf5c3fab3ec9aa83a1ab7d0982e2d31934080cf270b8ed173"
+    },
+    {
+      "id": "accessory-stone",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-3aab7f41-43fd-4f60-8422-2c4523a1ef6d.png",
+      "name": "蘊靈石",
+      "file": "assets/cultivation-items/accessory-stone.png",
+      "sha256": "4e7f004a771a75f223b64f0f41f097940636c0908f3e5c25499937b913b9fcf0"
+    },
+    {
+      "id": "luck",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-a197a402-82f7-4cbd-a273-8134de3f6f4c.png",
+      "name": "祈運符",
+      "file": "assets/cultivation-items/luck.png",
+      "sha256": "7e6c5c6e8c9450a61d9b7a78006f602983cfbd818b8111c571bce8c16f31dc62"
+    },
+    {
+      "id": "heal",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-38f0eed1-47c8-4713-b0ae-cc39daef7c4d.png",
+      "name": "回春丹",
+      "file": "assets/cultivation-items/heal.png",
+      "sha256": "452563b94a6d66d12c29de16ecd8366b81ed8f588d7d41657f36387eb6fba4a3"
+    },
+    {
+      "id": "weapon-stone",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-2ee8d34e-d1bb-4d75-a138-8e92c5cecec3.png",
+      "name": "淬鋒石",
+      "file": "assets/cultivation-items/weapon-stone.png",
+      "sha256": "2b549066fbba7675f27685e40402299e81833c1ffa58f6f9cb5ac9b83cb8e65b"
+    },
+    {
+      "id": "preserve",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1e01be76-5ee3-4608-901e-28d3b9f71a86.png",
+      "name": "鎮器保級符",
+      "file": "assets/cultivation-items/preserve.png",
+      "sha256": "f76998573bc07d1c708eca241fc79cd58cb412e3b23f1cf5defda631fa0251a9"
+    }
+  ]
+}

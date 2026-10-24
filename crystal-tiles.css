@@ -1,0 +1,114 @@
+/* D: Five-element crystal artwork. Geometry and game interactions stay in the existing layouts. */
+:root {
+  --art-jade: #6486a8;
+  --art-jade-deep: #2b4968;
+  --crystal-back-image: url('assets/tiles-crystal/04-honors-and-back.png');
+  --crystal-back-size: 443.930636% 219.742489%;
+  --crystal-back-position: 96.050420% 89.426523%;
+}
+
+.tile, .tile.small, .tile.mini, button.tile:disabled,
+#yourHand button.tile, .square-table .rail-tile,
+.left-area .meld-group .tile, .right-area .meld-group .tile,
+.mahjong-fx .fx-tile {
+  padding: 0;
+  border-width: 0;
+  border-color: #b1c9df;
+  background: #dbe6ef;
+}
+.tile-art[data-crystal-key] { overflow: hidden; border-radius: 2px; }
+
+/* The artwork has its own frame. Keep every personal tile visible on one row;
+   table-layout.js fits the shared hand/meld size to the available width. */
+.square-table .bottom-area {
+  --table-hand-width: 50px;
+  --table-hand-height: 70px;
+}
+.square-table [data-square-mode="inside"] .mahjong-table .left-area,
+.square-table [data-square-mode="inside"] .mahjong-table .right-area {
+  bottom: calc(70px + 52px);
+}
+.square-table [data-square-mode="below"] .bottom-area,
+.square-table [data-square-mode="side"] .bottom-area {
+  --table-hand-width: 40px;
+  --table-hand-height: 56px;
+}
+.square-table [data-square-mode="below"] .bottom-area .turn-message { top: calc(100% + 67px); }
+
+/* Each back is a view onto the same validated atlas region. The pseudo-element rotates
+   independently, so side seats retain their existing horizontal hitboxes and spacing. */
+#handBack1 .tile-back, #handBack2 .tile-back, #handBack3 .tile-back,
+.tile.tile-facedown, .square-table .rail-tile.is-back, .mahjong-fx .fx-tile.is-back {
+  position: relative;
+}
+#handBack1 .tile-back, #handBack2 .tile-back, #handBack3 .tile-back,
+.tile.tile-facedown, .square-table .rail-tile.is-back,
+.mahjong-fx .fx-tile.is-back, .opening-tile {
+  border-color: #a7c2db;
+  background: #c6d6e5;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 #c6deed, 0 3px 0 #365878, 0 5px 6px #0007;
+}
+#handBack1 .tile-back::before, #handBack2 .tile-back::before, #handBack3 .tile-back::before,
+.tile.tile-facedown::before, .square-table .rail-tile.is-back::before,
+.mahjong-fx .fx-tile.is-back::before, .opening-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--crystal-back-image);
+  background-size: var(--crystal-back-size);
+  background-position: var(--crystal-back-position);
+  background-repeat: no-repeat;
+  clip-path: polygon(7% 0, 93% 0, 100% 5%, 100% 95%, 93% 100%, 7% 100%, 0 95%, 0 5%);
+  pointer-events: none;
+}
+#handBack1 .tile-back::after, #handBack2 .tile-back::after, #handBack3 .tile-back::after,
+.tile.tile-facedown::after, .square-table .rail-tile.is-back::after,
+.mahjong-fx .fx-tile.is-back::after, .opening-tile::after { display: none; }
+#handBack1 .tile-back::before, #meldRail1 .rail-tile.is-back::before { transform: rotate(180deg); }
+#handBack2 .tile-back::before, #handBack3 .tile-back::before,
+.square-table #meldRail2 .rail-tile.is-back::before,
+.square-table #meldRail3 .rail-tile.is-back::before {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: calc(100% * 5 / 7);
+  height: calc(100% * 7 / 5);
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+#handBack3 .tile-back::before, .square-table #meldRail3 .rail-tile.is-back::before {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.square-table [data-square-mode] .bottom-area > .hand-meld-container {
+  left: 8px; right: 8px; top: auto; bottom: 30px;
+  width: auto; max-width: none; gap: 6px;
+}
+.square-table .bottom-area #yourHandArea { flex: none; overflow: visible; scroll-padding: 0; }
+.square-table #yourHand .hand-row { min-width: 0; padding: 8px 2px; gap: var(--personal-tile-gap, 2px); }
+.square-table #yourHand button.tile {
+  width: var(--personal-tile-width, 40px);
+  flex-basis: var(--personal-tile-width, 40px);
+  height: calc(var(--personal-tile-width, 40px) * 7 / 5);
+}
+.square-table #yourHand button.tile.tile-drawn { margin-left: 4px; }
+.square-table #meldRail0 {
+  --rail-w: calc(var(--personal-tile-width, 40px) * .86);
+  max-width: none;
+  overflow: visible;
+  gap: 4px;
+  padding-left: 2px;
+}
+
+/* Compact tables reserve a separate, fully visible discard strip above the hand. */
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-0 {
+  top: var(--bottom-river-top, calc(50% + var(--river-gap-y)));
+  min-height: 0;
+}
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-0 .discard-area {
+  display: grid; grid-template-columns: repeat(var(--bottom-river-columns, 8), var(--bottom-river-width, 13px));
+  width: max-content; gap: 1px;
+}
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-0 .tile.mini {
+  width: var(--bottom-river-width, 13px); height: auto;
+}

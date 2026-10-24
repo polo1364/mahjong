@@ -1,0 +1,100 @@
+{
+  "title": "五行晶石麻將圖集",
+  "source": "../../art-source/previews/tile-crystal-full-preview-20261021/manifest.json",
+  "pixelPolicy": "Selected generated PNGs copied byte-for-byte; browser crops retain the native resolution. Numbered and flower tile corner text removed with built-in image_gen; honor atlas unchanged.",
+  "renderer": "../../crystal-tiles.js",
+  "faceCount": 42,
+  "backCount": 1,
+  "sheets": [
+    {
+      "file": "01-wan-red-crystal-no-label.png",
+      "width": 1086,
+      "height": 1448,
+      "sha256": "A0480407B59F217F2DAACB008B708C181A0A53F6BA7A5C7BC6929176F94FBEF9",
+      "tileKeys": [
+        "W1",
+        "W2",
+        "W3",
+        "W4",
+        "W5",
+        "W6",
+        "W7",
+        "W8",
+        "W9"
+      ],
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/01-wan-red-crystal-no-label.png"
+    },
+    {
+      "file": "02-dots-spirit-pearls-no-label.png",
+      "width": 1086,
+      "height": 1448,
+      "sha256": "AF7C623A284F423BCF9B225F9AA94DCA2E0839A65DE1B335E8317FBFD7408CC4",
+      "tileKeys": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9"
+      ],
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/02-dots-spirit-pearls-no-label.png"
+    },
+    {
+      "file": "03-bamboo-flying-swords-no-label.png",
+      "width": 1086,
+      "height": 1448,
+      "sha256": "519C22CD88EC91E91E3354FBE6815A32D4924511FBF5A3D4FB1F5859D0D3AC85",
+      "tileKeys": [
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9"
+      ],
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/03-bamboo-flying-swords-no-label.png"
+    },
+    {
+      "file": "04-honors-and-back.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "C5A211B5F3128306031B19B2DA33E091F74B67A3749284AED008E5D7C0760107",
+      "tileKeys": [
+        "FE",
+        "FS",
+        "FW",
+        "FN",
+        "DC",
+        "DF",
+        "DB",
+        "BACK"
+      ],
+      "source": "../../art-source/previews/tile-crystal-full-preview-20261021/04-honors-and-back.png"
+    },
+    {
+      "file": "05-flowers-eight-no-label.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "7D30D0D84D22B3F3EBD31F98C58BFCA3E172180EEF386859CD174E73B536AA6B",
+      "tileKeys": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "source": "../../art-source/edits/tile-crystal-no-label-20261021/05-flowers-eight-no-label.png"
+    }
+  ],
+  "editedSource": "../../art-source/edits/tile-crystal-no-label-20261021/manifest.json",
+  "labelPolicy": "Only FE FS FW FN DC DF retain corner text. W/T/B/H faces, DB and BACK have none."
+}

@@ -1,0 +1,325 @@
+/* Hand-drawn Qinghe feedback: three compositions, three distinct motion vocabularies. */
+.action-announcement.mahjong-fx {
+  position: fixed;
+  width: min(440px, calc(100vw - 24px));
+  aspect-ratio: 440 / 240;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: #f3dfb3;
+  z-index: 120;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  contain: layout paint;
+  transform: translate(-50%, -50%);
+  translate: none;
+  font: inherit;
+  animation: fx-envelope var(--fx-duration, 1150ms) ease both;
+}
+.mahjong-fx *, .mahjong-fx *::before, .mahjong-fx *::after { box-sizing: border-box; pointer-events: none; }
+.mahjong-fx .fx-art { display: block; width: 100%; height: 100%; overflow: hidden; }
+.mahjong-fx .fx-copy {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 7px; padding: 36px 75px 30px;
+  text-align: center;
+}
+.mahjong-fx .fx-word {
+  display: block; font: 700 clamp(34px, 6vw, 54px)/1.05 "DFKai-SB", "KaiTi", "PMingLiU", serif;
+  letter-spacing: .12em; padding-left: .12em; color: inherit;
+  text-shadow: 0 2px 3px #071611b3;
+}
+.mahjong-fx .fx-caption {
+  display: block; max-width: 100%; font: 11px/1.4 "Microsoft JhengHei", sans-serif;
+  letter-spacing: .12em; color: inherit; opacity: .84;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mahjong-fx.fx-celebration .fx-word { font-size: clamp(40px, 7vw, 64px); }
+@keyframes fx-envelope { 0% { opacity: 0; } 11%,76% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Jade: open orbital arcs, quiet inner glow and discrete drifting gold-leaf fragments. */
+.fx-jade .fx-jade-halo { fill: #0b3029ed; stroke: #5eb89638; stroke-width: 6; }
+.fx-jade .fx-jade-orbit { transform-origin: 220px 120px; animation: fx-jade-orbit .8s cubic-bezier(.16,1,.3,1) both; }
+.fx-jade .fx-jade-arc { fill: none; stroke: #8de1bc; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 420; animation: fx-jade-draw .7s ease-out both; }
+.fx-jade .fx-jade-arc-gold { stroke: #dcb879; stroke-width: 2; animation-delay: 70ms; }
+.fx-jade .fx-jade-fine { fill: none; stroke: #bde6cb; stroke-width: 1; opacity: .5; }
+.fx-jade .fx-jade-thread { fill: none; stroke: #d8b77a; stroke-width: 1; opacity: .65; }
+.fx-jade .fx-jade-seal { fill: none; stroke: #d8b77a; stroke-width: 1.3; }
+.fx-jade .fx-jade-flecks path { fill: #e6c88c; transform-box: fill-box; transform-origin: center; animation: fx-jade-leaf 1.05s ease-out both; animation-delay: calc(var(--i) * 24ms); }
+.fx-jade .fx-jade-petal { fill: #67c6a70a; stroke: #90d8b782; stroke-width: 1; }
+.fx-jade .fx-copy { animation: fx-jade-copy .45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes fx-jade-orbit { from { transform: scale(.7) rotate(-24deg); } to { transform: scale(1) rotate(0); } }
+@keyframes fx-jade-draw { from { stroke-dashoffset: 420; } to { stroke-dashoffset: 0; } }
+@keyframes fx-jade-leaf { 0% { opacity: 0; translate: 0 9px; rotate: -15deg; } 30% { opacity: .9; } 100% { opacity: 0; translate: 0 -9px; rotate: 16deg; } }
+@keyframes fx-jade-copy { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Ink: horizontal brush reveal, fibrous negative space and a vermilion seal landing once. */
+.mahjong-fx.fx-ink { color: #243a36; }
+.fx-ink .fx-ink-paper { fill: #eee4cdec; }
+.fx-ink .fx-ink-wash { fill: #8a9d8733; }
+.fx-ink .fx-ink-brush { fill: #18382ee6; }
+.fx-ink .fx-ink-brush-low { fill: #274438d6; }
+.fx-ink .fx-ink-dry { fill: none; stroke: #e4ddc5; stroke-width: 2; opacity: .65; }
+.fx-ink .fx-ink-strokes { animation: fx-ink-sweep .45s cubic-bezier(.16,.84,.25,1) both; }
+.fx-ink .fx-ink-sprig { fill: none; stroke: #244538; stroke-width: 2; }
+.fx-ink .fx-ink-dots circle { fill: #c9cbb4; animation: fx-ink-dot .55s ease both; animation-delay: calc(var(--i) * 20ms); }
+.fx-ink .fx-ink-stamp { transform-origin: 339px 161px; animation: fx-ink-stamp .35s .22s cubic-bezier(.2,.9,.3,1) both; }
+.fx-ink .fx-ink-stamp path:first-child { fill: #a74136; stroke: #e2b3a3; stroke-width: 1; }
+.fx-ink .fx-ink-stamp path:last-child { fill: none; stroke: #f5e7cb; stroke-width: 2; }
+.fx-ink .fx-word { text-shadow: none; }
+.fx-ink .fx-copy { animation: fx-ink-copy .28s .12s ease-out both; }
+@keyframes fx-ink-sweep { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes fx-ink-stamp { from { opacity: 0; transform: scale(1.65) rotate(-12deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes fx-ink-dot { from { opacity: 0; } to { opacity: .75; } }
+@keyframes fx-ink-copy { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Neon: chamfered frame, orthogonal circuit traces and one restrained scanning line. */
+.mahjong-fx.fx-neon { color: #c1faff; }
+.fx-neon .fx-neon-panel { fill: #101c35ed; stroke: #5ad7e955; stroke-width: 1; }
+.fx-neon .fx-neon-frame { fill: none; stroke: #83ecff; stroke-width: 2; stroke-dasharray: 150; animation: fx-neon-route .5s ease-out both; }
+.fx-neon .fx-neon-traces { fill: none; stroke: #b48cf0; stroke-width: 1.6; stroke-dasharray: 90; animation: fx-neon-route .6s .07s ease-out both; }
+.fx-neon .fx-neon-nodes { fill: #bda1f4; }
+.fx-neon .fx-neon-nodes rect { animation: fx-neon-node .35s ease both; animation-delay: calc(var(--i) * 35ms); }
+.fx-neon .fx-neon-flower { fill: none; stroke: #bca2ee; stroke-width: 1.3; }
+.fx-neon .fx-neon-scan { fill: none; stroke: #7ee4ff; stroke-width: 1; opacity: 0; animation: fx-neon-scan .7s .05s ease-out both; }
+.fx-neon .fx-neon-slits { fill: none; stroke: #85e8f4; stroke-width: 2; }
+.fx-neon .fx-word { font-family: "Microsoft JhengHei", sans-serif; font-weight: 600; text-shadow: 0 0 13px #4ab9dd70; }
+.fx-neon .fx-caption { letter-spacing: .2em; color: #bdcbe9; }
+.fx-neon .fx-copy { animation: fx-neon-copy .3s .08s ease-out both; }
+@keyframes fx-neon-route { from { stroke-dashoffset: 150; opacity: 0; } to { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes fx-neon-node { from { opacity: 0; } to { opacity: .85; } }
+@keyframes fx-neon-scan { 0% { opacity: 0; transform: translateY(-22px); } 20% { opacity: .5; } 100% { opacity: 0; transform: translateY(52px); } }
+@keyframes fx-neon-copy { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+
+.action-announcement.mahjong-fx.fx-reduced {
+  width: min(260px, calc(100vw - 32px)); aspect-ratio: auto; min-height: 76px;
+  border: 1px solid #c6b17d; border-radius: 7px; background: #102d27f5;
+  animation: none;
+}
+.mahjong-fx.fx-reduced .fx-copy { position: relative; padding: 14px 18px; gap: 5px; animation: none; }
+.mahjong-fx.fx-reduced .fx-word { font-size: 29px; }
+.mahjong-fx.fx-reduced.fx-ink { color: #263d32; background: #eee4cdf5; border-color: #8d4e41; }
+.mahjong-fx.fx-reduced.fx-neon { background: #101c35f5; border-color: #83ecff; }
+@media (max-width: 540px) {
+  .action-announcement.mahjong-fx { width: min(340px, calc(100vw - 24px)); }
+  .mahjong-fx .fx-copy { padding: 28px 61px 24px; gap: 5px; }
+  .mahjong-fx .fx-caption { font-size: 10px; }
+  .action-announcement.mahjong-fx.fx-reduced { width: min(240px, calc(100vw - 32px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mahjong-fx, .mahjong-fx * { animation: none !important; }
+}
+
+/* Settled special hands: one headline plus all awarded special names, no new scoring. */
+.mahjong-fx .fx-special-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mahjong-fx .fx-special-mark { fill: #133e32; stroke: #f0d49a; stroke-width: 1.25; }
+.mahjong-fx .fx-special-mark text {
+  fill: #f3e5bd; stroke: none; text-anchor: middle;
+  font: 12px "DFKai-SB", "KaiTi", serif;
+}
+.mahjong-fx.fx-special .fx-copy { padding-top: 51px; gap: 6px; }
+.mahjong-fx.fx-special .fx-word { font-size: clamp(27px, 5.6vw, 42px); letter-spacing: .08em; }
+.mahjong-fx.fx-special .fx-caption { white-space: normal; overflow: visible; text-overflow: clip; font-size: 10px; line-height: 1.45; letter-spacing: .02em; }
+.mahjong-fx .fx-outcome { font: 10px/1.3 "Microsoft JhengHei", sans-serif; letter-spacing: .15em; opacity: .9; }
+.fx-jade .fx-special-mark { animation: fx-special-jade .65s cubic-bezier(.16,1,.3,1) both; }
+.fx-ink .fx-special-mark { fill: #ece2ca; stroke: #d4d7bc; animation: fx-special-ink .4s ease-out both; }
+.fx-ink .fx-special-mark text { fill: #294c3d; }
+.fx-ink.fx-special .fx-ink-paper { transform: scaleY(1.16); transform-origin: 220px 74px; }
+.fx-ink.fx-special .fx-ink-brush-low { transform: translateY(22px); }
+.fx-neon .fx-special-mark { fill: #14243e; stroke: #c4a6ff; }
+.fx-neon .fx-special-mark text { fill: #e2d7ff; font-family: "Microsoft JhengHei",sans-serif; }
+.fx-neon .fx-special-mark path { stroke-dasharray: 240; animation: fx-special-trace .65s ease-out both; }
+.fx-special .fx-jade-seal, .fx-special .fx-neon-flower { opacity: 0; }
+.action-announcement.mahjong-fx.fx-special.fx-reduced { width: min(310px, calc(100vw - 32px)); }
+.mahjong-fx.fx-special.fx-reduced .fx-copy { padding: 13px 15px; }
+.mahjong-fx.fx-special.fx-reduced .fx-word { font-size: 27px; }
+@keyframes fx-special-jade { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@keyframes fx-special-ink { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+@keyframes fx-special-trace { from { stroke-dashoffset: 240; opacity: .2; } to { stroke-dashoffset: 0; opacity: 1; } }
+
+/* Win sequence: gather, reveal the emblem, release a themed burst, then settle. */
+.mahjong-fx .fx-burst-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+.mahjong-fx.fx-celebration { animation-name: fx-win-envelope; }
+.fx-celebration .fx-burst-art { --burst-time: 1500ms; }
+.fx-special .fx-burst-art { --burst-time: 2150ms; }
+.fx-celebration .fx-word { animation: fx-win-word 800ms 100ms cubic-bezier(.16,1,.3,1) both; }
+.fx-special .fx-special-motion { animation: fx-emblem-wake 2100ms 180ms ease-out both; }
+.fx-special[data-motif="winds"] .fx-special-motion,
+.fx-special[data-motif="flowers"] .fx-special-motion { animation-name: fx-emblem-unfurl; }
+
+.fx-celebration .fx-jade-orbit { animation: fx-jade-victory var(--fx-duration) cubic-bezier(.2,.6,.3,1) both; }
+.fx-jade-ripples { fill: none; stroke: #9eeac4; stroke-width: 1.8; }
+.fx-jade-ripples ellipse { transform-origin: 220px 120px; animation: fx-jade-ripple var(--burst-time) 250ms ease-out both; }
+.fx-jade-ripples ellipse:last-child { stroke: #e6bd75; stroke-width: 1; animation-delay: 520ms; }
+.fx-burst-leaf {
+  fill: #f0ce86; transform-box: fill-box; transform-origin: center;
+  animation: fx-gold-release var(--burst-time) ease-out both;
+  animation-delay: calc(190ms + var(--i) * 17ms);
+}
+.fx-celebration .fx-ink-strokes { animation-duration: 700ms; }
+.fx-celebration .fx-ink-stamp { animation-delay: 550ms; animation-duration: 450ms; }
+.fx-ink-flourish { fill: none; stroke: #e2d8b3; stroke-width: 3; stroke-linecap: round; }
+.fx-ink-flourish path { stroke-dasharray: 1; animation: fx-ink-flourish var(--burst-time) 150ms ease-out both; }
+.fx-ink-flourish path:last-child { stroke: #8eaa8d; stroke-width: 5; animation-delay: 360ms; }
+.fx-ink-impact { fill: none; stroke: #d77660; stroke-width: 1.5; transform-origin: 339px 161px; animation: fx-ink-imprint 1400ms 580ms ease-out both; }
+.fx-ink-droplet {
+  fill: #e8d9b9; transform-box: fill-box; transform-origin: center;
+  animation: fx-ink-release var(--burst-time) ease-out both;
+  animation-delay: calc(370ms + var(--i) * 19ms);
+}
+.fx-ink-droplet:nth-child(3n) { fill: #bd6450; }
+.fx-neon-wave { fill: none; stroke: #86e8ff; stroke-width: 1.5; }
+.fx-neon-wave path { transform-origin: 220px 120px; animation: fx-neon-wave var(--burst-time) 220ms ease-out both; }
+.fx-neon-wave path:last-child { stroke: #c3a0ff; animation-delay: 480ms; }
+.fx-neon-comets { fill: none; stroke: #9ef5ff; stroke-width: 3; stroke-linecap: round; }
+.fx-neon-comets path { stroke-dasharray: .09 .91; animation: fx-neon-comet var(--burst-time) 250ms linear both; }
+.fx-neon-comets path:last-child { stroke: #d2b8ff; stroke-width: 2; animation-delay: 470ms; animation-direction: reverse; }
+.fx-neon-shard {
+  fill: none; stroke: #a6eaff; stroke-width: 1.5; transform-box: fill-box; transform-origin: center;
+  animation: fx-neon-release var(--burst-time) ease-out both;
+  animation-delay: calc(250ms + var(--i) * 23ms);
+}
+.fx-special.fx-neon .fx-special-mark path { animation-duration: 1100ms; }
+
+@keyframes fx-win-envelope {
+  0% { opacity: 0; }
+  8%,82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes fx-win-word {
+  0% { opacity: 0; transform: translateY(9px) scale(.86); }
+  65% { opacity: 1; transform: translateY(-1px) scale(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-emblem-wake {
+  0% { opacity: 0; transform: translateY(12px) scale(.65); }
+  26% { opacity: 1; transform: translateY(-2px) scale(1.08); }
+  45% { transform: translateY(0) scale(1); }
+  72% { transform: translateY(-2px) scale(1.035); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-emblem-unfurl {
+  0% { opacity: 0; transform: rotate(-55deg) scale(.45); }
+  34% { opacity: 1; transform: rotate(8deg) scale(1.09); }
+  68% { transform: rotate(-3deg) scale(1); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-jade-victory {
+  0% { opacity: 0; transform: scale(.45) rotate(-45deg); }
+  28% { opacity: 1; transform: scale(1.04) rotate(5deg); }
+  72% { transform: scale(1) rotate(14deg); }
+  100% { opacity: .2; transform: scale(1.1) rotate(28deg); }
+}
+@keyframes fx-jade-ripple {
+  0%,12% { opacity: 0; transform: scale(.56); }
+  30% { opacity: .8; }
+  80%,100% { opacity: 0; transform: scale(1.22); }
+}
+@keyframes fx-gold-release {
+  0% { opacity: 0; translate: var(--pull-x) var(--pull-y); scale: .2; rotate: -35deg; }
+  18% { opacity: 1; }
+  42% { translate: 0 0; scale: 1; rotate: 20deg; }
+  100% { opacity: 0; translate: var(--drift-x) var(--drift-y); scale: .5; rotate: 130deg; }
+}
+@keyframes fx-ink-flourish {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  25% { opacity: .8; }
+  55% { stroke-dashoffset: 0; opacity: .65; }
+  100% { stroke-dashoffset: -.08; opacity: 0; }
+}
+@keyframes fx-ink-imprint {
+  0% { opacity: 0; transform: scale(.7) rotate(-8deg); }
+  15% { opacity: .8; }
+  100% { opacity: 0; transform: scale(1.75) rotate(4deg); }
+}
+@keyframes fx-ink-release {
+  0% { opacity: 0; translate: var(--pull-x) var(--pull-y); scale: .1; }
+  18% { opacity: .9; }
+  46% { translate: 0 0; scale: 1.2; }
+  100% { opacity: 0; translate: var(--drift-x) var(--drift-y); scale: .65; }
+}
+@keyframes fx-neon-wave {
+  0% { opacity: 0; transform: scale(.55); }
+  25% { opacity: .75; }
+  80%,100% { opacity: 0; transform: scale(1.05); }
+}
+@keyframes fx-neon-comet {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  15%,75% { opacity: .9; }
+  100% { stroke-dashoffset: -1; opacity: 0; }
+}
+@keyframes fx-neon-release {
+  0% { opacity: 0; translate: var(--pull-x) var(--pull-y); scale: .2; rotate: 0deg; }
+  24% { opacity: 1; }
+  65% { translate: 0 0; scale: 1; rotate: 90deg; }
+  100% { opacity: 0; translate: 0 0; scale: .5; rotate: 135deg; }
+}
+
+/* Context: who acted (name + entrance from their side) and the public tiles involved. */
+.mahjong-fx { --fx-from-x: 0px; --fx-from-y: 0px; --fx-glow: #8de1bc66; }
+.mahjong-fx.fx-ink { --fx-glow: #b3433533; }
+.mahjong-fx.fx-neon { --fx-glow: #83ecff55; }
+.mahjong-fx[data-seat="bottom"] { --fx-from-y: 46px; }
+.mahjong-fx[data-seat="top"] { --fx-from-y: -46px; }
+.mahjong-fx[data-seat="left"] { --fx-from-x: -70px; }
+.mahjong-fx[data-seat="right"] { --fx-from-x: 70px; }
+.action-announcement.mahjong-fx[data-seat] { animation: fx-envelope var(--fx-duration, 1150ms) ease both, fx-seat-in .42s cubic-bezier(.2,.9,.3,1) both; }
+.action-announcement.mahjong-fx.fx-celebration[data-seat] { animation-name: fx-win-envelope, fx-seat-in; }
+.mahjong-fx[data-seat]::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0;
+  background: radial-gradient(ellipse 55% 70% at var(--fx-glow-at, 50% 100%), var(--fx-glow), transparent 70%);
+  animation: fx-seat-glow .9s ease-out both;
+}
+.mahjong-fx[data-seat="top"] { --fx-glow-at: 50% 0%; }
+.mahjong-fx[data-seat="left"] { --fx-glow-at: 0% 50%; }
+.mahjong-fx[data-seat="right"] { --fx-glow-at: 100% 50%; }
+.mahjong-fx .fx-art { position: relative; }
+.mahjong-fx .fx-art, .mahjong-fx .fx-burst-art, .mahjong-fx .fx-special-art, .mahjong-fx .fx-copy { z-index: 1; }
+.mahjong-fx .fx-copy.has-tiles { padding-top: 20px; padding-bottom: 22px; gap: 5px; }
+.mahjong-fx .fx-tiles { display: flex; justify-content: center; gap: 3px; margin-top: 3px; }
+.mahjong-fx .fx-tile {
+  display: block; width: 24px; aspect-ratio: 5 / 7; padding: 1px; border-radius: 3px;
+  background: linear-gradient(160deg, #fff 0%, #fbf6e6 40%, #e6dfc6 100%); border: 1px solid #f3ead0;
+  box-shadow: 0 2px 0 #2f7a5c, 0 3px 0 #17483a, 0 5px 6px #0008;
+  animation: fx-tile-drop .4s cubic-bezier(.2,1.35,.4,1) both; animation-delay: calc(140ms + var(--i, 0) * 60ms);
+}
+.mahjong-fx .fx-tile.is-back { background: linear-gradient(150deg, #6fb894, #2f7a5c 45%, #1f5c45); border: 2px solid #f2ead2; box-shadow: 0 2px 0 #c9bf9f, 0 0 0 1px #0007, 0 5px 6px #0008; }
+.mahjong-fx .fx-tile .tile-art { display: block; width: 100%; height: 100%; }
+.mahjong-fx.fx-celebration .fx-tile { width: 30px; animation-delay: 420ms; }
+.mahjong-fx.fx-celebration .fx-tile:not(.is-back) { box-shadow: 0 2px 0 #b08d4f, 0 3px 0 #6f5428, 0 0 0 2px #f2d38c, 0 0 18px #f2d38caa; }
+@keyframes fx-seat-in { from { translate: var(--fx-from-x) var(--fx-from-y); } to { translate: 0 0; } }
+@keyframes fx-seat-glow { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: .25; } }
+@keyframes fx-tile-drop {
+  0% { opacity: 0; transform: translateY(-16px) scale(1.3) rotate(-6deg); }
+  65% { opacity: 1; transform: translateY(1px) scale(.96) rotate(1deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* The table's centre readout steps back while an announcement is on top of it. */
+.center-info-panel { transition: opacity .2s ease; }
+body.fx-active .center-info-panel { opacity: .12; }
+
+/* The table itself reacts: a short thud for kongs, a warm gold bloom for wins. */
+.table-frame.fx-table-thud { animation: fx-table-thud .34s ease-out; }
+.table-frame.fx-table-win .mahjong-table { animation: fx-table-win 1.9s ease-out; }
+@keyframes fx-table-thud { 0% { translate: 0 0; } 22% { translate: 0 4px; } 48% { translate: 0 -2px; } 74% { translate: 0 1px; } 100% { translate: 0 0; } }
+@keyframes fx-table-win {
+  0% { filter: none; }
+  25% { filter: brightness(1.18) saturate(1.15) drop-shadow(0 0 22px #f2d38c88); }
+  100% { filter: none; }
+}
+@media (max-width: 540px) {
+  .mahjong-fx .fx-tile { width: 19px; }
+  .mahjong-fx.fx-celebration .fx-tile { width: 24px; }
+  .mahjong-fx[data-seat="left"] { --fx-from-x: -40px; }
+  .mahjong-fx[data-seat="right"] { --fx-from-x: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .table-frame.fx-table-thud, .table-frame.fx-table-win .mahjong-table { animation: none !important; }
+}
+.mahjong-fx.fx-reduced::before { display: none; }
+
+/* Explicit low-motion preference also wins over celebration-specific selectors. */
+.mahjong-fx.fx-reduced, .mahjong-fx.fx-reduced * { animation: none !important; }

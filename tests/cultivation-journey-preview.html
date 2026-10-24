@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><base href="../"><meta name="viewport" content="width=device-width,initial-scale=1"><title>修仙 V2 · 可見流程驗收</title><link rel="stylesheet" href="cultivation-journey-ui.css"><style>body{margin:0;padding:24px;background:#102832;color:#e9e8cf;font:15px/1.7 "Microsoft JhengHei",sans-serif}main{max-width:850px;margin:auto}button{padding:12px 18px;margin:5px;font:inherit;color:#eee4c4;background:#31594e;border:1px solid #b9ae80;border-radius:6px;cursor:pointer}pre{white-space:pre-wrap;background:#081f26;padding:18px;border-radius:9px}h1{font-size:25px}</style></head>
+<body><main><h1>修仙 V2 · 可見流程驗收</h1><p>此頁使用正式戰鬥資料與正式選角／整備畫面。牌局流程測試在主遊戲進行；這裡不寫入遊戲存檔。</p><button id="selectHero">選角建立測試旅程</button><button id="finishHand" disabled>模擬本局流局</button><button id="resumePreparation" disabled>從庭院快照繼續</button><section id="status" aria-live="polite">尚未建立旅程。</section><section id="result" hidden><h2>本局傷害結算</h2><p>本局流局；未擊殺妖獸會依正式規則重戰／退階。</p><button id="prepare">前往整備 →</button></section><pre id="stateInfo"></pre><p><a href="../index.html" style="color:#cbdcac">開啟正式遊戲</a></p></main>
+<script src="../cultivation-skills.js"></script><script src="../cultivation-finishers.js"></script><script src="../cultivation-heroes.js"></script><script src="../cultivation-monsters.js"></script><script src="../cultivation-combat.js"></script><script src="../cultivation-journey-ui.js"></script>
+<script>
+(() => {
+  const combat = MahjongCultivationCombat, ui = MahjongCultivationJourneyUI;
+  let state = null, preparedSave = null;
+  function render() {
+    document.getElementById('finishHand').disabled = !state || state.ended;
+    document.getElementById('resumePreparation').disabled = !preparedSave;
+    document.getElementById('result').hidden = state?.journey.phase !== 'result';
+    document.getElementById('status').textContent = state ? `第 ${state.handNumber} 局 · ${state.journey.phase === 'combat' ? '戰鬥中' : state.journey.phase === 'result' ? '傷害結算' : '整備庭院'}` : '尚未建立旅程。';
+    document.getElementById('stateInfo').textContent = state ? JSON.stringify({version:state.version,phase:state.journey.phase,party:state.players.map(player=>({hero:MahjongCultivationHeroes.get(player.heroId).name,damage:player.damage,passiveState:player.passiveState})),next:combat.journeyPreview(state)},null,2) : '';
+  }
+  function preparation() {
+    ui.showPreparation({cultivation:state}, {onStart(){state=combat.create(72,state);render();},onHome(){ui.close();render();}});
+  }
+  document.getElementById('selectHero').onclick = () => ui.chooseHero(heroId => {state=combat.create(71,null,{heroId});preparedSave=null;render();});
+  document.getElementById('finishHand').onclick = () => {state=combat.apply(state,{type:'finish',reason:'draw',id:state.seq+1,monsterId:state.monster.id}).state;render();};
+  document.getElementById('prepare').onclick = () => {state=combat.prepare(state);preparedSave=JSON.stringify(state);render();preparation();};
+  document.getElementById('resumePreparation').onclick = () => {state=JSON.parse(preparedSave);render();preparation();};
+})();
+</script></body></html>

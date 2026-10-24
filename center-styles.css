@@ -1,0 +1,132 @@
+/* Centre panel styles. Pick one with <html data-center-style="dial|board|bar|clear">; none keeps the scene default. */
+.center-seat-winds { display: none; }
+html[data-center-style] .table-scene .center-info-panel, html[data-center-style].table-scene.square-table .mahjong-table .center-info-panel { box-sizing: border-box; }
+
+/* ---------- board: 大字儀表 — gold-framed sect plaque, scales with --center-size ---------- */
+html[data-center-style="board"] .mahjong-table { --cs: var(--center-size, 124px); }
+html[data-center-style="board"].table-scene.square-table .mahjong-table .center-info-panel {
+  position: relative; width: calc(var(--cs) * 1.75); height: auto; padding: calc(var(--cs) * .15) calc(var(--cs) * .14) calc(var(--cs) * .11);
+  gap: calc(var(--cs) * .06); border-radius: 16px; overflow: visible;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 0%, #2a4a8a55, transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, #8fe9f418, transparent 70%),
+    linear-gradient(165deg, #10224a, #0a1531 55%, #070f24);
+  border: 1.5px solid #e2c27e;
+  box-shadow: inset 0 0 0 4px #0a1531, inset 0 0 0 5px #e2c27e55, 0 0 0 3px #07102499, 0 14px 34px #000c, 0 0 30px #8fe9f41f;
+  transition: box-shadow .35s ease;
+}
+/* Gold corner brackets and a crown jewel replace the old side diamonds. */
+html[data-center-style="board"].table-scene.square-table .mahjong-table .center-info-panel::before {
+  content: ""; position: absolute; inset: 7px; width: auto; height: auto; color: transparent; pointer-events: none; border-radius: 10px;
+  background:
+    linear-gradient(#e2c27e,#e2c27e) top left / 16px 2px no-repeat, linear-gradient(#e2c27e,#e2c27e) top left / 2px 16px no-repeat,
+    linear-gradient(#e2c27e,#e2c27e) top right / 16px 2px no-repeat, linear-gradient(#e2c27e,#e2c27e) top right / 2px 16px no-repeat,
+    linear-gradient(#e2c27e,#e2c27e) bottom left / 16px 2px no-repeat, linear-gradient(#e2c27e,#e2c27e) bottom left / 2px 16px no-repeat,
+    linear-gradient(#e2c27e,#e2c27e) bottom right / 16px 2px no-repeat, linear-gradient(#e2c27e,#e2c27e) bottom right / 2px 16px no-repeat;
+}
+html[data-center-style="board"].table-scene.square-table .mahjong-table .center-info-panel::after {
+  content: "\25C6"; position: absolute; left: 50%; right: auto; top: -11px; translate: -50% 0; font-size: 15px; line-height: 1;
+  color: #f3dca4; text-shadow: 0 0 8px #f3dca4, 0 0 2px #000;
+}
+/* Turn cue: the edge facing the active seat glows instead of a circular arc. */
+html[data-center-style="board"] .mahjong-table .turn-beacon { display: none; }
+html[data-center-style="board"].table-scene.square-table .mahjong-table[data-turn="top"] .center-info-panel { box-shadow: inset 0 0 0 4px #0a1531, inset 0 0 0 5px #e2c27e55, 0 -12px 22px -6px #8fe9f4, 0 14px 34px #000c; }
+html[data-center-style="board"].table-scene.square-table .mahjong-table[data-turn="bottom"] .center-info-panel { box-shadow: inset 0 0 0 4px #0a1531, inset 0 0 0 5px #e2c27e55, 0 12px 22px -6px #8fe9f4, 0 14px 34px #000c; }
+html[data-center-style="board"].table-scene.square-table .mahjong-table[data-turn="left"] .center-info-panel { box-shadow: inset 0 0 0 4px #0a1531, inset 0 0 0 5px #e2c27e55, -12px 0 22px -6px #8fe9f4, 0 14px 34px #000c; }
+html[data-center-style="board"].table-scene.square-table .mahjong-table[data-turn="right"] .center-info-panel { box-shadow: inset 0 0 0 4px #0a1531, inset 0 0 0 5px #e2c27e55, 12px 0 22px -6px #8fe9f4, 0 14px 34px #000c; }
+
+/* Round plaque */
+html[data-center-style="board"].table-scene.square-table .mahjong-table .round-info {
+  padding: 2px calc(var(--cs) * .12); border: 1px solid #e2c27e; border-radius: 5px;
+  background: linear-gradient(#3b2d12, #6a5124 50%, #3b2d12); box-shadow: 0 2px 6px #0008, inset 0 1px #fff3;
+  font: 700 calc(var(--cs) * .135)/1.5 "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; color: #fff1cf; white-space: nowrap;
+}
+/* Wind beads */
+html[data-center-style="board"].table-scene.square-table .mahjong-table .wind-indicators { gap: calc(var(--cs) * .05); }
+html[data-center-style="board"].table-scene.square-table .mahjong-table .wind-indicator {
+  width: calc(var(--cs) * .22); height: calc(var(--cs) * .22); border-radius: 50%;
+  font: 700 calc(var(--cs) * .125)/calc(var(--cs) * .22) "DFKai-SB", "KaiTi", serif;
+  color: #bfe9ee; background: radial-gradient(circle at 35% 30%, #2f7f8e, #123b49 70%); border: 1px solid #8fe9f455;
+}
+html[data-center-style="board"].table-scene.square-table .mahjong-table .wind-indicator.active {
+  color: #2a1a08; background: radial-gradient(circle at 35% 30%, #fff1c8, #d9ad5c 70%); border-color: #fff1c8; box-shadow: 0 0 10px #f3dca4aa;
+}
+/* Remaining wall: big gilded number plus a progress bar */
+html[data-center-style="board"].table-scene.square-table .mahjong-table .center-remain {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; column-gap: 6px; width: 100%;
+  font: calc(var(--cs) * .105)/1 "Microsoft JhengHei", sans-serif; color: #c9d6ef;
+}
+html[data-center-style="board"].table-scene.square-table .mahjong-table .center-remain strong {
+  font: 700 calc(var(--cs) * .34)/1.05 "Segoe UI", "Microsoft JhengHei", sans-serif; letter-spacing: 1px;
+  background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 4px #000a);
+}
+html[data-center-style="board"] .center-remain .wall-bar { flex: 0 0 82%; height: 5px; margin-top: 5px; border-radius: 3px; background: #ffffff14; box-shadow: inset 0 0 0 1px #e2c27e33; overflow: hidden; }
+html[data-center-style="board"] .center-remain .wall-bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6fd3e4, #f3dca4); transition: width .4s ease; }
+/* Last discard on a glowing pedestal */
+html[data-center-style="board"].table-scene.square-table .mahjong-table .last-play {
+  flex-direction: column; align-items: center; gap: 5px; padding-top: calc(var(--cs) * .04); width: 100%;
+  border-top: 1px solid #e2c27e33;
+  background: radial-gradient(ellipse 45% 30% at 50% 62%, #8fe9f42e, transparent 70%);
+}
+html[data-center-style="board"].table-scene.square-table .mahjong-table .last-play .tile {
+  width: calc(var(--cs) * .32); height: calc(var(--cs) * .448); margin-top: 6px;
+  box-shadow: 0 3px 0 #2c2466, 0 0 0 1px #f3dca4aa, 0 0 16px #8fe9f466, 0 8px 12px #000a;
+}
+html[data-center-style="board"].table-scene.square-table .mahjong-table .last-play-label { font: 600 calc(var(--cs) * .1)/1.3 "Microsoft JhengHei", sans-serif; color: #e6eaf7; letter-spacing: 1px; }
+.wall-bar { display: none; }
+html[data-center-style="board"] .wall-bar { display: block; }
+
+/* ---------- dial: 四方指向盤 — each seat's wind sits on the side facing that player ---------- */
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .center-info-panel {
+  width: calc(var(--center-size) * 1.55); height: calc(var(--center-size) * 1.55); padding: 34px 30px; gap: 6px; border-radius: 22px;
+  background: radial-gradient(circle at 50% 45%, #13285af5, #070f24f8 75%); border: 2px solid #d8b56aaa;
+  box-shadow: 0 0 0 4px #070f24aa, 0 10px 30px #000a;
+}
+html[data-center-style="dial"] .center-seat-winds { display: block; position: absolute; inset: 0; pointer-events: none; }
+html[data-center-style="dial"] .center-seat-winds span {
+  position: absolute; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  font: 700 17px/1 "DFKai-SB", "KaiTi", serif; color: #f3dca4; background: #0a1430; border: 1.5px solid #d8b56a99;
+  transition: transform .2s, box-shadow .2s, background .2s;
+}
+html[data-center-style="dial"] .center-seat-winds .seat-wind-bottom { left: 50%; bottom: -17px; translate: -50% 0; }
+html[data-center-style="dial"] .center-seat-winds .seat-wind-top { left: 50%; top: -17px; translate: -50% 0; }
+html[data-center-style="dial"] .center-seat-winds .seat-wind-left { top: 50%; left: -17px; translate: 0 -50%; }
+html[data-center-style="dial"] .center-seat-winds .seat-wind-right { top: 50%; right: -17px; translate: 0 -50%; }
+html[data-center-style="dial"] .center-seat-winds .is-turn { color: #08202a; background: linear-gradient(#c8f8ff, #6fd3e4); border-color: #e8fdff; transform: scale(1.22); box-shadow: 0 0 16px #8fe9f4; }
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .wind-indicators { display: none; }
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .round-info { font-size: 15px; color: #f3dca4; }
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .center-remain strong { font-size: 32px; color: #fff1cf; }
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .last-play .tile { width: 32px; height: 45px; }
+html[data-center-style="dial"].table-scene.square-table .mahjong-table .last-play-label { font-size: 12px; color: #e6eaf7; }
+html[data-center-style="dial"] .mahjong-table .turn-beacon { display: none; }
+
+/* ---------- bar: 簡潔橫條 — one line of essentials, out of the way ---------- */
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .center-info-panel {
+  flex-direction: row; width: auto; height: auto; padding: 8px 18px; gap: 16px; border-radius: 999px;
+  background: #07122af2; border: 1.5px solid #d8b56aaa; box-shadow: 0 6px 20px #000a; white-space: nowrap;
+}
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .wind-indicators { display: none; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .round-info { font-size: 15px; color: #f3dca4; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .center-remain { font-size: 13px; line-height: 30px; color: #c9d6ef; padding: 0 14px; border-left: 1px solid #d8b56a55; border-right: 1px solid #d8b56a55; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .center-remain strong { font-size: 26px; color: #fff1cf; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .last-play { flex-direction: row; align-items: center; gap: 8px; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .last-play .tile { width: 28px; height: 39px; }
+html[data-center-style="bar"].table-scene.square-table .mahjong-table .last-play-label { font-size: 13px; color: #e6eaf7; }
+html[data-center-style="bar"] .mahjong-table .turn-beacon { display: none; }
+
+/* ---------- clear: 清透桌心 — darken the busy jade around the rivers, compact round readout ---------- */
+html[data-center-style="clear"].table-scene.square-table .mahjong-table {
+  background:
+    radial-gradient(circle at 50% 50%, #040e1ae6 0, #040e1ad0 26%, #040e1a80 40%, #040e1a00 52%),
+    linear-gradient(#071d2133, #06191b33), url('assets/xianxia-table.jpg') center / cover;
+}
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .center-info-panel {
+  width: calc(var(--center-size) * 1.3); height: calc(var(--center-size) * 1.3); padding: 12px; gap: 5px; border-radius: 50%;
+  background: #08152cf2; border: 2px solid #d8b56aaa; box-shadow: 0 0 0 5px #08152c88, 0 0 26px #8fe9f433;
+}
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .round-info { font-size: 15px; color: #f3dca4; }
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .wind-indicator { width: 24px; height: 24px; font-size: 15px; line-height: 24px; }
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .center-remain strong { font-size: 30px; color: #fff1cf; }
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .last-play .tile { width: 30px; height: 42px; }
+html[data-center-style="clear"].table-scene.square-table .mahjong-table .last-play-label { font-size: 12px; color: #e6eaf7; }

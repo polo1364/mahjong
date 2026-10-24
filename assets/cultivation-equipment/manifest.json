@@ -1,0 +1,258 @@
+{
+  "status": "completed-style-approved",
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "chi-xiao-sword",
+      "name": "赤霄劍",
+      "prompt": "Use case: stylized-concept. Create one high-resolution game inventory asset: Chi Xiao Sword 赤霄劍, an ancient Chinese xianxia straight sword, no text. Ultra-detailed hand-painted realistic 3D material, antique bronze dragon guard, dark iron blade, restrained glowing vermilion crystal inlays running inside blade, jade-green grip fittings. Distinguished ancient divine weapon style, elegant and tangible, not cartoon. Single complete sword diagonally from lower left pommel to upper right tip, occupying 72% of a square canvas, all pommel tassels, guard and sharp tip fully visible with generous 14% safe margins. NO frame, NO panel, NO environment, NO floor, NO shadow backdrop, NO excessive flames, NO smoke. Actual transparent alpha background. Strong crisp silhouette readable at 96 pixels, intricate details at original size. Square PNG at least 1024x1024.",
+      "source": "C:/Users/User/.codex/generated_images/01a15eb9-9342-7161-a8a6-5bd939302524/exec-071e31e1-0c43-44c2-a774-ca7a0878a25c.png",
+      "kind": "equipment",
+      "path": "assets/cultivation-equipment/items/chi-xiao-sword.png"
+    },
+    {
+      "id": "zhenyue-armor",
+      "name": "鎮岳甲",
+      "prompt": "Use case: stylized-concept. Single high quality raster game equipment icon: Zhen Yue Armor 鎮岳甲. Ancient Chinese xianxia divine-warrior torso armor displayed alone with NO person or mannequin. Heavy dark iron lamellar cuirass, antique bronze mountain and guardian-beast carvings, green jade centerpiece, broad but complete pauldrons, hanging waist armor plates and deep teal cloth. Realistic hand-painted 3D materials, ornate but readable silhouette, matching an ancient bronze/jade divine weapon RPG. Front three-quarter view. Entire armor fully contained in CENTRAL 70% of square canvas, all shoulder horns and hems visible, 15 percent EMPTY TRANSPARENT border all sides. High sharp detail, no blurry bloom. NO frame, NO pedestal, NO ground, NO character, NO text, NO UI, no background or background smoke. True transparent alpha PNG square 1024x1024 or larger.",
+      "source": "C:/Users/User/.codex/generated_images/01a15eb9-9342-7161-a8a6-5bd939302524/exec-5e37c981-dc72-4677-939e-e682470e47c7.png",
+      "kind": "equipment",
+      "path": "assets/cultivation-equipment/items/zhenyue-armor.png"
+    },
+    {
+      "id": "ningyu-jade",
+      "name": "凝玉璧",
+      "prompt": "Use case: stylized-concept. Create one complete ancient Chinese xianxia artifact game inventory icon: Ning Yu Jade Bi 凝玉璧, a thick translucent green jade ritual disc pendant with a central round opening, finely engraved bronze cloud-dragon mounts around the rim, a restrained cyan inner glow inside the jade. A woven dark teal cord above and short elegant jade bead tassel below. Round disc is dominant; recognizably an accessory, not a weapon. Highly detailed realistic hand-painted 3D materials, antique bronze, dark patina, luminous jade, matches ancient divine weapon game style. All cord loops and tassels fully in frame. Object floating centered, occupies central 70 percent of square canvas, generous EMPTY alpha margins on every side. NO text, NO symbols resembling writing, NO UI, NO border, NO frame, NO scene, NO pedestal, no smoky backdrop. Genuine transparent alpha PNG 1024x1024 or larger, crisp silhouette.",
+      "edit": "Fix composition of this exact jade pendant. Current top cord is clipped. Recreate a complete closed cord loop and move ALL of the entire pendant including loop and bottom tassels well INSIDE canvas. Zoom out dramatically: complete object height must be ONLY 72% of canvas height, leaving at least 14% EMPTY transparent margin above AND below. Keep same jade disc and bronze dragons, crisp real materials. Do not enlarge the object to fill frame. All four margins empty transparent alpha. Square PNG. No text, no frame, no backdrop. This is a cutout inventory asset.",
+      "source": "C:/Users/User/.codex/generated_images/01a15eb9-9342-7161-a8a6-5bd939302524/exec-f7c394af-d8e9-4c3b-a8be-49a5d981ff6f.png",
+      "kind": "equipment",
+      "path": "assets/cultivation-equipment/items/ningyu-jade.png"
+    },
+    {
+      "id": "xuanfu-staff",
+      "name": "玄符杖",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete tall ritual staff with a circular bronze talisman crown, suspended small jade rings and blue-white crystal core; dark wood shaft, no writing. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9df9b62f-529e-4a4a-907e-f05d999776ff.png",
+      "path": "assets/cultivation-equipment/items/xuanfu-staff.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "huifeng-halberd",
+      "name": "回鋒戟",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete short ceremonial battle halberd, strong curved hooked axe blade and central spear tip of black iron, bronze wave carvings, turquoise bindings, compact diagonal silhouette. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e2b4ef97-06c6-49af-9821-3c0786e46b37.png",
+      "path": "assets/cultivation-equipment/items/huifeng-halberd.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "qingheng-whisk",
+      "name": "青蘅拂塵",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete Chinese Taoist horsetail whisk with jade and bronze handle, pale silver hair flowing in an elegant curl, tiny emerald beads, organic healing vine engraving. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-c5fdc066-5b18-486b-a7f1-0d5e0890d6f1.png",
+      "path": "assets/cultivation-equipment/items/qingheng-whisk.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "ningyu-ringblade",
+      "name": "凝玉環刃",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A single complete crescent edged jade chakram ring weapon with bronze protective fittings and blue-green gemstone blade, heavy solid ring silhouette, no text. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-0d1f8f3d-d72e-4aa0-a9fe-241ed26bb2c6.png",
+      "path": "assets/cultivation-equipment/items/ningyu-ringblade.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "liuyun-robe",
+      "name": "流雲袍",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete empty flowing Taoist robe, light cream and muted blue silk cloud panels, ancient bronze shoulder clasps, airy layered wide sleeves, no body or mannequin. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9d15e8a9-fb82-41e1-b949-c1de5cc7b1b6.png",
+      "path": "assets/cultivation-equipment/items/liuyun-robe.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "huichun-robe",
+      "name": "回春衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete empty healer robe, deep green and ivory cloth, bronze leaf clasps, small herbal pouch and jade buttons, full sleeve and hem silhouette, no body or mannequin. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-16988548-eea9-467f-9c88-f1003719ee63.png",
+      "path": "assets/cultivation-equipment/items/huichun-robe.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "xuanyu-robe",
+      "name": "玄玉衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete empty defensive robe incorporating overlapping translucent celadon jade lamellae over dark teal fabric, bronze cloud clasps, no body or mannequin. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-b007433c-1176-484e-96af-fd012905319e.png",
+      "path": "assets/cultivation-equipment/items/xuanyu-robe.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "yexing-robe",
+      "name": "夜行衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete empty stealth cultivator tunic with charcoal-black cloth, slender silver-bronze edges, midnight teal scarf, fitted forearm guards, no head/body/mannequin. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1d0e4718-d416-4263-9762-2b2ce5bb2454.png",
+      "path": "assets/cultivation-equipment/items/yexing-robe.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "chiyao-pendant",
+      "name": "赤曜佩",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete red sun crystal pendant with angular red gemstone held by antique bronze phoenix wings and a short dark-red cord; broad sun silhouette. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-0fe26120-5741-4fae-9776-8619f60cf7a1.png",
+      "originalSource": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-c3038712-f827-40ca-9125-62a4b1175d2c.png",
+      "edit": "Edit the same ruby phoenix pendant. Reconstruct its cropped upper red cord into a COMPLETE SMALL CLOSED LOOP. Zoom the entire pendant OUT to only 65% of canvas height. Leave 17% completely EMPTY transparent space at top and bottom; no object touches any edge. Keep entire lower three tassels and gems visible. Preserve red gem/bronze twin phoenix design. Isolated alpha transparent square PNG, no text/frame/background.",
+      "path": "assets/cultivation-equipment/items/chiyao-pendant.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "qingheng-pendant",
+      "name": "青蘅墜",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete small green jade leaf pendant with intertwined bronze herb branches, white jade droplet and braided pale teal cord, elegant asymmetric healing motif. Any cord must form a SMALL COMPLETE CLOSED LOOP fully inside canvas, not extending upward beyond image. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-61fd4271-38ed-4eee-9063-e5693d8c27a6.png",
+      "path": "assets/cultivation-equipment/items/qingheng-pendant.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "yinxi-bell",
+      "name": "隱息鈴",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete ancient dark bronze ritual bell, jade clapper visible below, tiny crescent cutouts, charcoal teal knotted cord and restrained violet rim glow. Any cord must form a SMALL COMPLETE CLOSED LOOP fully inside canvas, not extending upward beyond image. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-86d38d19-6891-4b1a-a45b-884bb7acf49f.png",
+      "path": "assets/cultivation-equipment/items/yinxi-bell.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "huifeng-seal",
+      "name": "回鋒印",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete square bronze personal seal with carved coiled guardian beast handle and dark jade base, three-quarter perspective, no readable characters on any face. Any cord must form a SMALL COMPLETE CLOSED LOOP fully inside canvas, not extending upward beyond image. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-8a7f87ac-2f2a-4955-afe9-4ef7b0cf0a77.png",
+      "path": "assets/cultivation-equipment/items/huifeng-seal.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-zhenyue-weapon",
+      "name": "鎮岳重戟",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A massive compact ancient battle halberd with mountain-shaped black iron axe head, bronze guardian face and jade inlay, complete diagonal weapon including shaft and pommel. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-267fd914-82e8-4bfe-a182-d83331d2dad2.png",
+      "path": "assets/cultivation-equipment/items/set-zhenyue-weapon.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-zhenyue-armor",
+      "name": "玄甲戰衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A heavy full empty armored cuirass with oversized bronze turtle-dragon pauldrons, dark iron overlapping plates and central mountain jade crest, deep teal cloth; no mannequin. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-07e1f9fb-8e12-4f41-aac0-9736306e06b6.png",
+      "path": "assets/cultivation-equipment/items/set-zhenyue-armor.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-zhenyue-accessory",
+      "name": "山魄印",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete cubic mountain jade seal topped with a tiny bronze mountain and turtle guardian, chunky earth-defender silhouette, no written characters. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-73a8e41c-1777-4294-9ebb-cdd491b814ae.png",
+      "path": "assets/cultivation-equipment/items/set-zhenyue-accessory.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-jiuyou-weapon",
+      "name": "靈藤杖",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete living vine staff twisted around bronze core, luminous emerald jade blossom crown, hanging ivory flowers, elegantly curved compact silhouette. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-d76dd486-0c38-4f40-ada3-7360dd14a3d1.png",
+      "path": "assets/cultivation-equipment/items/set-jiuyou-weapon.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-jiuyou-armor",
+      "name": "幽蘅衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: An empty elegant deep emerald healer robe woven with bronze vine filigree, pale jade leaf pauldrons, long complete sleeves and hem; no person/mannequin. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-81a895b3-6fb1-45c6-bfb8-631fb10c9abc.png",
+      "path": "assets/cultivation-equipment/items/set-jiuyou-armor.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-jiuyou-accessory",
+      "name": "返生墜",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete lotus-seed jade amulet with antique bronze branches enclosing a luminous green crystal drop, four tiny hanging jade leaves and complete cord loop. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-634ac9bb-01dc-4b68-a17f-93a06e720d45.png",
+      "path": "assets/cultivation-equipment/items/set-jiuyou-accessory.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-chixiao-weapon",
+      "name": "赤霄古劍",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete straight ancient sword of dark silver iron, antique bronze winged guard, red-orange crystal channels, split crescent pommel, dramatic sharp diagonal silhouette. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-bf9d1a0f-7229-4fb4-acf7-ba386497d7d9.png",
+      "path": "assets/cultivation-equipment/items/set-chixiao-weapon.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-chixiao-armor",
+      "name": "劍紋袍",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: An empty dark charcoal and muted crimson swordsman robe with layered bronze sword-shaped pauldrons, narrow silver protective panels, full sleeves and hem, no person/mannequin. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-7ade09ab-9070-4ccd-b776-00772711b187.png",
+      "path": "assets/cultivation-equipment/items/set-chixiao-armor.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-chixiao-accessory",
+      "name": "破霄佩",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete slim ruby-red triangular crystal pendant pierced by three miniature bronze sword motifs, sharp upright silhouette and complete dark-red cord. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9faa1310-574d-4dc8-a10d-21145fe20f7c.png",
+      "path": "assets/cultivation-equipment/items/set-chixiao-accessory.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-wuxiang-weapon",
+      "name": "五相神兵",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete ancient divine polearm with a circular bronze five-element wheel around its blade, five small distinct colored crystals gold green blue red amber, ornate dark iron haft; compact complete diagonal silhouette. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-75ceaa83-0223-43de-bf1e-73e95ecc6efa.png",
+      "path": "assets/cultivation-equipment/items/set-wuxiang-weapon.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-wuxiang-armor",
+      "name": "歸元法衣",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete empty emperor-cultivator mantle, layered dark teal silk and ancient bronze plate, five discrete colored jade clasps across chest, broad dignified shape, no person/mannequin. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-8cf55a8f-9851-44aa-b3e7-e29b3458543f.png",
+      "path": "assets/cultivation-equipment/items/set-wuxiang-armor.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "set-wuxiang-accessory",
+      "name": "輪轉璧",
+      "prompt": "Use case: stylized-concept. One game equipment inventory asset in ancient Chinese xianxia divine weapon style. Realistic hand-painted 3D materials: antique bronze filigree, dark iron, translucent jade, restrained inner glow. Crisp high resolution detailed silhouette. Subject: A complete circular bronze five-spoke cosmological jade disc, five gems gold green blue red amber spaced around rim, open center, short teal cord and small complete tassel. Any cord is a complete short closed loop. COMPLETE isolated object, entire silhouette inside image including tips, cords, sleeves, tassels, 12 percent EMPTY transparent margin ALL sides. Square 1024 or larger PNG, TRUE alpha transparency. No text, no UI, no frame, no environment or floor, no smoky backdrop. Make the object fit completely; do not crop.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-bc8363a4-c6ec-40ac-a6df-0f799c4c26b3.png",
+      "path": "assets/cultivation-equipment/items/set-wuxiang-accessory.png",
+      "kind": "equipment"
+    },
+    {
+      "id": "zhenyue",
+      "name": "鎮岳玄甲",
+      "prompt": "Create a wide landscape premium xianxia equipment set showcase illustration. Use these three reference equipment assets faithfully: weapon left, armor center, accessory right, each separate and fully visible with all tips cords and hems inside 10% safe margins. No wearer. Rich hand-painted realistic antique divine weapon style. massive mountain stone shrine, dark iron bronze jade defensive relics. Dark teal cinematic background with a faint antique bronze altar, subtle light only, high clarity. Armor largest, weapon tall and accessory enlarged enough to read. Do not overlap or crop objects. No text, no lettering, no border, no UI. Landscape 1536x1024 or larger. This is one cohesive set showcase; exactly three equipment objects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-76aa93c4-d591-4973-8c4e-f2fd65331805.png",
+      "path": "assets/cultivation-equipment/sets/zhenyue.png",
+      "kind": "showcase"
+    },
+    {
+      "id": "jiuyou",
+      "name": "九幽靈藤",
+      "prompt": "Create a wide landscape premium xianxia equipment set showcase illustration. Use these three reference equipment assets faithfully: weapon left, armor center, accessory right, each separate and fully visible with all tips cords and hems inside 10% safe margins. No wearer. Rich hand-painted realistic antique divine weapon style. ancient forest shrine, intricate living green vines and jade, healing spiritual relics. Dark teal cinematic background with a faint antique bronze altar, subtle light only, high clarity. Armor largest, weapon tall and accessory enlarged enough to read. Do not overlap or crop objects. No text, no lettering, no border, no UI. Landscape 1536x1024 or larger. This is one cohesive set showcase; exactly three equipment objects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-711e78a5-6341-4f65-8b8b-a0b545f5519f.png",
+      "path": "assets/cultivation-equipment/sets/jiuyou.png",
+      "kind": "showcase"
+    },
+    {
+      "id": "chixiao",
+      "name": "赤霄劍意",
+      "prompt": "Create a wide landscape premium xianxia equipment set showcase illustration. Faithfully preserve these three referenced equipment assets: weapon left, armor center, accessory right, each separate and FULLY visible with all tips cords and hems inside 10% safe margins. No wearer. Rich hand-painted realistic antique divine weapon style. ancient sword temple, restrained crimson light, bronze and dark iron sword-themed relics. Dark teal cinematic background with a faint antique bronze altar. High clarity. Armor largest, weapon tall and accessory enlarged enough to read. Do not overlap or crop objects. No text, no lettering, no border, no UI. Landscape 1536x1024 or larger. One cohesive showcase, exactly three equipment objects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-8e8e96e0-561c-488f-bf7a-f9380a388212.png",
+      "path": "assets/cultivation-equipment/sets/chixiao.png",
+      "kind": "showcase"
+    },
+    {
+      "id": "wuxiang",
+      "name": "五相歸元",
+      "prompt": "Create a wide landscape premium xianxia equipment set showcase illustration. Faithfully preserve these three referenced equipment assets: weapon left, armor center, accessory right, each separate and FULLY visible with all tips cords and hems inside 10% safe margins. No wearer. Rich hand-painted realistic antique divine weapon style. ancient celestial shrine, balanced five tiny jewel glows gold green blue red amber, jade and antique bronze. Dark teal cinematic background with a faint antique bronze altar. High clarity. Armor largest, weapon tall and accessory enlarged enough to read. Do not overlap or crop objects. No text, no lettering, no border, no UI. Landscape 1536x1024 or larger. One cohesive showcase, exactly three equipment objects.",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-33f6cc2c-4355-4244-be2c-e7e2473da11f.png",
+      "path": "assets/cultivation-equipment/sets/wuxiang.png",
+      "kind": "showcase"
+    }
+  ],
+  "approval": "User approved bronze, dark iron and jade samples and authorized remaining assets"
+}

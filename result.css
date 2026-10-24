@@ -1,0 +1,71 @@
+/* Hand result: summary on top, compact player rows, vertical scrolling when needed. */
+#reactionPanel:has(> .rs-panel) {
+  width: min(1480px, calc(100% - 24px)); max-height: calc(100dvh - 24px); overflow: visible; border-radius: 20px; background: none; box-shadow: none;
+}
+#reactionPanel > .result-panel.rs-panel {
+  /* Tile width follows the viewport so a full row (flowers + melds + hand ≈ 30 tiles) fits on one line. */
+  --rt: clamp(15px, calc((min(1480px, 100vw - 24px) - 300px) / 31), 40px);
+  display: flex; flex-direction: column; gap: 10px; max-height: calc(100dvh - 24px) !important; overflow-x: hidden !important; overflow-y: auto !important;
+  padding: 22px 26px 18px; border-radius: 20px; text-align: left;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, #2b3f7a55, transparent 70%), linear-gradient(170deg, #121c40, #0a1130 55%, #070b1e) !important;
+  border: 1.5px solid #e2c27e !important;
+  box-shadow: inset 0 0 0 5px #0b1230, inset 0 0 0 6px #e2c27e55, 0 30px 80px #000d !important;
+}
+.rs-panel .rs-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; padding-bottom: 10px; border-bottom: 1px solid #e2c27e33; }
+.rs-panel .rs-head .eyebrow { flex-basis: 100%; margin: 0; font: 600 12px/1 "Microsoft JhengHei", sans-serif; letter-spacing: 5px; color: #9fd9e6; }
+#reactionPanel > .rs-panel .rs-head h3 {
+  margin: 0; font: 700 28px/1.3 "DFKai-SB", "KaiTi", serif !important; letter-spacing: 4px;
+  background: linear-gradient(#fff8e6, #f3dca4 50%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent !important;
+}
+.rs-panel .rs-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font: 14px "Microsoft JhengHei", sans-serif; color: #c9d6ef; }
+.rs-panel .rs-fan { color: #f3dca4; font-size: 15px; }
+.rs-panel .rs-fan strong { font: 700 30px/1 "Segoe UI", sans-serif; margin-right: 2px; color: #fff1cf; }
+.rs-panel .rs-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-panel .rs-chip { padding: 3px 10px; border-radius: 999px; font-size: 13px; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+.rs-panel .rs-chip.is-plain { color: #c9d6ef; background: #ffffff14; border: 1px solid #ffffff22; }
+.rs-panel .rs-from { padding: 3px 10px; border-radius: 999px; border: 1px solid #9fd9e655; color: #bfe9ee; font-size: 13px; }
+
+.rs-panel .rs-rows { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.rs-panel .rs-rows, .rs-panel .rs-head, .rs-panel .result-footer { flex-shrink: 0; }
+#reactionPanel > .rs-panel .result-player.rs-row {
+  display: grid; grid-template-columns: 210px minmax(0, 1fr); align-items: center; gap: 14px;
+  margin: 0; padding: 8px 14px; border-radius: 12px; border: 1px solid #9cb4e033; background: #121b3f99;
+}
+#reactionPanel > .rs-panel .result-player.rs-row.winner { border-color: #e2c27e; background: linear-gradient(100deg, #4b3f1e66, #121b3f99 45%); box-shadow: 0 0 22px #f3dca422; }
+#reactionPanel > .rs-panel .result-player.rs-row.is-from { border-color: #d8573f88; }
+.rs-panel .rs-who { display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center; min-width: 0; }
+.rs-panel .rs-wind { grid-row: 1 / 3; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 700 17px/1 "DFKai-SB", "KaiTi", serif; color: #f3dca4; background: radial-gradient(circle at 35% 30%, #2f4f8e, #121b3f 70%); border: 1px solid #e2c27e88; }
+.rs-panel .rs-name { font: 700 16px/1.3 "DFKai-SB", "KaiTi", "Microsoft JhengHei", serif; color: #f1e9d4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs-panel .rs-name small { margin-left: 6px; padding: 0 6px; border-radius: 6px; font: 600 11px/1.6 "Microsoft JhengHei", sans-serif; color: #08202a; background: #9fd9e6; }
+.rs-panel .rs-points { display: flex; align-items: baseline; gap: 8px; font: 700 15px/1.3 "Segoe UI", sans-serif; color: #f3dca4; font-variant-numeric: tabular-nums; }
+.rs-panel .rs-delta { font-style: normal; font-size: 13px; }
+.rs-panel .rs-delta.is-up { color: #8ff0b0; }
+.rs-panel .rs-delta.is-down { color: #ff9b8a; }
+.rs-panel .rs-tiles { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 12px; min-width: 0; }
+.rs-panel .rs-group { display: flex; align-items: flex-end; gap: 1px; padding: 3px; border-radius: 6px; }
+.rs-panel .rs-meld, .rs-panel .rs-flowers { background: #ffffff0a; box-shadow: inset 0 0 0 1px #e2c27e2e; }
+.rs-panel .rs-tag { align-self: center; margin-right: 4px; font: 700 12px/1 "DFKai-SB", "KaiTi", serif; color: #f3dca4; writing-mode: vertical-rl; letter-spacing: 1px; }
+.rs-panel .rs-flowers .flower-row { display: flex; gap: 1px; margin: 0; }
+#reactionPanel > .rs-panel .rs-group .tile.small, #reactionPanel > .rs-panel .rs-flowers .flower-row .tile {
+  width: var(--rt) !important; min-width: 0 !important; height: auto !important; aspect-ratio: 5 / 7; padding: 1px; flex: none;
+}
+#reactionPanel > .rs-panel .rs-group .tile .tile-art { width: 100%; height: 100%; }
+#reactionPanel > .rs-panel .rs-win-tile { margin-left: 6px; box-shadow: 0 0 0 2px #f3dca4, 0 0 14px #f3dca4aa !important; translate: 0 -4px; }
+#reactionPanel > .rs-panel .result-footer { position: static; margin: 0; padding: 12px 0 0; border-top: 1px solid #e2c27e33; background: none; text-align: right; }
+#reactionPanel > .rs-panel .result-footer button { min-height: 46px; min-width: 200px; border-radius: 999px; font: 700 16px "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; }
+
+@media (max-width: 760px) {
+  #reactionPanel:has(> .rs-panel) { width: calc(100% - 12px); max-height: calc(100dvh - 12px); }
+  #reactionPanel > .result-panel.rs-panel { --rt: clamp(13px, calc((100vw - 60px) / 18), 22px); padding: 14px 10px 12px; gap: 8px; max-height: calc(100dvh - 12px) !important; }
+  #reactionPanel > .rs-panel .rs-head h3 { font-size: 22px; letter-spacing: 2px; }
+  .rs-panel .rs-fan strong { font-size: 24px; }
+  #reactionPanel > .rs-panel .result-player.rs-row { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 6px 8px; }
+  .rs-panel .rs-who { grid-template-columns: 26px auto auto; grid-template-rows: auto; justify-content: start; }
+  .rs-panel .rs-wind { grid-row: auto; width: 26px; height: 26px; font-size: 14px; }
+  .rs-panel .rs-tiles { gap: 4px 6px; }
+  #reactionPanel > .rs-panel .result-footer button { width: 100%; }
+}
+@media (max-height: 760px) and (min-width: 761px) {
+  #reactionPanel > .result-panel.rs-panel { --rt: clamp(15px, calc((min(1480px, 100vw - 24px) - 300px) / 34), 34px); padding: 16px 22px 14px; gap: 8px; }
+  #reactionPanel > .rs-panel .result-player.rs-row { padding: 6px 12px; }
+}

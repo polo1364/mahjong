@@ -1,0 +1,152 @@
+{
+  "title": "修仙技能施法預覽",
+  "status": "approval-preview-only",
+  "audio": {"provider":"ElevenLabs","model":"v3","durationSeconds":2,"loop":false,"promptInfluence":0.3,"autoEnhance":false,"selectedCandidate":1,"sourceDirectory":"../../art-source/cultivation-preview/audio","files":["jade-fire.mp3","jade-heal.mp3","jade-ward.mp3","jade-mountain.mp3","ink-fire.mp3","ink-heal.mp3","ink-ward.mp3","ink-mountain.mp3","bronze-fire.mp3","bronze-heal.mp3","bronze-ward.mp3","bronze-mountain.mp3"],"processing":"loudnorm I=-18 TP=-3 LRA=7; brief fade; 44.1kHz stereo 192kbps; full-health healing variants retain first 0.72s only"},
+  "monster": {"id":"monster","kind":"combat-target","source":"C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-5c90009e-e1ba-48e5-8852-737420145c7b.png","file":"monster.png","prompt":"Generate a single high-end Chinese xianxia fantasy enemy game asset on transparent background. Full-body three-quarter view of an ancient obsidian qilin stone guardian, facing left toward its opponent. Four strong legs, jagged dark stone armor, a pair of bronze antler horns, glowing amber eyes and subtle golden fissures. Regal fierce supernatural beast, no blood, no humans. Elegant realistic hand-painted 3D game art with detailed believable volumetric materials and clean silhouette; camera slightly above with visible front and left flank, suitable for a tabletop combat scene. Dark slate and antique bronze, restrained warm emissive highlights. Groundless isolated cutout, entire creature and tail fit canvas with margins. No text, logos, UI, border, decorative frame or icons. Wide composition 3:2."},
+  "styles": [
+    {
+      "id": "jade",
+      "name": "晶玉仙門",
+      "desc": "Exquisite cinematic 3D xianxia jade-and-crystal sacred artefact. Translucent nephrite, crystal refraction, fine brushed antique gold filigree, soft ethereal volumetric wisps, crisp material detail. Elegant sophisticated Chinese immortal cultivation game."
+    },
+    {
+      "id": "ink",
+      "name": "玄墨符法",
+      "desc": "Premium hand-painted Chinese dark-ink sorcery illustration, dimensional smoky ink, vermilion cinnabar seals, fine liquid gold accents, mineral pigment textures and ethereal brushstroke mist. Not flat line art. Rich detailed fantasy painting with sculptural depth."
+    },
+    {
+      "id": "bronze",
+      "name": "上古神兵",
+      "desc": "Epic high-end 3D ancient Chinese mythological artefact. Weathered ritual bronze with taotie carvings, dark jade inlays, warm ember-filled seams, heavy sculptural relief, restrained gold highlights, dramatic physically plausible lighting."
+    }
+  ],
+  "skills": [
+    {
+      "id": "fire",
+      "name": "星火燎原",
+      "subject": "a single compact blazing fire seed crystallized into a curved flame crest, brilliant ruby-orange core, elegant curling flame tongues and a few embers; recognizable FIRE ATTACK silhouette"
+    },
+    {
+      "id": "heal",
+      "name": "甘霖回脈",
+      "subject": "one luminous turquoise water droplet cradled by an unfurling lotus, liquid ribbons and dewdrops rising in a gentle spiral; recognizable WATER HEALING silhouette"
+    },
+    {
+      "id": "ward",
+      "name": "玉璧生輝",
+      "subject": "one substantial round Chinese jade bi-disc protective ward, carved protective relief and radiant amber-gold rim, three quarter frontal view, small shards of protective light; recognizable EARTH SHIELD silhouette"
+    },
+    {
+      "id": "mountain",
+      "name": "五嶽鎮魔",
+      "subject": "five majestic miniature sacred mountain peaks arranged as one compact ascending crown, suspended above an ancient square sealing plinth, descending golden aura and stone fragments; exactly five primary peaks; recognizable FIVE MOUNTAIN FINISHER silhouette"
+    }
+  ],
+  "images": [
+    {
+      "id": "jade-fire",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-2657fbf4-1372-45f7-9e37-8833261f456d.png",
+      "file": "jade-fire.png",
+      "prompt": "Use case: stylized-concept. Produce one high-resolution raster game ability icon and reusable effect cutout, at least 1024x1024 quality. Art direction A: Exquisite cinematic 3D xianxia jade-and-crystal sacred artefact. Translucent nephrite, crystal refraction, fine brushed antique gold filigree, soft ethereal volumetric wisps, crisp material detail. Elegant sophisticated Chinese immortal cultivation game. Subject: a single compact blazing fire seed crystallized into a curved flame crest, brilliant ruby-orange core, elegant curling flame tongues and a few embers; recognizable FIRE ATTACK silhouette. Center one coherent motif occupying 75% of the square with generous transparent margin. Real transparent alpha background, isolated object with localized soft glow only. Carefully finished highly legible at 64px, strong distinct silhouette, complex materials but uncluttered composition. NO text, lettering, numbers, border, UI frame, square background, scene, people, watermark, logo, SVG/vector appearance, flat pictogram or checkerboard. Beautiful tangible three-dimensional painted/rendered game art, not a generic neon outline."
+    },
+    {
+      "id": "jade-heal",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-5009924a-e0c8-4b06-b332-a30eefdcde2b.png",
+      "file": "jade-heal.png",
+      "prompt": "Use case: stylized-concept. Produce one high-resolution raster game ability icon and reusable effect cutout, at least 1024x1024 quality. Art direction A: Exquisite cinematic 3D xianxia jade-and-crystal sacred artefact. Translucent nephrite, crystal refraction, fine brushed antique gold filigree, soft ethereal volumetric wisps, crisp material detail. Elegant sophisticated Chinese immortal cultivation game. Subject: one luminous turquoise water droplet cradled by an unfurling lotus, liquid ribbons and dewdrops rising in a gentle spiral; recognizable WATER HEALING silhouette. Center one coherent motif occupying 75% of the square with generous transparent margin. Real transparent alpha background, isolated object with localized soft glow only. Carefully finished highly legible at 64px, strong distinct silhouette, complex materials but uncluttered composition. NO text, lettering, numbers, border, UI frame, square background, scene, people, watermark, logo, SVG/vector appearance, flat pictogram or checkerboard. Beautiful tangible three-dimensional painted/rendered game art, not a generic neon outline."
+    },
+    {
+      "id": "jade-ward",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-84251d24-2adb-483e-a2fc-aa658e1e15ca.png",
+      "file": "jade-ward.png",
+      "prompt": "Use case: stylized-concept. Produce one high-resolution raster game ability icon and reusable effect cutout, at least 1024x1024 quality. Art direction A: Exquisite cinematic 3D xianxia jade-and-crystal sacred artefact. Translucent nephrite, crystal refraction, fine brushed antique gold filigree, soft ethereal volumetric wisps, crisp material detail. Elegant sophisticated Chinese immortal cultivation game. Subject: one substantial round Chinese jade bi-disc protective ward, carved protective relief and radiant amber-gold rim, three quarter frontal view, small shards of protective light; recognizable EARTH SHIELD silhouette. Center one coherent motif occupying 75% of the square with generous transparent margin. Real transparent alpha background, isolated object with localized soft glow only. Carefully finished highly legible at 64px, strong distinct silhouette, complex materials but uncluttered composition. NO text, lettering, numbers, border, UI frame, square background, scene, people, watermark, logo, SVG/vector appearance, flat pictogram or checkerboard. Beautiful tangible three-dimensional painted/rendered game art, not a generic neon outline."
+    },
+    {
+      "id": "jade-mountain",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-da7f8a69-a2d1-418f-b082-1ff8c1dad3e4.png",
+      "file": "jade-mountain.png",
+      "prompt": "Use case: stylized-concept. Produce one high-resolution raster game ability icon and reusable effect cutout, at least 1024x1024 quality. Art direction A: Exquisite cinematic 3D xianxia jade-and-crystal sacred artefact. Translucent nephrite, crystal refraction, fine brushed antique gold filigree, soft ethereal volumetric wisps, crisp material detail. Elegant sophisticated Chinese immortal cultivation game. Subject: five majestic miniature sacred mountain peaks arranged as one compact ascending crown, suspended above an ancient square sealing plinth, descending golden aura and stone fragments; exactly five primary peaks; recognizable FIVE MOUNTAIN FINISHER silhouette. Center one coherent motif occupying 75% of the square with generous transparent margin. Real transparent alpha background, isolated object with localized soft glow only. Carefully finished highly legible at 64px, strong distinct silhouette, complex materials but uncluttered composition. NO text, lettering, numbers, border, UI frame, square background, scene, people, watermark, logo, SVG/vector appearance, flat pictogram or checkerboard. Beautiful tangible three-dimensional painted/rendered game art, not a generic neon outline."
+    },
+    {
+      "id": "jade-atlas",
+      "kind": "combat-texture-atlas",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-e38b379b-23ec-407c-b6d1-22a4b3b5d634.png",
+      "file": "jade-atlas.png",
+      "prompt": "Use case: stylized-concept. Create a PROFESSIONAL GAME VFX TEXTURE ATLAS, not icons or UI. Landscape 2:1 image, ideally 2048x1024, exactly FOUR equal columns and TWO equal rows, eight isolated usable spell-effect textures, on genuine transparent alpha. Every cell has its subject centered with 15 percent clear padding, no overlap, no frames or grid lines. Art direction 晶玉仙門: transparent crystalline flame plasma, luminous turquoise water, fine jade sparks, clean white-gold radiance. These are raw organic energy and matter textures for real combat effects; NO symbolic icons, jewellery, logos, text, numbers, SVG or vector art. Top row left to right: (1) blazing magical projectile, horizontal, bright head at right trailing fire and sparks to left; (2) radial violent fire impact burst with hot core and explosive filaments; (3) sweeping crescent of fluid turquoise water with droplets, energetic tangible splashing water; (4) circular horizontal expanding gold shockwave ring, viewed from above, glowing broken textured rim and EMPTY center. Bottom row left to right: (5) soft irregular translucent smoke / ink cloud with edges fading to full transparency; (6) small cluster of sharp radiant gold energy sparks radiating outward, empty surrounding area; (7) one tall angular massive dark sacred rock spike with molten golden fissures, vertical, flat lower end and pointed top, NO plinth; (8) curved protective energy barrier arc, golden translucent shell with layered ripple structure, open crescent silhouette. Highly detailed physical particle texture, high contrast enough for dark green tabletop, edges naturally fade to transparent, no rectangular backdrop, no checkerboard. Each tile is an attack-effect layer, never an ability icon."
+    },
+    {
+      "id": "ink-fire",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-1599a72a-7c38-4bcd-b078-e215b3274a1b.png",
+      "file": "ink-fire.png",
+      "prompt": "Use case: stylized-concept. One premium raster ability icon / transparent effect cutout for a Chinese immortal cultivation game. Premium hand-painted Chinese dark-ink sorcery illustration, dimensional smoky ink, vermilion cinnabar seals, fine liquid gold accents, mineral pigment textures and ethereal brushstroke mist. Not flat line art. Rich detailed fantasy painting with sculptural depth.. Subject: a vermilion flame conjured from a curling black-ink talisman stroke, dense red-orange fire nucleus, flickering gold flecks. Centered single cohesive motif, bold readable silhouette, 75% of canvas, plenty of transparent margin. Painterly materials, highly detailed, layered cinematic light, NOT a geometric vector symbol. At least 1024x1024 detail. Pure transparent alpha background, soft translucent ink wisps only around subject. NO text, readable calligraphy, numbers, labels, border, square card, people, scenery, watermark, logo, SVG, vector, flat pictogram, checkerboard. Style must look distinctly hand-painted and ink-based, not glossy crystal jewellery."
+    },
+    {
+      "id": "ink-heal",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-0794fbbe-fd2a-44f1-af27-6f669ba932e1.png",
+      "file": "ink-heal.png",
+      "prompt": "Use case: stylized-concept. One premium raster ability icon / transparent effect cutout for a Chinese immortal cultivation game. Premium hand-painted Chinese dark-ink sorcery illustration, dimensional smoky ink, vermilion cinnabar seals, fine liquid gold accents, mineral pigment textures and ethereal brushstroke mist. Not flat line art. Rich detailed fantasy painting with sculptural depth.. Subject: a translucent teal-blue water droplet above an ink-painted lotus, pale jade leaves, flowing watery brushstroke spiral and delicate gold dewdrops. Centered single cohesive motif, bold readable silhouette, 75% of canvas, plenty of transparent margin. Painterly materials, highly detailed, layered cinematic light, NOT a geometric vector symbol. At least 1024x1024 detail. Pure transparent alpha background, soft translucent ink wisps only around subject. NO text, readable calligraphy, numbers, labels, border, square card, people, scenery, watermark, logo, SVG, vector, flat pictogram, checkerboard. Style must look distinctly hand-painted and ink-based, not glossy crystal jewellery."
+    },
+    {
+      "id": "ink-ward",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9fc836c7-0684-45dd-9b1b-9d3b196de357.png",
+      "file": "ink-ward.png",
+      "prompt": "Use case: stylized-concept. One premium raster ability icon / transparent effect cutout for a Chinese immortal cultivation game. Premium hand-painted Chinese dark-ink sorcery illustration, dimensional smoky ink, vermilion cinnabar seals, fine liquid gold accents, mineral pigment textures and ethereal brushstroke mist. Not flat line art. Rich detailed fantasy painting with sculptural depth.. Subject: a round jade bi-disc protective seal with an ancient carved central aperture, gold pigment relief and layered black ink smoke, warm ivory and gold core. Centered single cohesive motif, bold readable silhouette, 75% of canvas, plenty of transparent margin. Painterly materials, highly detailed, layered cinematic light, NOT a geometric vector symbol. At least 1024x1024 detail. Pure transparent alpha background, soft translucent ink wisps only around subject. NO text, readable calligraphy, numbers, labels, border, square card, people, scenery, watermark, logo, SVG, vector, flat pictogram, checkerboard. Style must look distinctly hand-painted and ink-based, not glossy crystal jewellery."
+    },
+    {
+      "id": "ink-mountain",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-c15605f7-4fba-4c44-95fc-348e87e0a4b1.png",
+      "file": "ink-mountain.png",
+      "prompt": "Use case: stylized-concept. One premium raster ability icon / transparent effect cutout for a Chinese immortal cultivation game. Premium hand-painted Chinese dark-ink sorcery illustration, dimensional smoky ink, vermilion cinnabar seals, fine liquid gold accents, mineral pigment textures and ethereal brushstroke mist. Not flat line art. Rich detailed fantasy painting with sculptural depth.. Subject: exactly five sacred mountain peaks emerging from dark ink mist above a square vermilion sealing pedestal, golden ridgelines, five descending golden rays. Centered single cohesive motif, bold readable silhouette, 75% of canvas, plenty of transparent margin. Painterly materials, highly detailed, layered cinematic light, NOT a geometric vector symbol. At least 1024x1024 detail. Pure transparent alpha background, soft translucent ink wisps only around subject. NO text, readable calligraphy, numbers, labels, border, square card, people, scenery, watermark, logo, SVG, vector, flat pictogram, checkerboard. Style must look distinctly hand-painted and ink-based, not glossy crystal jewellery."
+    },
+    {
+      "id": "ink-atlas",
+      "kind": "combat-texture-atlas",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-40be07c4-9964-4154-8146-60ba6b013d20.png",
+      "file": "ink-atlas.png",
+      "prompt": "Use case: stylized-concept. Create a PROFESSIONAL GAME VFX TEXTURE ATLAS, not icons or UI. Landscape 2:1 image, ideally 2048x1024, exactly FOUR equal columns and TWO equal rows, eight isolated usable spell-effect textures, on genuine transparent alpha. Every cell has its subject centered with 15 percent clear padding, no overlap, no frames or grid lines. Art direction 玄墨符法: dense flowing black ink vapour with vermilion fire and thin gold edges, turquoise liquid brushstroke spray, rich painterly billowing smoke. These are raw organic energy and matter textures for real combat effects; NO symbolic icons, jewellery, logos, text, numbers, SVG or vector art. Top row left to right: (1) blazing magical projectile, horizontal, bright head at right trailing fire and sparks to left; (2) radial violent fire impact burst with hot core and explosive filaments; (3) sweeping crescent of fluid turquoise water with droplets, energetic tangible splashing water; (4) circular horizontal expanding gold shockwave ring, viewed from above, glowing broken textured rim and EMPTY center. Bottom row left to right: (5) soft irregular translucent smoke / ink cloud with edges fading to full transparency; (6) small cluster of sharp radiant gold energy sparks radiating outward, empty surrounding area; (7) one tall angular massive dark sacred rock spike with molten golden fissures, vertical, flat lower end and pointed top, NO plinth; (8) curved protective energy barrier arc, golden translucent shell with layered ripple structure, open crescent silhouette. Highly detailed physical particle texture, high contrast enough for dark green tabletop, edges naturally fade to transparent, no rectangular backdrop, no checkerboard. Each tile is an attack-effect layer, never an ability icon."
+    },
+    {
+      "id": "bronze-fire",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-839f2e20-78be-4ca3-88bb-f813f0085c25.png",
+      "file": "bronze-fire.png",
+      "prompt": "Use case: stylized-concept. One high-resolution raster ability icon / static game menu art. Epic high-end 3D ancient Chinese mythological artefact. Weathered ritual bronze with taotie carvings, dark jade inlays, warm ember-filled seams, heavy sculptural relief, restrained gold highlights, dramatic physically plausible lighting.. Subject: a single compact blazing fire seed crystallized into a curved flame crest, brilliant ruby-orange core, elegant curling flame tongues and a few embers; recognizable FIRE ATTACK silhouette. Carved antique bronze structures and jade substance, ancient ritual Chinese appearance, aged surfaces with minute engravings and tangible mass. For healing use dark green jade lotus and teal water core, for flame use molten orange core, for shield warm carved bronze and jade disk, for five mountains use dark stone-gold sacred peaks. Square composition, subject occupying 75%, transparent background and generous margin. Highly legible silhouette at small scale. NO text, numbers, border, UI frame, square background, people, logos, watermark, vector/SVG appearance, checkerboard. Isolated premium 3D-rendered object with restrained localized glow."
+    },
+    {
+      "id": "bronze-heal",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-9a9f6613-72ca-4b4d-a68f-5437e745e8fd.png",
+      "file": "bronze-heal.png",
+      "prompt": "Use case: stylized-concept. One high-resolution raster ability icon / static game menu art. Epic high-end 3D ancient Chinese mythological artefact. Weathered ritual bronze with taotie carvings, dark jade inlays, warm ember-filled seams, heavy sculptural relief, restrained gold highlights, dramatic physically plausible lighting.. Subject: one luminous turquoise water droplet cradled by an unfurling lotus, liquid ribbons and dewdrops rising in a gentle spiral; recognizable WATER HEALING silhouette. Carved antique bronze structures and jade substance, ancient ritual Chinese appearance, aged surfaces with minute engravings and tangible mass. For healing use dark green jade lotus and teal water core, for flame use molten orange core, for shield warm carved bronze and jade disk, for five mountains use dark stone-gold sacred peaks. Square composition, subject occupying 75%, transparent background and generous margin. Highly legible silhouette at small scale. NO text, numbers, border, UI frame, square background, people, logos, watermark, vector/SVG appearance, checkerboard. Isolated premium 3D-rendered object with restrained localized glow."
+    },
+    {
+      "id": "bronze-ward",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-accdb99a-4a07-4feb-affa-d5726a7d4db7.png",
+      "file": "bronze-ward.png",
+      "prompt": "Use case: stylized-concept. One high-resolution raster ability icon / static game menu art. Epic high-end 3D ancient Chinese mythological artefact. Weathered ritual bronze with taotie carvings, dark jade inlays, warm ember-filled seams, heavy sculptural relief, restrained gold highlights, dramatic physically plausible lighting.. Subject: one substantial round Chinese jade bi-disc protective ward, carved protective relief and radiant amber-gold rim, three quarter frontal view, small shards of protective light; recognizable EARTH SHIELD silhouette. Carved antique bronze structures and jade substance, ancient ritual Chinese appearance, aged surfaces with minute engravings and tangible mass. For healing use dark green jade lotus and teal water core, for flame use molten orange core, for shield warm carved bronze and jade disk, for five mountains use dark stone-gold sacred peaks. Square composition, subject occupying 75%, transparent background and generous margin. Highly legible silhouette at small scale. NO text, numbers, border, UI frame, square background, people, logos, watermark, vector/SVG appearance, checkerboard. Isolated premium 3D-rendered object with restrained localized glow."
+    },
+    {
+      "id": "bronze-mountain",
+      "kind": "static-icon",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-475f1ec1-6694-439d-b221-f48e2eda91e7.png",
+      "file": "bronze-mountain.png",
+      "prompt": "Use case: stylized-concept. One high-resolution raster ability icon / static game menu art. Epic high-end 3D ancient Chinese mythological artefact. Weathered ritual bronze with taotie carvings, dark jade inlays, warm ember-filled seams, heavy sculptural relief, restrained gold highlights, dramatic physically plausible lighting.. Subject: five majestic miniature sacred mountain peaks arranged as one compact ascending crown, suspended above an ancient square sealing plinth, descending golden aura and stone fragments; exactly five primary peaks; recognizable FIVE MOUNTAIN FINISHER silhouette. Carved antique bronze structures and jade substance, ancient ritual Chinese appearance, aged surfaces with minute engravings and tangible mass. For healing use dark green jade lotus and teal water core, for flame use molten orange core, for shield warm carved bronze and jade disk, for five mountains use dark stone-gold sacred peaks. Square composition, subject occupying 75%, transparent background and generous margin. Highly legible silhouette at small scale. NO text, numbers, border, UI frame, square background, people, logos, watermark, vector/SVG appearance, checkerboard. Isolated premium 3D-rendered object with restrained localized glow."
+    },
+    {
+      "id": "bronze-atlas",
+      "kind": "combat-texture-atlas",
+      "source": "C:\\Users\\User\\.codex\\generated_images\\01a15eb9-9342-7161-a8a6-5bd939302524\\exec-43f9f1f1-4d84-4c4f-8e3a-4321ea0217ef.png",
+      "file": "bronze-atlas.png",
+      "prompt": "Use case: stylized-concept. Create a PROFESSIONAL GAME VFX TEXTURE ATLAS, not icons or UI. Landscape 2:1 image, ideally 2048x1024, exactly FOUR equal columns and TWO equal rows, eight isolated usable spell-effect textures, on genuine transparent alpha. Every cell has its subject centered with 15 percent clear padding, no overlap, no frames or grid lines. Art direction 上古神兵: heavy amber molten embers, bronze-gold shockwaves, dark teal water energy, granular rocky debris and dramatic smoky impact. These are raw organic energy and matter textures for real combat effects; NO symbolic icons, jewellery, logos, text, numbers, SVG or vector art. Top row left to right: (1) blazing magical projectile, horizontal, bright head at right trailing fire and sparks to left; (2) radial violent fire impact burst with hot core and explosive filaments; (3) sweeping crescent of fluid turquoise water with droplets, energetic tangible splashing water; (4) circular horizontal expanding gold shockwave ring, viewed from above, glowing broken textured rim and EMPTY center. Bottom row left to right: (5) soft irregular translucent smoke / ink cloud with edges fading to full transparency; (6) small cluster of sharp radiant gold energy sparks radiating outward, empty surrounding area; (7) one tall angular massive dark sacred rock spike with molten golden fissures, vertical, flat lower end and pointed top, NO plinth; (8) curved protective energy barrier arc, golden translucent shell with layered ripple structure, open crescent silhouette. Highly detailed physical particle texture, high contrast enough for dark green tabletop, edges naturally fade to transparent, no rectangular backdrop, no checkerboard. Each tile is an attack-effect layer, never an ability icon."
+    }
+  ]
+}

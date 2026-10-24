@@ -1,0 +1,130 @@
+/* Scoped combat HUD. Tile rails and their measured sizes stay under table-layout. */
+html.cultivation-mode .center-area > .center-info-panel { display: none !important; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .player-info-inline { gap: 3px 6px; padding: 7px; border-radius: 12px; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-points,
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-sub { display: none; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-portrait { width: 38px; grid-column: 1; grid-row: 1; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-avatar { display: none; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-name { grid-column: 2 / -1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .seat-meta { display: none; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .top-area > .player-info-inline { grid-template-columns: 30px minmax(0,1fr); padding: 5px 8px; width: clamp(220px,24%,300px); }
+html.cultivation-mode.table-scene.square-table .mahjong-table .top-area .seat-portrait { width: 25px; }
+html.cultivation-mode.table-scene.square-table .mahjong-table .self-header > .player-info-inline { grid-template-columns: 28px minmax(0,1fr); }
+html.cultivation-mode.table-scene.square-table .mahjong-table .self-header .seat-portrait { width: 27px; }
+html.cultivation-mode .player-info-inline.cult-targeted { border-color: #eeae7d !important; box-shadow: 0 0 0 1px #eeae7d55, 0 4px 16px #0007 !important; }
+html.cultivation-mode .player-info-inline.cult-weakened { border-color: #a28aa7 !important; }
+.cult-player-stats { grid-column: 1 / -1; min-width: 0; font: 11px/1.35 "Microsoft JhengHei", "Segoe UI", sans-serif; color: #d7e9e3; font-variant-numeric: tabular-nums; }
+.cult-life { display: flex; justify-content: space-between; gap: 3px; align-items: baseline; white-space: nowrap; }
+.cult-life b { color: #f2fff9; font-size: 13px; }.cult-life small { font-size: 10px; color: #a0bdb4; }
+.cult-lock { font-size: 10px; color: #d8aada; }.cult-lock.is-target { color: #ffc092; }
+.cult-bar { height: 5px; margin: 3px 0 4px; background: #08120f; border-radius: 4px; overflow: hidden; border: 1px solid #a3cbb733; }
+.cult-bar i { height: 100%; display: block; background: linear-gradient(90deg,#348772,#8ed9ab); border-radius: inherit; }
+.cult-numbers { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1px 8px; }.cult-numbers span { white-space: nowrap; }.cult-numbers b { color: #f2d89b; font-weight: 600; }
+.cult-statuses { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; font-size: 10px; }.cult-statuses span { padding: 1px 4px; border-radius: 3px; background: #a7c9b214; color: #bde6cf; }
+.cult-weak { margin: 3px 0 0; color: #f0bed7; font-size: 10px; }
+.cult-monster { --element: #dbc491; width: 152px; box-sizing: border-box; padding: 10px; border: 1px solid #bca16a99; border-radius: 16px; background: linear-gradient(155deg,#16382feb,#071c1fee); box-shadow: 0 4px 24px #0008, inset 0 0 20px #2a675315; color: #ebf3e9; font: 12px/1.4 "Microsoft JhengHei",sans-serif; }
+.cult-monster[data-element="fire"] { --element: #ffa777; }.cult-monster[data-element="water"] { --element: #8dcfee; }.cult-monster[data-element="wood"] { --element: #9ae0a9; }.cult-monster[data-element="metal"] { --element: #ece0a7; }.cult-monster[data-element="earth"] { --element: #d6b791; }
+.cult-monster-top { display: flex; align-items: center; gap: 7px; }.cult-monster-top > span { min-width: 0; }.cult-monster-top small { display: block; font-size: 10px; color: #b4c8ba; }.cult-monster-top strong { display: block; color: var(--element); font-size: 16px; font-weight: 700; }
+.cult-emblem { width: 32px; height: 36px; flex: none; fill: none; stroke: var(--element); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cult-monster-hp { text-align: center; margin-top: 5px; font-variant-numeric: tabular-nums; }.cult-monster-hp b { font-size: 18px; }.cult-monster-hp span { color: #a9c2b8; font-size: 10px; }
+.cult-enemy-bar { height: 6px; margin: 3px 0 7px; }.cult-enemy-bar i { background: linear-gradient(90deg,#b46d4d,#edba7a); }
+.cult-attack { display: flex; flex-direction: column; text-align: center; line-height: 1.4; }.cult-attack b { color: #f3dbad; }.cult-attack span { color: #bed0c8; font-size: 11px; }.cult-attack.is-charged b { color: #ffc3a2; }
+.cult-target { text-align: center; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 3px 0; color: #e9cda4; }.cult-countdown { text-align: center; padding-top: 4px; border-top: 1px solid #d1c59433; color: #c0d8cd; font-size: 10px; }.cult-monster-status { justify-content: center; }
+.cult-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.cult-catalog { grid-column: 1 / -1; border-top: 1px solid #c1a77455; padding-top: 16px; font: 14px/1.65 "Microsoft JhengHei",sans-serif; }
+.cult-catalog summary { cursor: pointer; min-height: 44px; color: #f1d69c; font-weight: 700; }.cult-catalog summary > span { font-size: 12px; color: #acbeb7; margin-left: 6px; }
+.cult-catalog p { color: #c6d9d0; margin: 5px 0 12px; }.cult-catalog-controls { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }.cult-catalog-controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #c5d7cd; }
+.cult-catalog-controls input,.cult-catalog-controls select { min-width: 0; min-height: 44px; box-sizing: border-box; width: 100%; padding: 8px; background: #0a1d23; color: #f4eed9; border: 1px solid #9eb7a955; border-radius: 7px; font: 14px "Microsoft JhengHei",sans-serif; }
+.cult-skill-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }.cult-skill-card { padding: 12px; border: 1px solid #c6b17b44; border-radius: 9px; background: #072a252e; }.cult-skill-card h4 { margin: 4px 0 5px; color: #f1d69c; font-size: 16px; }.cult-skill-card p { margin: 0; font-size: 13px; line-height: 1.65; }.cult-skill-meta { color: #a8c7bb; font-size: 11px; }.cult-log-details { margin-top: 16px; }.cult-log-details li { margin: 4px 0; color: #d0ded3; }.cult-log-details ol { padding-left: 24px; }
+.cult-choice { width: min(620px,calc(100vw - 24px)); box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; border: 1px solid #d9bb7c; border-radius: 16px; padding: 20px; background: linear-gradient(140deg,#17372f,#0b1b27); color: #e9eedb; font: 14px/1.6 "Microsoft JhengHei",sans-serif; box-shadow: 0 20px 80px #000b; }
+.cult-choice::backdrop { background: #020b15c9; }.cult-choice header { display: flex; justify-content: space-between; gap: 16px; align-items: center; }.cult-choice header p { margin: 0; color: #a4cabb; font-size: 11px; letter-spacing: 3px; }.cult-choice h2 { color: #f3d69b; font-size: 23px; margin: 3px 0; }.cult-choice p { color: #c7d9cf; }.cult-choice button { min-height: 44px; font-family: inherit; }.cult-choice-cancel { flex: none; padding: 8px 12px; color: #e4d8b7; border: 1px solid #c9b37a77; background: #081f25; border-radius: 7px; }.cult-choice-options { display: grid; gap: 10px; }.cult-choice-option { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 14px; color: #e2eee1; background: #26493966; border: 1px solid #adb98577; border-radius: 10px; cursor: pointer; }.cult-choice-option:hover { background: #3a624b88; }.cult-choice button:focus-visible,.cult-catalog :focus-visible { outline: 2px solid #9ff2d9; outline-offset: 3px; }.cult-choice-label { color: #abcebb; font-size: 12px; }.cult-skill-heading { display: flex; justify-content: space-between; gap: 10px; }.cult-skill-heading strong { font-size: 17px; color: #f2d8a1; }.cult-skill-heading > span { color: #b6d2c5; font-size: 12px; }.cult-skill-description { font-size: 14px; line-height: 1.65; }
+#reactionPanel > .cult-result.rs-panel { overflow-y: auto !important; }
+.cult-result .rs-rows,.cult-result .rs-head,.cult-result .result-footer { flex-shrink: 0; }
+.cult-result .rs-tiles { flex-wrap: nowrap; gap: 4px; overflow: visible; }.cult-result .rs-group { flex: none; }.cult-result .rs-points { flex-wrap: wrap; gap: 4px; }.cult-result .rs-points small { font-size: 11px; }.cult-rank { font-size: 11px; color: #bfe1cc; }.cult-result .rs-head h3 { font-family: "Microsoft JhengHei",sans-serif !important; letter-spacing: 1px !important; }
+.cult-skill-values,.cult-skill-card p.cult-skill-values { display: block; color: #a7cabb; font-size: 12px; margin-top: 7px; }
+#startHome .start-actions:has(#continueCultivationBtn) { flex-wrap: wrap; }
+@media (max-height: 560px) and (orientation: landscape) { #startHome .start-actions:has(#continueCultivationBtn) { display: grid; grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); gap: 8px; } #startHome .start-actions:has(#continueCultivationBtn) > button { width: 100%; padding: 9px 10px; font-size: 14px; } }
+@media (max-width: 680px) and (orientation: portrait) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .player-info-inline { padding: 4px 5px; grid-template-columns: 20px minmax(0,1fr); gap: 2px 4px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .seat-portrait { width: 20px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .seat-name { font-size: 12px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .top-area > .player-info-inline { top: 7px; left: 12px; right: auto; width: calc(100% - 96px); grid-template-columns: 20px minmax(0,1fr); }
+  html.cultivation-mode .top-area .cult-player-stats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 7px; }.top-area .cult-life { min-width: 0; }
+  html.cultivation-mode .top-area .cult-bar { grid-column: 1; }.cultivation-mode .top-area .cult-numbers { grid-column: 2; grid-row: 1 / 3; font-size: 10px; gap: 1px 4px; }
+  .cult-player-stats { font-size: 10px; }.cult-life b { font-size: 12px; }.cult-life small { font-size: 9px; }.cult-lock { font-size: 9px; }.cult-statuses { font-size: 9px; }.cult-numbers { gap: 1px 4px; }
+  .cult-monster { width: 106px; padding: 6px; border-radius: 12px; }.cult-emblem { width: 22px; height: 28px; }.cult-monster-top { gap: 3px; }.cult-monster-top strong { font-size: 12px; }.cult-monster-top small { font-size: 8px; }.cult-monster-hp b { font-size: 15px; }.cult-monster-hp { margin-top: 2px; }.cult-attack { font-size: 11px; }.cult-attack span,.cult-target,.cult-countdown { font-size: 10px; }.cult-enemy-bar { margin-bottom: 4px; }.cult-monster-status { font-size: 8px; }
+  .cult-catalog-controls { grid-template-columns: 1fr 1fr; }.cult-catalog-controls label:first-child { grid-column: 1 / -1; }.cult-skill-list { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-height: 550px) and (orientation: landscape) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .player-info-inline { padding: 4px; gap: 1px 3px; grid-template-columns: 18px minmax(0,1fr); }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .seat-portrait { width: 18px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .seat-name { font-size: 11px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .top-area > .player-info-inline { top: 3px; width: 210px; right: 110px; }
+  html.cultivation-mode .top-area .cult-player-stats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 5px; }
+  html.cultivation-mode .top-area .cult-bar { grid-column: 1; }.cultivation-mode .top-area .cult-numbers { grid-column: 2; grid-row: 1 / 3; }
+  .cult-player-stats { font-size: 9px; }.cult-life b { font-size: 11px; }.cult-life small { font-size: 8px; }.cult-lock { font-size: 8px; }.cult-numbers { gap: 0 4px; }.cult-statuses { font-size: 8px; margin-top: 2px; }.cult-weak { font-size: 8px; }.cult-bar { margin: 2px 0; height: 4px; }
+  .cult-monster { width: 118px; padding: 5px 7px; border-radius: 10px; }.cult-emblem { width: 20px; height: 22px; }.cult-monster-top { gap: 4px; }.cult-monster-top strong { font-size: 12px; }.cult-monster-top small { font-size: 8px; }.cult-monster-hp { margin: 0; font-size: 10px; }.cult-monster-hp b { font-size: 13px; }.cult-monster-hp span { font-size: 9px; }.cult-attack { flex-direction: row; justify-content: space-between; gap: 3px; font-size: 10px; }.cult-attack span { font-size: 9px; }.cult-target,.cult-countdown { font-size: 9px; margin: 1px 0; padding-top: 1px; }.cult-enemy-bar { margin-bottom: 3px; }.cult-monster-status { margin-top: 2px; font-size: 8px; }
+  .cult-choice { padding: 12px; }.cult-choice header h2 { font-size: 20px; }
+}
+/* On the shortest tables the central gap is smaller than the decorative panel. */
+@media (max-height: 650px) and (orientation: portrait), (max-height: 550px) and (orientation: landscape) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .center-area { top: 50%; }
+  .cult-monster { width: 132px; padding: 5px 7px; border-radius: 10px; }
+  .cult-monster .cult-emblem { display: none; }
+  .cult-monster-top > span { display: flex; align-items: baseline; justify-content: center; gap: 4px; width: 100%; }
+  .cult-monster-top small { font-size: 8px; white-space: nowrap; }
+  .cult-monster-top strong { font-size: 11px; white-space: nowrap; }
+  .cult-monster-hp { margin: 0; line-height: 17px; }.cult-monster-hp b { font-size: 14px; }.cult-monster-hp span { font-size: 9px; }
+  .cult-enemy-bar { height: 4px; margin: 2px 0; }
+  .cult-attack { flex-direction: row; justify-content: center; gap: 4px; font-size: 9px; line-height: 13px; }.cult-attack span { font-size: 9px; }
+  .cult-target,.cult-countdown { margin: 1px 0; padding-top: 1px; font-size: 9px; line-height: 12px; }
+  .cult-monster-status { max-height: 12px; overflow: hidden; margin-top: 1px; }
+}
+@media (max-height: 650px) and (orientation: portrait) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .center-area { top: 57%; }
+  .cult-monster { width: 106px; padding: 3px 5px; }
+  .cult-monster-number { display: none; }
+  .cult-monster-top strong { font-size: 11px; }.cult-monster-top small { font-size: 8px; }
+  .cult-attack b,.cult-attack > span { white-space: nowrap; }.cult-attack > span small { display: none; }
+  .cult-monster-status { display: none; }
+  .cult-monster-hp { line-height: 15px; }.cult-enemy-bar { height: 3px; margin: 1px 0; }
+  .cult-target,.cult-countdown { margin: 0; padding-top: 0; }
+}
+@media (max-width: 360px) and (max-height: 650px) and (orientation: portrait) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .left-area > .player-info-inline { left: 40px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .right-area > .player-info-inline { right: 40px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .self-header > .player-info-inline { left: 50%; transform: translateX(-50%); width: 150px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .self-header .seat-portrait { display: none; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .self-header .seat-name { grid-column: 1 / -1; }
+  .cult-player-stats .cult-statuses { max-height: 13px; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; }
+  .cult-weakened .cult-statuses { display: none; }
+  html.cultivation-mode .self-header .cult-statuses,html.cultivation-mode .self-header .cult-weak { position: absolute; left: 0; right: 0; top: 100%; margin-top: 2px; }
+  html.cultivation-mode .self-header .seat-turn { display: none; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .left-area > .hand-meld-container { left: 1px; width: 30px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .right-area > .hand-meld-container { right: 1px; width: 30px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .left-area .flower-row,
+  html.cultivation-mode.table-scene.square-table .mahjong-table .right-area .flower-row,
+  html.cultivation-mode.table-scene.square-table .mahjong-table .bottom-area .flower-row { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html.cultivation-mode.table-scene.square-table .mahjong-table .left-area .meld-area .flower-row .tile,
+  html.cultivation-mode.table-scene.square-table .mahjong-table .right-area .meld-area .flower-row .tile,
+  html.cultivation-mode.table-scene.square-table .mahjong-table .bottom-area #meldArea0 .flower-row .tile { width: 10px; }
+}
+
+/* Skill catalogue and battle log belong to cultivation mode only. */
+html:not(.cultivation-mode) .cult-catalog { display: none !important; }
+.cult-player-stats .cult-seal-trigger { display: block; grid-column: 1 / -1; width: 100%; min-height: 22px; padding: 2px 3px; margin-top: 2px; font: 11px/1.3 "Microsoft JhengHei",sans-serif; color: #ffd4b9; background: #442525; border: 1px solid #d8a06688; border-radius: 5px; white-space: nowrap; }
+.cult-finish-detail { padding: 4px 10px; font-size: 12px; color: #f3dca4; border: 1px solid #d8b56b88; border-radius: 8px; background: #142b34; }
+.cult-information { max-height: calc(100dvh - 32px); overflow: auto; color: #e6f3ec; }
+.cult-information header { position: sticky; top: -1px; background: #153730; z-index: 1; }
+.cult-information-body { line-height: 1.65; font-size: 15px; overflow-wrap: anywhere; }
+.cult-finish-part { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid #d8b56b44; }
+.cult-finish-part b { flex-shrink: 0; color: #f3dca4; }
+.cult-pending-seals { color: #ffd4b9; border-top: 1px solid #d8b56b88; padding-top: 12px; }
+@media(max-height:550px) { .cult-player-stats .cult-seal-trigger { font-size: 9px; min-height: 18px; padding: 1px 2px; } .cult-finish-detail { padding: 2px 8px; font-size: 10px; } }
+html.cultivation-mode .top-area .cult-seal-trigger { position: absolute; top: 3px; right: 5px; width: auto; margin: 0; }
+html.cultivation-mode .top-area .cult-seal-duration { display: none; }
+html.cultivation-mode .top-area .player-info-inline:has(.cult-seal-trigger) .seat-name { padding-right: 122px; }
+html.cultivation-mode .top-area .player-info-inline:has(.cult-seal-trigger) .cult-statuses { position: absolute; right: 48px; top: 4px; max-width: 72px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+@media (max-height:550px) and (orientation:landscape) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table .top-area > .player-info-inline { top: 0; }
+}

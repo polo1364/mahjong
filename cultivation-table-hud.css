@@ -1,0 +1,388 @@
+/* Cultivation table HUD: on-table 戰況 feed, character status sheet and the hero selection screen. */
+
+/* ---------- 戰況 feed ---------- */
+.cult-battle-feed { display: none; }
+html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
+  display: block; position: fixed; z-index: 26; top: 30px; left: 38px; width: 256px;
+  color: #dce6ee; font: 13px/1.5 "Microsoft JhengHei", sans-serif;
+  border-radius: 14px; border: 1px solid #e2c27e66;
+  background: linear-gradient(165deg, #10223acc, #08121fe6); backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px #0a1230, 0 10px 28px #0009;
+}
+.cult-battle-feed .cult-feed-toggle {
+  display: flex; align-items: center; gap: 9px; width: 100%; min-height: 40px; padding: 6px 10px 6px 8px;
+  color: inherit; background: none; border: 0; border-bottom: 1px solid #e2c27e2b; cursor: pointer; text-align: left;
+}
+.cult-battle-feed .cult-feed-toggle:focus-visible { outline: 2px solid #9fd9e6; outline-offset: -2px; border-radius: 14px; }
+.cult-battle-feed .cult-feed-seal {
+  display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%;
+  font: 700 14px/1 "DFKai-SB", "KaiTi", serif; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); box-shadow: 0 0 10px #e2c27e66;
+}
+.cult-battle-feed .cult-feed-title { flex: 1; font: 700 15px/1 "DFKai-SB", "KaiTi", serif; letter-spacing: 4px; color: #f3dca4; }
+.cult-battle-feed .cult-feed-more { padding: 2px 9px; border-radius: 999px; font-size: 11px; color: #bfe9ee; border: 1px solid #9fd9e655; }
+.cult-battle-feed .cult-feed-body { padding: 6px 12px 9px; }
+.cult-battle-feed #cultivationLog { list-style: none; margin: 0; padding: 0; }
+.cult-battle-feed #cultivationLog li {
+  position: relative; margin: 0; padding: 3px 0 3px 13px; color: #b9c6d6; font-size: 12px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cult-battle-feed #cultivationLog li::before { content: ""; position: absolute; left: 1px; top: 11px; width: 5px; height: 5px; border-radius: 50%; background: #5f7f8f; }
+.cult-battle-feed #cultivationLog li:first-child { color: #fff1cf; font-weight: 700; }
+.cult-battle-feed #cultivationLog li:first-child::before { background: #9ff2d9; box-shadow: 0 0 6px #9ff2d9; }
+.cult-battle-feed #cultivationLog li:nth-child(n+4) { display: none; }
+.cult-battle-feed #cultivationStatusReference { display: none; }
+.cult-battle-feed.is-open #cultivationLog li:nth-child(n+4) { display: block; }
+.cult-battle-feed.is-open #cultivationStatusReference {
+  display: block; margin: 0 0 8px; padding: 0 0 8px; border-bottom: 1px dashed #e2c27e33;
+}
+.cult-battle-feed #cultivationStatusReference p { margin: 0 0 4px; font-size: 12px; color: #c9d6ef; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cult-battle-feed #cultivationStatusReference p:first-child { color: #f3dca4; font-weight: 700; }
+.cult-battle-feed.is-open { z-index: 60; }
+
+/* Small or short screens: a seal button under 設定; the feed opens as a popover. */
+@media (max-width: 899px), (max-height: 599px) {
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
+    top: max(66px, calc(env(safe-area-inset-top) + 58px)); left: auto; right: max(10px, env(safe-area-inset-right));
+    width: auto; border-radius: 999px; background: #111d37eb;
+  }
+  .cult-battle-feed .cult-feed-toggle { min-height: 40px; padding: 5px 12px 5px 6px; border: 0; gap: 7px; }
+  .cult-battle-feed .cult-feed-title { font-size: 13px; letter-spacing: 2px; }
+  .cult-battle-feed .cult-feed-more, .cult-battle-feed .cult-feed-body { display: none; }
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { width: min(340px, calc(100vw - 20px)); border-radius: 14px; background: linear-gradient(165deg, #10223af2, #08121ff7); }
+  .cult-battle-feed.is-open .cult-feed-toggle { border-bottom: 1px solid #e2c27e2b; }
+  .cult-battle-feed.is-open .cult-feed-more, .cult-battle-feed.is-open .cult-feed-body { display: block; }
+  .cult-battle-feed.is-open .cult-feed-body { max-height: calc(100dvh - 140px); overflow: hidden; }
+}
+@media (max-width: 899px) and (orientation: portrait) {
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed { top: max(64px, calc(env(safe-area-inset-top) + 56px)); }
+}
+
+/* ---------- Character status sheet ---------- */
+.cult-information.cult-role-sheet {
+  width: min(880px, calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 0; overflow: auto;
+  border: 1.5px solid #e2c27e; border-radius: 18px; color: #e6eef0;
+  background: radial-gradient(ellipse 60% 70% at 18% 40%, #1e4f5a55, transparent 70%), linear-gradient(160deg, #0f2430, #08131d 65%, #060d16);
+  box-shadow: inset 0 0 0 5px #08131d, inset 0 0 0 6px #e2c27e40, 0 30px 90px #000d;
+}
+.cult-role-sheet > header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 14px 26px; background: linear-gradient(#0f2430f5, #0f2430e6); border-bottom: 1px solid #e2c27e33; }
+.cult-role-sheet > header h2 { margin: 0; font: 700 25px/1.2 "DFKai-SB", "KaiTi", serif; letter-spacing: 4px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cult-role-sheet > header button { flex: none; min-height: 40px; padding: 6px 16px; border-radius: 999px; color: #f3dca4; background: #ffffff0d; border: 1px solid #e2c27e88; }
+.cult-role-sheet .cult-information-body { padding: 18px 22px 22px; font-size: 14px; line-height: 1.6; }
+.role-sheet { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 22px; align-items: start; }
+.role-portrait {
+  position: sticky; top: 86px; margin: 0; height: 420px; display: flex; align-items: flex-end; justify-content: center; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(ellipse 70% 55% at 50% 45%, #e2c27e30, transparent 70%), radial-gradient(ellipse 60% 10% at 50% 96%, #0009, transparent 70%), linear-gradient(#123341, #0a1a24);
+  border: 1px solid #e2c27e44;
+}
+.role-portrait img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 10px 18px #000a); }
+.role-main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.role-main .journey-role { align-self: flex-start; margin: 0; padding: 3px 12px; border-radius: 999px; font-size: 12px; color: #08202a; background: #9fd9e6; font-weight: 700; }
+.role-main > h2 { display: none; }
+.role-main .journey-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.role-main .journey-stats > div { padding: 10px 12px; border: 1px solid #e2c27e33; border-radius: 12px; background: #ffffff08; text-align: center; }
+.role-main .journey-stats dt { font-size: 12px; color: #9fb3bf; letter-spacing: 2px; }
+.role-main .journey-stats dd { margin: 2px 0 0; font: 700 26px/1.1 "Segoe UI", sans-serif; color: #fff1cf; }
+.role-main .journey-stats dd small { font-size: 12px; color: #c9a868; }
+.role-main .journey-passive { position: relative; padding: 14px 16px 14px 58px; border: 1px solid #e2c27e55; border-left: 1px solid #e2c27e55; border-radius: 14px; background: linear-gradient(110deg, #e2c27e1f, #ffffff05 70%); }
+.role-main .journey-passive::before { content: "被動"; position: absolute; left: 12px; top: 14px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 700 12px/1 "DFKai-SB", "KaiTi", serif; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+.role-main .journey-passive h3 { margin: 0; font: 700 17px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; color: #f3dca4; }
+.role-main .journey-passive p { margin: 4px 0 0; font-size: 13px; color: #d3dde4; }
+.role-main .journey-counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.role-main .journey-counters > div { display: flex; align-items: baseline; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #ffffff0a; border: 1px solid #ffffff1a; font-size: 12px; color: #a9b6cc; }
+.role-main .journey-counters dd { margin: 0; font-weight: 700; color: #fff1cf; }
+.role-main > .journey-muted { margin: 0; }
+.role-main .equip-role-info { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.role-main .equip-role-info > h3, .role-main .equip-role-info > p:nth-of-type(n+4), .role-main .equip-role-info > .equip-sets { grid-column: 1 / -1; }
+.role-main .equip-role-info > h3 { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font: 700 16px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; color: #f3dca4; }
+.role-main .equip-role-info > h3::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #e2c27e66, transparent); }
+.role-main .equip-role-info > p { margin: 0; font-size: 12px; color: #c9d6e2; }
+.role-main .equip-role-info > p:nth-of-type(-n+3) { padding: 10px 12px; border-radius: 12px; border: 1px dashed #e2c27e44; background: #ffffff06; font-size: 13px; color: #e9e4d4; }
+.role-main .equip-role-info > p.journey-muted { color: #9fb3bf; }
+.role-main .equip-sets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 2px 0 0; }
+.role-main .equip-sets details { padding: 8px 12px; border-radius: 12px; background: #13303c; border: 1px solid #ffffff14; }
+.role-main .equip-sets details[open] { grid-column: 1 / -1; border-color: #e2c27e55; }
+.role-main .equip-sets summary { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #e9e4d4; cursor: pointer; list-style: none; }
+.role-main .equip-sets summary::-webkit-details-marker { display: none; }
+.role-main .equip-sets summary img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+.role-main .equip-sets summary b { margin-left: auto; padding: 1px 10px; border-radius: 999px; font-size: 12px; color: #f3dca4; background: #e2c27e1f; }
+.role-main .equip-sets .equip-set-showcase { height: 130px; margin: 8px auto; }
+@media (max-width: 720px) {
+  .cult-role-sheet .cult-information-body { padding: 12px 14px 16px; }
+  .cult-role-sheet > header { padding: 12px 14px 10px 18px; }
+  .cult-role-sheet > header h2 { font-size: 21px; }
+  .role-sheet { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .role-portrait { position: static; height: 190px; }
+  .role-main .journey-stats { gap: 6px; }
+  .role-main .journey-stats > div { padding: 7px 4px; }
+  .role-main .journey-stats dd { font-size: 20px; }
+  .role-main .equip-role-info { grid-template-columns: minmax(0, 1fr); }
+  .role-main .equip-sets { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-height: 560px) and (min-width: 721px) {
+  .role-sheet { grid-template-columns: 180px minmax(0, 1fr); }
+  .role-portrait { height: calc(100dvh - 130px); top: 70px; }
+}
+
+/* ---------- Hero selection screen ---------- */
+.journey-selection-screen .journey-header h1 { font-family: "DFKai-SB", "KaiTi", serif; font-weight: 700; letter-spacing: 6px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.journey-selection-screen .journey-header p { color: #9fd9e6; letter-spacing: 5px; }
+.journey-selection-screen .journey-intro { display: inline-block; padding: 6px 14px; border-radius: 999px; background: #ffffff08; border: 1px solid #ffffff14; color: #c6d6d4; }
+.journey-selection-screen .journey-hero-grid { gap: 10px; }
+.journey-selection-screen .journey-hero-option {
+  position: relative; overflow: hidden; padding: 0 4px 10px; border-radius: 14px; border: 1px solid #e2c27e33;
+  background: radial-gradient(ellipse 80% 55% at 50% 38%, #2f5d5d66, transparent 70%), linear-gradient(170deg, #12303acc, #07161ee6);
+  box-shadow: inset 0 -40px 40px -20px #05101699; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.journey-selection-screen .journey-hero-option::after { content: ""; position: absolute; inset: auto 12% 30px; height: 10px; border-radius: 50%; background: radial-gradient(#000a, transparent 70%); z-index: 0; }
+.journey-selection-screen .journey-hero-option img { position: relative; z-index: 1; filter: drop-shadow(0 6px 8px #0009); transition: transform .25s ease; }
+.journey-selection-screen .journey-hero-option span { position: relative; z-index: 1; margin-top: 2px; font: 700 16px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; color: #efe6cf; }
+.journey-selection-screen .journey-hero-option small { position: relative; z-index: 1; margin-top: 3px; padding: 0 9px; border-radius: 999px; font-size: 11px; color: #bfe9ee; background: #9fd9e61a; border: 1px solid #9fd9e633; }
+.journey-selection-screen .journey-hero-option:hover { transform: translateY(-3px); border-color: #e2c27e99; }
+.journey-selection-screen .journey-hero-option:hover img { transform: scale(1.04); }
+.journey-selection-screen .journey-hero-option.is-selected {
+  border: 1.5px solid #f3dca4; transform: translateY(-3px);
+  background: radial-gradient(ellipse 80% 55% at 50% 38%, #e2c27e40, transparent 70%), linear-gradient(170deg, #2c4a3ccc, #0b1d22e6);
+  box-shadow: 0 0 0 3px #e2c27e33, 0 10px 26px #000a, 0 0 26px #e2c27e44;
+}
+.journey-selection-screen .journey-hero-option.is-selected span { color: #ffe3a2; }
+.journey-selection-screen .journey-hero-option.is-selected small { color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; }
+.journey-selection-screen .journey-hero-detail {
+  padding: 14px 18px; border-radius: 18px; border: 1px solid #e2c27e44;
+  background: radial-gradient(ellipse 50% 60% at 30% 55%, #e2c27e22, transparent 70%), linear-gradient(160deg, #0f2a33cc, #06141bdd);
+  box-shadow: inset 0 0 0 1px #06141b, 0 18px 40px #0008;
+}
+.journey-selection-screen .journey-selected-art { position: relative; }
+.journey-selection-screen .journey-selected-art::after { content: ""; position: absolute; left: 15%; right: 15%; bottom: 4%; height: 18px; border-radius: 50%; background: radial-gradient(#000b, transparent 70%); }
+.journey-selection-screen .journey-selected-art img { position: relative; z-index: 1; filter: drop-shadow(0 14px 22px #000b); }
+.journey-selection-screen #journeyHeroDetails { display: flex; flex-direction: column; gap: 12px; }
+.journey-selection-screen #journeyHeroDetails .journey-role { align-self: flex-start; margin: 0; padding: 3px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #08202a; background: #9fd9e6; }
+.journey-selection-screen #journeyHeroDetails h2 { margin: 0; font: 700 34px/1.2 "DFKai-SB", "KaiTi", serif; letter-spacing: 6px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.journey-selection-screen #journeyHeroDetails .journey-stats { gap: 8px; margin: 0; }
+.journey-selection-screen #journeyHeroDetails .journey-stats > div { padding: 8px 12px; border: 1px solid #e2c27e33; border-radius: 12px; background: #ffffff08; }
+.journey-selection-screen #journeyHeroDetails .journey-stats dt { letter-spacing: 2px; color: #9fb3bf; }
+.journey-selection-screen #journeyHeroDetails .journey-stats dd { font: 700 26px/1.15 "Segoe UI", sans-serif; color: #fff1cf; }
+.journey-selection-screen #journeyHeroDetails .journey-stats dd small { color: #c9a868; }
+.journey-selection-screen #journeyHeroDetails .journey-passive { position: relative; padding: 12px 14px 12px 56px; border: 1px solid #e2c27e55; border-radius: 14px; background: linear-gradient(110deg, #e2c27e1f, #ffffff05 70%); }
+.journey-selection-screen #journeyHeroDetails .journey-passive::before { content: "被動"; position: absolute; left: 12px; top: 12px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font: 700 12px/1 "DFKai-SB", "KaiTi", serif; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+.journey-selection-screen #journeyHeroDetails .journey-passive h3 { font: 700 17px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; color: #f3dca4; }
+.journey-selection-screen #journeyHeroDetails .journey-passive p { color: #d3dde4; }
+.journey-selection-screen .journey-footer button { border-radius: 999px; padding: 10px 24px; }
+.journey-selection-screen .journey-footer button.primary { color: #2a1a08; font-weight: 700; letter-spacing: 2px; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; box-shadow: 0 6px 18px #e2c27e44; }
+.journey-selection-screen .journey-footer button.primary:hover { filter: brightness(1.06); }
+@media (max-width: 680px) {
+  .journey-selection-screen .journey-hero-option { padding: 0 2px 6px; border-radius: 10px; }
+  .journey-selection-screen .journey-hero-option span { font-size: 13px; letter-spacing: 0; }
+  .journey-selection-screen .journey-hero-option small { font-size: 9px; padding: 0 5px; }
+  .journey-selection-screen .journey-hero-detail { padding: 10px; }
+  .journey-selection-screen #journeyHeroDetails { gap: 8px; }
+  .journey-selection-screen #journeyHeroDetails h2 { font-size: 24px; letter-spacing: 3px; }
+  .journey-selection-screen #journeyHeroDetails .journey-stats > div { padding: 5px 4px; text-align: center; }
+  .journey-selection-screen #journeyHeroDetails .journey-stats dd { font-size: 18px; }
+  .journey-selection-screen #journeyHeroDetails .journey-passive { padding: 9px 10px 9px 48px; }
+  .journey-selection-screen #journeyHeroDetails .journey-passive::before { width: 28px; height: 28px; left: 10px; top: 10px; font-size: 11px; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .journey-selection-screen #journeyHeroDetails h2 { font-size: 24px; }
+  .journey-selection-screen #journeyHeroDetails .journey-stats dd { font-size: 19px; }
+  .journey-selection-screen .journey-hero-detail { padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-selection-screen .journey-hero-option, .journey-selection-screen .journey-hero-option img { transition: none; }
+}
+/* Short landscape: status and log side by side so the popover fits the height. */
+@media (max-height: 599px) and (min-width: 600px) {
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed { top: 74px; }
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { width: min(600px, calc(100vw - 20px)); }
+  .cult-battle-feed.is-open .cult-feed-body { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; max-height: calc(100dvh - 130px); }
+  .cult-battle-feed.is-open #cultivationStatusReference { margin: 0; padding: 0 12px 0 0; border-bottom: 0; border-right: 1px dashed #e2c27e33; }
+  .cult-battle-feed.is-open #cultivationLog li:nth-child(n+7) { display: none; }
+}
+
+/* ---------- Table lookup (flower / meld skill card) ---------- */
+.cult-codex.is-single {
+  width: min(540px, calc(100vw - 16px)); border: 1.5px solid #e2c27e; border-radius: 18px;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, #2b3f7a55, transparent 70%), linear-gradient(170deg, #121c40, #0a1130 55%, #070b1e);
+  box-shadow: inset 0 0 0 5px #0b1230, inset 0 0 0 6px #e2c27e40, 0 30px 90px #000d;
+}
+.cult-codex.is-single .codex-header { padding: 16px 20px 14px 24px; background: none; border-bottom: 1px solid #e2c27e33; }
+.cult-codex.is-single .codex-eyebrow { color: #9fd9e6; letter-spacing: 4px; font-size: 11px; }
+.cult-codex.is-single .codex-header h2 { margin: 2px 0; font: 700 26px/1.25 "DFKai-SB", "KaiTi", serif; letter-spacing: 5px; background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cult-codex.is-single .codex-header p { margin: 0; color: #a9b6cc; font-size: 13px; }
+.cult-codex.is-single #cultivationCodexClose { min-height: 40px; padding: 6px 16px; border-radius: 999px; color: #f3dca4; background: #ffffff0d; border: 1px solid #e2c27e88; }
+.cult-codex.is-single .codex-scroll { padding: 14px 20px 20px; }
+.cult-codex.is-single .codex-meld-note { margin: 0 0 12px; padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.6; color: #a9b6cc; background: #ffffff07; border: 1px solid #ffffff10; }
+.cult-codex.is-single .codex-grid { gap: 12px; }
+.cult-codex.is-single .codex-card {
+  position: relative; padding: 18px 20px 20px; border-radius: 16px; border: 1px solid #e2c27e44; border-top: 3px solid var(--codex-element, #d4bb77);
+  background: radial-gradient(ellipse 70% 45% at 50% 0%, color-mix(in srgb, var(--codex-element, #d4bb77) 18%, transparent), transparent 75%), linear-gradient(165deg, #16224a, #0b1330);
+  box-shadow: 0 10px 28px #0007;
+}
+.cult-codex.is-single .codex-card-top { display: flex; justify-content: space-between; gap: 8px; }
+.cult-codex.is-single .codex-card-top span { padding: 2px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #08202a; background: #9fd9e6; }
+.cult-codex.is-single .codex-card-top span:last-child { color: #1a1206; background: var(--codex-element, #d4bb77); }
+.cult-codex.is-single .codex-card .codex-combo { margin: 14px 0 8px; text-align: center; font: 700 16px/1.4 "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; color: #f1e9d4; }
+.cult-codex.is-single .codex-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 auto; }
+.cult-codex.is-single .codex-tiles > span { width: 52px; max-width: none; filter: drop-shadow(0 4px 8px #000a) drop-shadow(0 0 10px #e2c27e33); }
+.cult-codex.is-single .codex-card .codex-legacy { margin: 6px 0 0; text-align: center; color: #8f9cb6; }
+.cult-codex.is-single .codex-card h3 {
+  display: flex; align-items: center; gap: 12px; margin: 16px 0 2px; font: 700 28px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 4px;
+  background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cult-codex.is-single .codex-card h3::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #e2c27e66, transparent); }
+.cult-codex.is-single .codex-card .codex-trigger { margin: 0 0 10px; color: #9fd9e6; font-size: 12px; }
+.cult-codex.is-single .codex-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.cult-codex.is-single .codex-tags span { padding: 2px 12px; border-radius: 999px; font-size: 12px; color: #f3dca4; background: #e2c27e1a; border: 1px solid #e2c27e55; }
+.cult-codex.is-single .codex-card > p:not([class]) { margin: 12px 0 10px; font-size: 15px; line-height: 1.7; color: #e9e4d4; }
+.cult-codex.is-single .cult-skill-values { list-style: none; margin: 0; padding: 10px 14px; border-radius: 12px; background: #ffffff08; border: 1px solid #ffffff14; }
+.cult-codex.is-single .cult-skill-values li { position: relative; margin: 0; padding: 4px 0 4px 18px; font-size: 14px; color: #fff1cf; }
+.cult-codex.is-single .cult-skill-values li::before { content: ""; position: absolute; left: 2px; top: 13px; width: 7px; height: 7px; transform: rotate(45deg); background: #e2c27e; }
+.cult-codex.is-single .cult-skill-values li + li { border-top: 1px dashed #ffffff14; }
+.cult-codex.is-single .cult-skill-values:empty { display: none; }
+.cult-codex.is-single .codex-formation-status { margin: 0 0 10px; padding: 3px 12px; display: inline-block; border-radius: 999px; font-size: 12px; font-weight: 700; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
+@media (max-width: 560px) {
+  .cult-codex.is-single .codex-header h2 { font-size: 22px; }
+  .cult-codex.is-single .codex-scroll { padding: 12px 12px 16px; }
+  .cult-codex.is-single .codex-card { padding: 14px 14px 16px; }
+  .cult-codex.is-single .codex-card h3 { font-size: 24px; }
+  .cult-codex.is-single .codex-tiles > span { width: 44px; }
+}
+.cult-codex.is-single { height: fit-content; max-height: calc(100dvh - 16px); }
+.cult-codex.is-single .codex-card h3 { margin-top: 12px; }
+.cult-codex.is-single .codex-card .codex-combo { margin-top: 10px; }
+/* A flower with its completed formations: cards side by side on wide screens. */
+@media (min-width: 760px) {
+  .cult-codex.is-single:has(.codex-card + .codex-card) { width: min(1000px, calc(100vw - 32px)); }
+  .cult-codex.is-single:has(.codex-card + .codex-card) .codex-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+
+/* ---------- Boss layout: beast centre stage, long HP bar above, intent pill below ---------- */
+html.cultivation-mode #cultivationMonster.cult-monster {
+  --boss-w: 380px; --boss-stage: 190px;
+  width: var(--boss-w); padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; color: #ebf3e9;
+  font: 12px/1.4 "Microsoft JhengHei", sans-serif; text-shadow: 0 1px 3px #000c;
+}
+html.cultivation-mode #cultivationMonster .cult-monster-top { display: flex; align-items: center; justify-content: center; gap: 8px; }
+html.cultivation-mode #cultivationMonster .cult-monster-top > span { display: flex; flex-direction: column; align-items: center; }
+html.cultivation-mode #cultivationMonster .cult-monster-top small { order: -1; font-size: 11px; letter-spacing: 3px; color: var(--element); }
+html.cultivation-mode #cultivationMonster .cult-monster-number { display: inline; }
+html.cultivation-mode #cultivationMonster .cult-monster-top strong {
+  font: 700 27px/1.15 "DFKai-SB", "KaiTi", serif; letter-spacing: 8px; padding-left: 8px; white-space: nowrap;
+  background: linear-gradient(#fff8e6, #f3dca4 55%, #c99a4c); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
+  filter: drop-shadow(0 2px 3px #000c);
+}
+html.cultivation-mode #cultivationMonster .cult-emblem, html.cultivation-mode #cultivationMonster .cult-journey-emblem { display: block; width: 30px; height: 34px; }
+html.cultivation-mode #cultivationMonster .cult-boss-hp { position: relative; width: 100%; }
+html.cultivation-mode #cultivationMonster .cult-enemy-bar {
+  height: 16px; margin: 0; border-radius: 4px; border: 1px solid #e2c27eaa; background: #07100ee6;
+  box-shadow: 0 0 0 2px #0008, 0 4px 12px #000a;
+}
+html.cultivation-mode #cultivationMonster .cult-enemy-bar i { border-radius: 2px; background: linear-gradient(90deg, #a2412c, #ec8f5a 60%, #ffd08a); box-shadow: 0 0 10px #ec8f5a88; transition: width .35s ease; }
+html.cultivation-mode #cultivationMonster .cult-monster-hp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0; line-height: 1; pointer-events: none; }
+html.cultivation-mode #cultivationMonster .cult-monster-hp b { font: 800 12px "Segoe UI", sans-serif; color: #fff; }
+html.cultivation-mode #cultivationMonster .cult-monster-hp span { font: 600 10px "Segoe UI", sans-serif; color: #f6e6d4; }
+html.cultivation-mode #cultivationMonster .cult-boss-tags { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px; }
+html.cultivation-mode #cultivationMonster .cult-monster-status { display: contents; }
+html.cultivation-mode #cultivationMonster .cult-monster-status span, html.cultivation-mode #cultivationMonster .cult-monster-lookup {
+  padding: 2px 10px; border-radius: 999px; font-size: 11px; line-height: 1.5; color: #dce6ee; background: #050b12b3; border: 1px solid #ffffff2a; text-shadow: none;
+}
+html.cultivation-mode #cultivationMonster .cult-monster-lookup { min-height: 0; color: #f3dca4; border-color: #e2c27e77; cursor: pointer; }
+html.cultivation-mode #cultivationMonster .cult-monster-lookup:hover { background: #e2c27e22; }
+html.cultivation-mode #cultivationMonster .cult-monster-stage {
+  width: 100%; height: var(--boss-stage); flex: none;
+  background: radial-gradient(ellipse 34% 7% at 50% 94%, #000b, transparent 70%), radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--element) 22%, transparent), transparent 55%);
+}
+html.cultivation-mode #cultivationMonster .cult-boss-intent {
+  display: grid; grid-template-columns: auto auto minmax(0, auto); grid-template-rows: auto auto; align-items: center; column-gap: 9px; max-width: 100%;
+  padding: 6px 16px 6px 6px; border-radius: 999px; text-align: left;
+  background: linear-gradient(90deg, #3a1610ee, #120d0ae6); border: 1px solid #ec8f5a99; box-shadow: 0 8px 20px #000a; text-shadow: none;
+}
+html.cultivation-mode #cultivationMonster .cult-intent-icon {
+  grid-row: 1 / 3; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  font: 700 19px/1 "DFKai-SB", "KaiTi", serif; color: #2a1a08; background: radial-gradient(circle at 35% 30%, #ffd08a, #ec8f5a 60%, #a2412c); box-shadow: 0 0 12px #ec8f5a;
+}
+html.cultivation-mode #cultivationMonster .cult-intent-damage { grid-row: 1 / 3; font: 800 24px/1 "Segoe UI", sans-serif; color: #fff1cf; }
+html.cultivation-mode #cultivationMonster .cult-attack { display: block; text-align: left; line-height: 1.3; }
+html.cultivation-mode #cultivationMonster .cult-attack b { font-size: 12px; color: #ffe0cf; white-space: nowrap; }
+html.cultivation-mode #cultivationMonster .cult-attack span { display: none; }
+html.cultivation-mode #cultivationMonster .cult-monster-extra { grid-column: 3; font-size: 11px; color: #f0d2c4; line-height: 1.3; margin: 0; }
+html.cultivation-mode #cultivationMonster .cult-boss-intent.is-charged { border-color: #ffb08a; box-shadow: 0 8px 20px #000a, 0 0 16px #ec8f5a77; }
+html.cultivation-mode #cultivationMonster .cult-boss-intent.is-charged .cult-intent-icon { animation: cult-charge 1.4s ease-in-out infinite; }
+html.cultivation-mode #cultivationMonster .cult-boss-intent.is-cancelled { background: linear-gradient(90deg, #1b2a33ee, #0c141ae6); border-color: #9fd9e688; }
+html.cultivation-mode #cultivationMonster .cult-boss-intent.is-cancelled .cult-intent-icon { color: #08202a; background: radial-gradient(circle at 35% 30%, #d8f6fb, #9fd9e6 60%, #4a8a99); box-shadow: 0 0 12px #9fd9e6; }
+@keyframes cult-charge { 50% { box-shadow: 0 0 22px #ffb08a, 0 0 0 4px #ec8f5a44; } }
+html.cultivation-mode #cultivationMonster .cult-boss-turn { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; max-width: 100%; }
+html.cultivation-mode #cultivationMonster .cult-target { margin: 0; padding: 1px 10px; border-radius: 999px; font-size: 11px; color: #f3dca4; background: #050b12b3; border: 1px solid #e2c27e55; text-shadow: none; }
+html.cultivation-mode #cultivationMonster .cult-countdown { display: flex; align-items: center; gap: 7px; margin: 0; padding: 0; border: 0; font-size: 12px; color: #dce6ee; }
+html.cultivation-mode #cultivationMonster .cult-pips { display: inline-flex; gap: 4px; }
+html.cultivation-mode #cultivationMonster .cult-pips i { width: 9px; height: 9px; transform: rotate(45deg); border: 1px solid #e2c27e; background: #050b12aa; }
+html.cultivation-mode #cultivationMonster .cult-pips i.on { background: #e2c27e; box-shadow: 0 0 6px #e2c27e; }
+@media (prefers-reduced-motion: reduce) { html.cultivation-mode #cultivationMonster .cult-boss-intent.is-charged .cult-intent-icon { animation: none; } }
+html.feedback-reduced.cultivation-mode #cultivationMonster .cult-boss-intent.is-charged .cult-intent-icon { animation: none; }
+
+/* Sizes follow the free space in the table centre. */
+@media (max-height: 820px) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 340px; --boss-stage: 140px; } }
+@media (max-width: 600px) and (orientation: portrait) {
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 250px; --boss-stage: 104px; gap: 3px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top strong { font-size: 20px; letter-spacing: 4px; padding-left: 4px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top small { font-size: 9px; letter-spacing: 1px; }
+  html.cultivation-mode #cultivationMonster .cult-emblem, html.cultivation-mode #cultivationMonster .cult-journey-emblem { width: 22px; height: 26px; }
+  html.cultivation-mode #cultivationMonster .cult-enemy-bar { height: 13px; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { padding: 4px 10px 4px 4px; column-gap: 6px; }
+  html.cultivation-mode #cultivationMonster .cult-intent-icon { width: 30px; height: 30px; font-size: 15px; }
+  html.cultivation-mode #cultivationMonster .cult-intent-damage { font-size: 18px; }
+  html.cultivation-mode #cultivationMonster .cult-attack b { font-size: 11px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-extra { font-size: 10px; }
+  html.cultivation-mode #cultivationMonster .cult-countdown { font-size: 11px; }
+}
+@media (max-width: 360px) and (orientation: portrait) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 220px; --boss-stage: 80px; } }
+/* Short landscape: beast on the left, plate and intent stacked on the right. */
+@media (max-height: 599px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster {
+    --boss-w: 340px; --boss-stage: 100%;
+    display: grid; grid-template-columns: 110px minmax(0, 1fr); grid-auto-rows: auto; column-gap: 8px; row-gap: 3px; align-items: center;
+  }
+  html.cultivation-mode #cultivationMonster.cult-monster > * { grid-column: 2; }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 5; height: 100%; min-height: 110px; align-self: stretch; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top strong { font-size: 18px; letter-spacing: 3px; padding-left: 3px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top small { font-size: 9px; letter-spacing: 1px; }
+  html.cultivation-mode #cultivationMonster .cult-emblem, html.cultivation-mode #cultivationMonster .cult-journey-emblem { display: none; }
+  html.cultivation-mode #cultivationMonster .cult-enemy-bar { height: 12px; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { padding: 3px 10px 3px 3px; column-gap: 6px; justify-self: center; }
+  html.cultivation-mode #cultivationMonster .cult-intent-icon { width: 26px; height: 26px; font-size: 13px; }
+  html.cultivation-mode #cultivationMonster .cult-intent-damage { font-size: 16px; }
+  html.cultivation-mode #cultivationMonster .cult-attack b { font-size: 10px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-extra { font-size: 9px; }
+  html.cultivation-mode #cultivationMonster .cult-countdown, html.cultivation-mode #cultivationMonster .cult-target { font-size: 10px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-status span, html.cultivation-mode #cultivationMonster .cult-monster-lookup { font-size: 9px; padding: 0 7px; }
+}
+html.cultivation-mode #cultivationMonster .cult-monster-lookup { width: auto; max-width: 100%; flex: none; margin: 0; }
+@media (max-height: 760px) and (orientation: landscape) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-stage: 118px; gap: 3px; } }
+@media (max-width: 600px) and (orientation: portrait) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 230px; } }
+/* Small phones: beast beside a compact plate so the panel clears the side seats. */
+@media (max-width: 360px) and (max-height: 650px) and (orientation: portrait) {
+  html.cultivation-mode #cultivationMonster.cult-monster {
+    --boss-w: 214px; display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 6px; row-gap: 2px; align-items: center;
+  }
+  html.cultivation-mode #cultivationMonster.cult-monster > * { grid-column: 2; }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 5; height: 100%; min-height: 70px; align-self: stretch; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top strong { font-size: 15px; letter-spacing: 2px; padding-left: 2px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top small { font-size: 8px; letter-spacing: 0; }
+  html.cultivation-mode #cultivationMonster .cult-monster-number, html.cultivation-mode #cultivationMonster .cult-emblem, html.cultivation-mode #cultivationMonster .cult-journey-emblem, html.cultivation-mode #cultivationMonster .cult-monster-extra, html.cultivation-mode #cultivationMonster .cult-monster-status { display: none; }
+  html.cultivation-mode #cultivationMonster .cult-enemy-bar { height: 11px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-hp b { font-size: 10px; } html.cultivation-mode #cultivationMonster .cult-monster-hp span { font-size: 8px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-lookup { font-size: 9px; padding: 0 6px; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { padding: 2px 8px 2px 2px; column-gap: 5px; justify-self: center; }
+  html.cultivation-mode #cultivationMonster .cult-intent-icon { width: 22px; height: 22px; font-size: 11px; }
+  html.cultivation-mode #cultivationMonster .cult-intent-damage { font-size: 14px; }
+  html.cultivation-mode #cultivationMonster .cult-attack b { font-size: 9px; }
+  html.cultivation-mode #cultivationMonster .cult-target { display: none; }
+  html.cultivation-mode #cultivationMonster .cult-countdown { font-size: 9px; gap: 4px; }
+  html.cultivation-mode #cultivationMonster .cult-pips i { width: 7px; height: 7px; }
+}
+@media (max-width: 360px) and (max-height: 650px) and (orientation: portrait) {
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 156px; grid-template-columns: 46px minmax(0, 1fr); }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { min-height: 60px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-lookup, html.cultivation-mode #cultivationMonster .cult-attack, html.cultivation-mode #cultivationMonster .cult-pips { display: none; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { padding-right: 10px; }
+}

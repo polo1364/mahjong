@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><base href="../"><meta name="viewport" content="width=device-width,initial-scale=1"><title>裝備 V3 · 互動驗收</title><link rel="stylesheet" href="cultivation-journey-ui.css"><link rel="stylesheet" href="cultivation-equipment-ui.css"><style>body{margin:0;padding:22px;background:#102b34;color:#e1e8cf;font:14px/1.7 "Microsoft JhengHei",sans-serif}main{max-width:1040px;margin:auto}button{font:inherit;color:#eee4c4;background:#285548;border:1px solid #aebc87;border-radius:6px;padding:10px 15px;margin:4px;min-height:44px}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:15px;background:#08222a;border-radius:9px}a{color:#cbdcac}h1{font-size:25px}.qa-tools{position:sticky;top:0;background:#102b34;padding:8px 0}</style></head><body><main><h1>裝備 V3 · 互動驗收</h1><p>僅供測試：此頁使用正式 Combat / Economy / UI 模組；測試背包與資源由 fixture 建立。只寫獨立 sessionStorage（mahjong-equipment-v3-fixture），不寫正式 IndexedDB 存檔。</p><div class="qa-tools"><button id="seedPreparation">建立資源充足庭院</button><button id="resumePreparation">讀取已保存庭院</button><button id="reloadFixture">重新載入本頁驗證</button><button id="showResult">顯示個人掉落／裝備說明</button><label><input id="failSave" type="checkbox">下一次儲存失敗</label><label><input id="slowSave" type="checkbox" checked>儲存延遲 700ms</label></div><section id="fixtureStatus" role="status" aria-live="polite">尚未建立測試旅程。</section><pre id="fixtureState"></pre><section id="fixtureLoot"></section><p><a href="index.html">開啟正式遊戲</a></p></main>
+<script src="cultivation-skills.js"></script><script src="cultivation-finishers.js"></script><script src="cultivation-heroes.js"></script><script src="cultivation-monsters.js"></script><script src="cultivation-equipment.js"></script><script src="cultivation-economy.js"></script><script src="cultivation-combat.js"></script><script src="cultivation-journey-ui.js"></script><script src="cultivation-equipment-ui.js"></script>
+<script>
+(() => {
+  'use strict';
+  const C=MahjongCultivationCombat,E=MahjongCultivationEquipment,UI=MahjongCultivationJourneyUI,key='mahjong-equipment-v3-fixture';
+  let state=null,saves=0,locked=false;
+  const $=id=>document.getElementById(id);
+  function summary(message='') {
+    if(message) $('fixtureStatus').textContent=message;
+    $('resumePreparation').disabled=!sessionStorage.getItem(key);
+    if(!state)return;
+    const p=state.cultivation.players[0];
+    $('fixtureState').textContent=JSON.stringify({testOnly:true,version:state.cultivation.version,phase:state.cultivation.journey.phase,saveAttempts:saves,locked,gold:p.economy.gold,sand:p.economy.sand,seals:p.economy.seals,equipment:p.equipment,inventory:p.economy.inventory,receipts:p.economy.receipts.length,shop:p.economy.shop,rng:p.economy.rng},null,2);
+  }
+  async function save(candidate) {
+    saves++;
+    const fail=$('failSave').checked;$('failSave').checked=false;
+    if($('slowSave').checked) await new Promise(resolve=>setTimeout(resolve,700));
+    if(fail){summary('模擬儲存失敗：已發布狀態及快照維持原值；只能重試原交易。');return false;}
+    C.validate(candidate.cultivation);
+    sessionStorage.setItem(key,JSON.stringify(candidate));
+    return true;
+  }
+  function preparation() {
+    UI.showPreparation(state,{getState:()=>state,save,publish(next){state=next;summary('交易儲存成功後才發布狀態。');},onLock(value){locked=value;summary();},onStart(){state={cultivation:C.create(20261025,state.cultivation)};summary('已開始下一局：保留裝備／資源，重設每局計量。');},async onHome(){const saved=await save(state);if(saved){UI.close();summary('庭院已封存。可按讀取或重新載入驗證。');}return saved;}});
+    const tools=document.createElement('aside');
+    tools.className='fixture-controls';
+    tools.innerHTML='<p>測試專用控制（不會出現在正式遊戲）</p><button type="button" id="fixtureFailNext">讓下一交易儲存失敗</button><span id="fixtureFailureArmed" role="status"></span>';
+    document.querySelector('.journey-header').after(tools);
+    tools.querySelector('button').onclick=()=>{if(locked)return;$('failSave').checked=true;$('fixtureFailureArmed').textContent='已設定：下一筆保存回傳 false。';};
+  }
+  $('seedPreparation').onclick=()=>{
+    if(locked)return;
+    let combat=C.create(20261024,null,{heroId:'shen-gufeng',equipment:true});
+    combat=C.prepare(C.apply(combat,{type:'finish',reason:'draw',id:1}).state);
+    const p=combat.players[0];
+    p.economy.gold=5000;p.economy.sand=500;
+    Object.keys(p.economy.seals).forEach(id=>p.economy.seals[id]=8);
+    const ids=['chi-xiao-sword','xuanfu-staff','huifeng-halberd','zhenyue-armor','huichun-robe','xuanyu-robe','ningyu-jade','huifeng-seal','set-zhenyue-weapon','set-zhenyue-armor','set-zhenyue-accessory','set-wuxiang-weapon','set-wuxiang-armor','set-wuxiang-accessory'];
+    p.economy.inventory=ids.map((catId,i)=>({uid:`p0-${i+1}`,catId,grade:catId.startsWith('set-wuxiang')?5:catId.startsWith('set-')?4:(i%5)+1,level:i===0?7:i===1?1:i===3?6:0,locked:i===2}));
+    p.economy.serial=ids.length;p.equipment={weapon:'p0-1',armor:'p0-4',accessory:'p0-7'};
+    // Chosen xorshift seed gives an actual first forge failure for target +8.
+    p.economy.rng.forge=0x12345678;
+    p.economy.handLoot.items=['p0-9'];p.economy.handLoot.sand=6;p.economy.handLoot.seals={zhenyue:1};
+    state={cultivation:combat};C.validate(combat);sessionStorage.setItem(key,JSON.stringify(state));saves=0;summary('已建立測試庭院。赤霄劍 +7 可驗證失敗退階、移轉；完整兩套可驗證套裝。');preparation();
+  };
+  $('resumePreparation').onclick=()=>{if(locked)return;state=JSON.parse(sessionStorage.getItem(key));C.validate(state.cultivation);summary('已從獨立測試快照讀回；商品、資源、裝備與指令回執沿用。');preparation();};
+  $('reloadFixture').onclick=()=>{if(!locked)location.reload();};
+  $('showResult').onclick=()=>{if(state)$('fixtureLoot').innerHTML=MahjongCultivationEquipmentUI.loot(state.cultivation.players[0])+MahjongCultivationEquipmentUI.roleInfo(state.cultivation.players[0]);};
+  if(sessionStorage.getItem(key))summary('發現已保存測試庭院；按「讀取已保存庭院」檢查持久狀態。');else summary();
+})();
+</script></body></html>

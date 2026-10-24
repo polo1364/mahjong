@@ -1,0 +1,357 @@
+/* Table art pass: felt, jade tile backs, ivory tiles, brass compass and turn cues.
+   Visual only. Loaded last; layout geometry stays in table-layout.css. */
+:root {
+  --art-ivory: #fbf6e6;
+  --art-ivory-shade: #e6dfc6;
+  --art-jade: #2f7a5c;
+  --art-jade-deep: #17483a;
+  --art-brass: #d8b977;
+  --art-brass-deep: #8a6a3a;
+  --art-felt-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  --art-back-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='none' stroke='%23e9dcae' stroke-opacity='.55' stroke-width='.9'%3E%3Cpath d='M10 3L17 10L10 17L3 10Z'/%3E%3Ccircle cx='10' cy='10' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- Felt ---------- */
+.mahjong-table {
+  background:
+    var(--art-felt-noise),
+    radial-gradient(ellipse 70% 60% at 50% 48%, #2b6a5a 0%, #1d5245 45%, #123a31 80%, #0c2a24 100%);
+  background-size: 160px 160px, 100% 100%;
+  box-shadow: inset 0 0 0 1px #d7c28a33, inset 0 0 60px #04120ecc, inset 0 18px 40px #00000033;
+}
+.mahjong-table::after {
+  /* Faint engraved compass behind the center panel. */
+  content: ''; position: absolute; left: 50%; top: var(--table-center-y, 50%);
+  width: min(62%, 460px); aspect-ratio: 1; transform: translate(-50%, -50%);
+  border-radius: 50%; pointer-events: none; z-index: 0;
+  background:
+    repeating-conic-gradient(from 0deg, #e6cf9a0b 0deg .6deg, transparent .6deg 15deg),
+    radial-gradient(circle, transparent 54%, #e6cf9a1c 54.4%, transparent 55%, transparent 69%, #e6cf9a14 69.4%, transparent 70%);
+  -webkit-mask: radial-gradient(circle, transparent 30%, #000 31%, #000 70%, transparent 71%);
+          mask: radial-gradient(circle, transparent 30%, #000 31%, #000 70%, transparent 71%);
+}
+.mahjong-table > * { z-index: 1; }
+
+/* ---------- Brass frame ---------- */
+.table-frame {
+  background:
+    linear-gradient(135deg, #b8955c 0%, #4a3a28 7%, #7a5f3d 16%, #3a2f24 52%, #6e5535 84%, #c9a46a 100%);
+}
+
+/* ---------- Center compass panel ---------- */
+.center-info-panel {
+  background:
+    radial-gradient(circle at 50% 38%, #1d5a4bdd, #0b2c26f0 72%);
+  border: 1px solid #d9bd8066;
+  box-shadow:
+    0 0 0 4px #0f3a2fcc,
+    0 0 0 5px #d9bd8055,
+    0 0 0 9px #0f3a2f88,
+    0 10px 30px #0008,
+    inset 0 0 24px #04161288,
+    inset 0 1px 0 #fff1;
+}
+.wind-indicator { transition: background .25s, color .25s, box-shadow .25s; }
+.wind-indicator.active {
+  background: linear-gradient(#f0d9a4, #c9a463);
+  color: #1d3a2d;
+  box-shadow: 0 2px 0 #7d6237, 0 0 10px #f0d9a466;
+}
+.center-remain strong { color: #f3dfb0; text-shadow: 0 0 12px #f3dfb033; }
+
+/* ---------- Ivory tiles with a jade back layer ---------- */
+.tile, button.tile:disabled {
+  background:
+    linear-gradient(160deg, #ffffff 0%, var(--art-ivory) 38%, var(--art-ivory-shade) 100%);
+  border: 1px solid #f3ead0;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -2px 3px #c9bf9f66,
+    0 2px 0 #d9d2b6,
+    0 4px 0 var(--art-jade),
+    0 5px 0 var(--art-jade-deep),
+    0 8px 10px #0007;
+}
+.tile.small, .tile.mini {
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 #d9d2b6, 0 2px 0 var(--art-jade), 0 3px 0 var(--art-jade-deep), 0 4px 4px #0005;
+}
+.game-log .tile { box-shadow: none; }
+
+/* Playable tiles lift on hover/focus; disabled ones stay still. */
+#yourHand button.tile { transition: transform .14s ease, box-shadow .14s ease, filter .14s; }
+#yourHand button.tile:not(:disabled):hover,
+#yourHand button.tile:not(:disabled):focus-visible {
+  transform: translateY(-8px);
+  box-shadow:
+    inset 0 1px 0 #fff, inset 0 -2px 3px #c9bf9f66,
+    0 2px 0 #d9d2b6, 0 4px 0 var(--art-jade), 0 5px 0 var(--art-jade-deep),
+    0 0 0 2px #f2d79a, 0 14px 16px #0008;
+}
+#yourHand button.tile:focus-visible { outline: none; }
+#yourHand button.tile:disabled { filter: saturate(.85) brightness(.96); }
+#yourHand button.tile.tile-drawn {
+  box-shadow:
+    inset 0 1px 0 #fff, 0 2px 0 #d9d2b6, 0 4px 0 #b08d4f, 0 5px 0 #6f5428,
+    0 0 0 2px #edcd88, 0 0 16px #edcd8866, 0 8px 10px #0007;
+}
+
+/* Latest discard on the table gets a soft brass halo. */
+.discard-area .tile.mini.discard-latest { box-shadow: inset 0 1px 0 #fff, 0 2px 0 var(--art-jade), 0 3px 0 var(--art-jade-deep), 0 0 0 1px #e9cd8a99; }
+.discard-area .tile.mini.discard-current {
+  box-shadow: inset 0 1px 0 #fff, 0 2px 0 var(--art-jade), 0 3px 0 var(--art-jade-deep), 0 0 0 2px #f2d38c, 0 0 12px #f2d38caa;
+}
+
+/* ---------- Jade tile backs ---------- */
+#handBack1 .tile-back, #handBack2 .tile-back, #handBack3 .tile-back, .tile.tile-facedown {
+  border: 1px solid #a9c7a6;
+  border-radius: 4px;
+  background:
+    var(--art-back-motif) center / 70% no-repeat,
+    linear-gradient(150deg, #5fa483 0%, #2f7a5c 45%, #1f5c45 100%);
+  box-shadow: inset 0 1px 0 #ffffff40, inset 0 -2px 0 #0f3a2c66, 0 2px 0 #f2ead2, 0 3px 0 #c9bf9f, 0 5px 6px #0006;
+}
+#handBack1 .tile-back::after, #handBack2 .tile-back::after, #handBack3 .tile-back::after {
+  border: 1px solid #e9dcae55; background: none;
+}
+#handBack2 .tile-back, #handBack3 .tile-back { background-size: auto 70%, 100% 100%; }
+.tile.tile-facedown { color: transparent; padding: 0; }
+
+/* ---------- Seats ---------- */
+.player-info-inline { transition: border-color .25s, box-shadow .25s, background .25s; }
+.player-info-inline.active-turn {
+  border-color: #f0d49a;
+  background: linear-gradient(110deg, #3e5a40f2, #1d4636f2);
+  box-shadow: 0 0 0 2px #f0d49a33, 0 0 18px #f0d49a44, 0 6px 16px #0008;
+  animation: art-turn-glow 2.4s ease-in-out infinite;
+}
+.player-info-inline.active-turn .seat-avatar { border-color: #f6dca4; box-shadow: inset 0 0 0 2px #123d36, 0 0 10px #f6dca488; }
+@keyframes art-turn-glow { 50% { box-shadow: 0 0 0 3px #f0d49a22, 0 0 26px #f0d49a66, 0 6px 16px #0008; } }
+.dealer-badge { background: linear-gradient(#f0d49a, #bf9a5c); color: #1f2f22; border-radius: 3px; }
+.listen-badge { background: linear-gradient(#e47c5c, #a9442f); color: #fff3df; border-radius: 3px; }
+
+/* ---------- Action buttons ---------- */
+.controls-inline button { transition: transform .12s, filter .12s, box-shadow .2s; }
+.controls-inline button:not(:disabled):active { transform: translateY(1px); }
+.controls-inline button.active:not(:disabled) { box-shadow: 0 0 0 1px #f6dfae, 0 0 14px #f0d49a88; }
+.controls-inline #btnHu.active:not(:disabled) { animation: art-hu-pulse 1.2s ease-in-out infinite; }
+@keyframes art-hu-pulse { 50% { box-shadow: 0 0 0 2px #ffd9a6, 0 0 22px #ff9a6aaa; } }
+
+/* ---------- Panels ---------- */
+.side-panel, .settings-content, .reaction-panel { border-color: #c9b07a66; }
+.panel-heading h3, .settings-content h3, .reaction-panel h3 { color: #f0d9a8; text-shadow: 0 1px 8px #0006; }
+.result-player.winner { border-color: #e7c886; background: linear-gradient(120deg, #6d663a40, #18392e66); box-shadow: 0 0 20px #e7c88622; }
+
+@media (prefers-reduced-motion: reduce) {
+  .player-info-inline.active-turn, .controls-inline #btnHu.active:not(:disabled) { animation: none; }
+  #yourHand button.tile { transition: none; }
+}
+html.feedback-reduced .player-info-inline.active-turn,
+html.feedback-reduced .controls-inline #btnHu.active:not(:disabled) { animation: none; }
+
+/* ---------- Game log: event badges on a timeline ---------- */
+.game-log { padding: 2px 2px 0 0; }
+.game-log > .log-entry {
+  position: relative; display: grid; grid-template-columns: 22px minmax(0,1fr); gap: 8px; align-items: start;
+  margin: 0; padding: 6px 6px 6px 0; border-bottom: 0; border-radius: 6px; color: #c3d0c8; line-height: 1.6;
+}
+.game-log > .log-entry::before {
+  /* timeline rail behind the badges */
+  content: ''; position: absolute; left: 10.5px; top: 0; bottom: 0; width: 1px; background: #d6bf8a26;
+}
+.log-badge {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px;
+  border-radius: 50%; font: 600 11px/1 "PMingLiU","Noto Serif TC",serif; color: #d9e3d9;
+  background: #1c3a33; border: 1px solid #8fa89566; box-shadow: 0 0 0 3px #10242b;
+}
+.log-text { min-width: 0; overflow-wrap: anywhere; }
+.log-actor { font-weight: 600; color: #e9dcbc; }
+.log-actor.seat-0 { color: #f2d798; }
+.log-actor.seat-1 { color: #a9bce0; }
+.log-actor.seat-2 { color: #e2b796; }
+.log-actor.seat-3 { color: #c8b2d6; }
+.game-log .log-text .tile.small.log-tile {
+  display: inline-block; width: 19px; min-width: 0; height: auto; aspect-ratio: 5 / 7; margin: 0 1px; padding: 1px;
+  border-radius: 3px; vertical-align: middle; background: linear-gradient(160deg,#fff,var(--art-ivory) 40%,var(--art-ivory-shade));
+  border: 1px solid #f1e7cc; box-shadow: 0 1px 0 #d9d2b6, 0 2px 0 var(--art-jade), 0 3px 2px #0006;
+}
+.game-log .log-text .tile.small.log-tile + .tile.small.log-tile { margin-left: 0; }
+.game-log .log-win .tile.small.log-tile { width: 21px; }
+
+.log-discard .log-badge, .log-draw .log-badge { color: #b9c9be; background: #172f2b; }
+.log-discard, .log-draw { color: #aebdb4; }
+.log-chow .log-badge { background: #2c5a46; border-color: #8fc4a5aa; color: #e4f4e7; }
+.log-pong .log-badge { background: #5b4a2a; border-color: #e1c27fbb; color: #fbe6b6; }
+.log-kong .log-badge { background: #6a3a2c; border-color: #eba584bb; color: #ffe2d1; }
+.log-flower .log-badge { background: #5a3346; border-color: #e3a3bdbb; color: #ffe1ec; }
+.log-ready .log-badge { background: #2c4766; border-color: #9ec3e8bb; color: #e5f1ff; }
+.log-round .log-badge, .log-save .log-badge { background: #33352a; border-color: #c9b98a88; color: #efe2bd; }
+.log-warn .log-badge { background: #6b2c27; border-color: #f0a08f; color: #ffe8e1; }
+.log-warn { color: #f0c3b6; }
+.log-win { background: linear-gradient(90deg, #e7c88626, transparent 80%); color: #f6e7c4; }
+.log-win .log-badge { background: linear-gradient(#f3d89c,#c39a55); border-color: #ffe9b8; color: #3a2a12; box-shadow: 0 0 0 3px #10242b, 0 0 12px #f3d89c88; }
+.game-log > .log-entry.my-log { background: linear-gradient(90deg, #f2d7980f, transparent 70%); }
+.game-log > .log-entry.my-log .log-text { color: #efe3c3; }
+.game-log > .log-entry:last-child:not([hidden]) .log-badge { box-shadow: 0 0 0 3px #10242b, 0 0 0 4px #e9cd8a66; }
+.game-log > .log-divider { display: flex; align-items: center; gap: 10px; padding: 8px 0; color: #d8c08b; font-size: 10px; letter-spacing: 3px; }
+.game-log > .log-divider::before { display: none; }
+.game-log > .log-divider::after, .game-log > .log-divider > span::before { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #d8c08b66, transparent); }
+.game-log > .log-divider > span { display: contents; }
+
+/* ---------- On-table melds: beside each hand, at that player's left, all groups shown ---------- */
+.meld-rail { display: none; }
+.square-table .meld-rail { --rail-w: calc(var(--table-hand-width) * .8); display: flex; flex: none; gap: 6px; }
+.square-table .meld-rail:empty { display: none; }
+.square-table .meld-area .meld-group { display: none !important; }
+.rail-group { display: flex; gap: 1px; flex: none; }
+.square-table .rail-tile {
+  width: var(--rail-w); min-width: 0; height: auto; aspect-ratio: 5 / 7; padding: 1px; flex: none;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 #d9d2b6, 0 2px 0 var(--art-jade), 0 3px 0 var(--art-jade-deep), 0 4px 4px #0006;
+}
+.square-table .rail-tile.is-back {
+  background: var(--art-back-motif) center / 70% no-repeat, linear-gradient(150deg, #5fa483, #2f7a5c 45%, #1f5c45);
+  border-color: #a9c7a6; box-shadow: 0 1px 0 #f2ead2, 0 2px 0 #c9bf9f, 0 3px 4px #0006;
+}
+.square-table .rail-tile .tile-art { display: block; width: 100%; height: 100%; }
+
+/* Top seat: melds to the right of the backs (that player's left). */
+.square-table .top-area > .hand-meld-container { display: flex; justify-content: center; align-items: flex-start; gap: 10px; }
+.square-table .top-area #handBack1 { flex: 0 1 auto; min-width: 0; }
+
+/* Side seats: the rail lies along the hand; left seat's melds above, right seat's below; tiles turned sideways. */
+.square-table .left-area > .hand-meld-container, .square-table .right-area > .hand-meld-container {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+}
+.square-table #handBack2, .square-table #handBack3 { height: auto; flex: 0 1 auto; min-height: 0; }
+.square-table .meld-rail.vertical, .square-table .meld-rail.vertical .rail-group { flex-direction: column; }
+.square-table .meld-rail.vertical .rail-tile { position: relative; width: calc(var(--rail-w) * 7 / 5); height: var(--rail-w); aspect-ratio: auto; padding: 0; }
+.square-table .meld-rail.vertical .rail-tile .tile-art {
+  position: absolute; left: 50%; top: 50%; width: calc(var(--rail-w) - 2px); height: calc(var(--rail-w) * 7 / 5 - 2px);
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.square-table #meldRail3 .rail-tile .tile-art { transform: translate(-50%, -50%) rotate(-90deg); }
+
+/* Your seat: melds on the left end of your own rack, nearly hand-sized. */
+.square-table .bottom-area > .hand-meld-container { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: flex-end; gap: 8px; }
+.square-table #meldRail0 { --rail-w: calc(var(--table-hand-width) * .86); margin-bottom: 8px; padding-left: 4px; }
+.square-table .bottom-area #yourHandArea { flex: 0 1 auto; min-width: 0; width: auto; }
+
+/* ---------- Autosave prompt ---------- */
+.restore-panel .result-footer { display: flex; justify-content: flex-end; gap: 10px; }
+/* Side seats stop above your rack so the rack row (melds + hand) can use the full table width. */
+.square-table [data-square-mode="inside"] .mahjong-table .left-area,
+.square-table [data-square-mode="inside"] .mahjong-table .right-area { bottom: calc(var(--table-hand-height) + 52px); }
+
+/* ---------- Player plates: name, wind, points and hand size in one block ---------- */
+.player-info-inline { position: relative; overflow: visible; }
+.player-info-inline .seat-meta { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.player-info-inline .seat-count {
+  font: 600 10px/1.5 "Segoe UI", "Microsoft JhengHei", sans-serif; color: #cfe0d4;
+  padding: 0 6px; border: 1px solid #c8b88a55; border-radius: 9px; background: #0d2a24aa;
+}
+.player-info-inline .seat-turn {
+  display: none; position: absolute; top: -10px; right: -8px; z-index: 3;
+  font: 700 10px/1.6 "Microsoft JhengHei", sans-serif; letter-spacing: 1px; padding: 0 7px; border-radius: 9px;
+  color: #2a2412; background: linear-gradient(#f8e2ad, #c99f5a); box-shadow: 0 2px 6px #0008, 0 0 10px #f2d38c88;
+}
+.player-info-inline.active-turn .seat-turn { display: block; animation: art-turn-tag 1.2s ease-in-out infinite; }
+.player-info-inline.active-turn { border-width: 2px; scale: 1.06; z-index: 4; }
+.mahjong-table[data-turn]:not([data-turn=""]) .player-info-inline:not(.active-turn) { opacity: .78; }
+@keyframes art-turn-tag { 50% { translate: 0 -2px; box-shadow: 0 4px 8px #0008, 0 0 16px #f2d38ccc; } }
+
+/* ---------- Centre compass points at the seat whose turn it is ---------- */
+.center-info-panel { overflow: visible; }
+.turn-beacon {
+  position: absolute; inset: -12px; border-radius: 50%; pointer-events: none; opacity: 0; z-index: 0;
+  background: conic-gradient(from -42deg, #f6d48e 0deg 84deg, transparent 84deg 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 88%, #000 89%, #000 99%, transparent 100%);
+          mask: radial-gradient(closest-side, transparent 88%, #000 89%, #000 99%, transparent 100%);
+  filter: drop-shadow(0 0 6px #f6d48e);
+  transition: opacity .25s ease, rotate .45s cubic-bezier(.3,.9,.3,1);
+}
+.mahjong-table[data-turn="top"] .turn-beacon { opacity: 1; rotate: 0deg; }
+.mahjong-table[data-turn="right"] .turn-beacon { opacity: 1; rotate: 90deg; }
+.mahjong-table[data-turn="bottom"] .turn-beacon { opacity: 1; rotate: 180deg; }
+.mahjong-table[data-turn="left"] .turn-beacon { opacity: 1; rotate: 270deg; }
+.center-info-panel > :not(.turn-beacon) { position: relative; z-index: 1; }
+
+/* ---------- The active player's tiles glow ---------- */
+.mahjong-table[data-turn="top"] #handBack1 .tile-back,
+.mahjong-table[data-turn="left"] #handBack2 .tile-back,
+.mahjong-table[data-turn="right"] #handBack3 .tile-back {
+  box-shadow: inset 0 1px 0 #ffffff40, 0 2px 0 #f2ead2, 0 3px 0 #c9bf9f, 0 0 0 1px #f2d38c, 0 0 12px #f2d38c99;
+}
+.mahjong-table[data-turn="bottom"] #yourHand .hand-row { box-shadow: 0 0 0 1px #f2d38c66, 0 0 22px #f2d38c33; border-radius: 10px; }
+
+/* ---------- Discard rivers: all tiles on the table, growing away from the centre ---------- */
+.square-table .mahjong-table { --river-gap-y: 88px; --river-gap-x: 82px; }
+.square-table .mahjong-table[data-square-small="true"] { --river-gap-y: 52px; --river-gap-x: 48px; --public-tile-width: 15px; }
+.square-table .table-discard-zone { width: auto; min-height: 0; display: block; }
+.square-table .table-discard-zone .discard-area,
+.square-table .table-discard-zone .discard-area.vertical { gap: 3px; margin: 0; width: auto; max-width: none; }
+.square-table .table-discard-zone .tile.mini[hidden] { display: block !important; }
+.square-table .table-discard-zone-0, .square-table .table-discard-zone-1 { left: 50%; }
+.square-table .table-discard-zone-0 { top: calc(50% + var(--river-gap-y)); transform: translate(-50%, 0); }
+.square-table .table-discard-zone-1 { top: calc(50% - var(--river-gap-y)); transform: translate(-50%, -100%); }
+.square-table .table-discard-zone-0 .discard-area, .square-table .table-discard-zone-1 .discard-area {
+  display: flex; flex-wrap: wrap; justify-content: flex-start; width: calc(6 * (var(--public-tile-width) + 3px));
+}
+.square-table .table-discard-zone-1 .discard-area { flex-wrap: wrap-reverse; flex-direction: row-reverse; }
+.square-table .table-discard-zone-2, .square-table .table-discard-zone-3 { top: 50%; }
+.square-table .table-discard-zone-2 { left: calc(50% - var(--river-gap-x)); transform: translate(-100%, -50%); }
+.square-table .table-discard-zone-3 { left: calc(50% + var(--river-gap-x)); transform: translate(0, -50%); }
+.square-table .table-discard-zone-2 .discard-area.vertical, .square-table .table-discard-zone-3 .discard-area.vertical {
+  display: grid; grid-template-rows: repeat(6, auto); grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: var(--public-tile-width);
+}
+.square-table .table-discard-zone-2 .discard-area.vertical { direction: rtl; }
+
+/* Flowers stay beside each plate, all of them visible. */
+.square-table .meld-area .flower-row { flex-wrap: wrap; }
+.square-table .meld-area .flower-row .tile[hidden] { display: block !important; }
+
+/* Side plates size to their content so the hand-count badge stays inside. */
+.square-table .left-area > .player-info-inline, .square-table .right-area > .player-info-inline { width: auto; min-width: 82px; }
+.square-table .mahjong-table[data-square-small="true"] .left-area > .player-info-inline,
+.square-table .mahjong-table[data-square-small="true"] .right-area > .player-info-inline { width: auto; min-width: 46px; height: auto; padding: 2px 4px; }
+.square-table .mahjong-table[data-square-small="true"] .seat-meta { flex-direction: column; gap: 1px; align-items: flex-start; }
+
+/* Small tables: tighter, longer rivers so a late-game discard pile stays clear of the hands. */
+.square-table .mahjong-table[data-square-small="true"] { --public-tile-width: 13px; --river-gap-y: 50px; --river-gap-x: 46px; }
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone .discard-area { gap: 2px; }
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-0 .discard-area,
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-1 .discard-area { width: calc(8 * (var(--public-tile-width) + 2px)); }
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-2 .discard-area.vertical,
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone-3 .discard-area.vertical { grid-template-rows: repeat(6, auto); }
+.square-table .mahjong-table[data-square-small="true"] .table-discard-zone .tile.mini { padding: 0; border-radius: 2px; }
+
+/* ---------- Table fills the window: no title row, slim header carrying the stakes ---------- */
+.square-table .toolbar { display: none; }
+.square-table .shell { grid-template-rows: 58px minmax(0,1fr); padding-bottom: 8px; }
+.square-table .masthead .table-meta { margin: 0 14px 0 auto; padding: 6px 12px; font-size: 11px; white-space: nowrap; }
+.square-table .app-layout { gap: 16px; }
+@media (min-width:1600px) and (min-height:850px) { .square-table .shell { grid-template-rows: 64px minmax(0,1fr); } }
+@media (max-height:800px) and (min-width:1001px) { .square-table .shell { grid-template-rows: 50px minmax(0,1fr); } }
+@media (max-width:1000px) { .square-table .shell { grid-template-rows: 56px minmax(0,1fr); } }
+@media (max-width:600px) {
+  .square-table .shell { grid-template-rows: 78px minmax(0,1fr); }
+  .square-table .masthead .table-meta { order: 1; margin: 0 0 0 auto; padding: 3px 6px; font-size: 8px; flex-direction: column; gap: 0; }
+  .square-table .masthead .table-meta strong { font-size: 10px; }
+  .square-table .masthead .header-actions { order: 2; }
+}
+@media (max-width:1000px) and (max-height:500px) and (orientation:landscape) {
+  .square-table .shell { grid-template-rows: 43px minmax(0,1fr); }
+  .square-table .masthead .table-meta { display: none; }
+}
+
+/* ---------- Game settings dialog now also holds sound and effects ---------- */
+.settings-content .settings-section-title {
+  margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #c9b07a33;
+  font: 15px "PMingLiU", "Noto Serif TC", serif; letter-spacing: 2px; color: #f0d9a8;
+}
+.settings-content .settings-section-title:first-of-type { margin-top: 6px; padding-top: 0; border-top: 0; }
+.settings-content .settings-section-note { margin: -2px 0 10px; font-size: 12px; color: #a9bbb0; }
+.settings-content .feedback-panel { padding: 0; background: none; border: 0; box-shadow: none; display: block; }
+.settings-content .feedback-panel .workshop-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.settings-content .feedback-panel .feedback-settings { padding-top: 10px; }
+.settings-content #feedbackStatus { margin-top: 8px; }
+.settings-content .settings-buttons { position: sticky; bottom: -28px; z-index: 2; margin: 14px -28px -28px; padding: 14px 28px; background: #10241ff5; border-top: 1px solid #a2b58c44; }
+@media (max-width:600px) { .settings-content .settings-buttons { bottom: -20px; margin: 14px -20px -20px; padding: 12px 20px; } }

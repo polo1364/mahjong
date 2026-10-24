@@ -1,0 +1,10 @@
+.hero-voice-preview { display: none; }
+.cultivation-mode .hero-voice-preview { display: grid; gap: 10px; margin-bottom: 14px; }
+.hero-voice-preview select { min-width: 0; width: 100%; }
+.hero-voice-preview .feedback-preview { display: flex; gap: 8px; }
+.hero-voice-preview button { flex-shrink: 0; }
+.hero-voice-preview p { margin: 0; color: var(--muted, #b8c9c3); font-size: 12px; line-height: 1.6; }
+@media (max-width: 480px) {
+  .hero-voice-preview .feedback-preview { flex-wrap: wrap; }
+  .hero-voice-preview .feedback-preview select { flex-basis: 100%; }
+}

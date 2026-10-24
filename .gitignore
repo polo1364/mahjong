@@ -1,0 +1,12 @@
+# Local backups, credentials, dependencies, and generated previews/results.
+.local-backups/
+*.bak*
+.claude/
+.env
+.env.*
+node_modules/
+__pycache__/
+art-source/
+artifacts/
+tests/*.json
+tests/*.txt
