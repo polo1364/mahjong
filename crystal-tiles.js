@@ -1,4 +1,4 @@
-/* Five-Element Crystal artwork. Edited PNGs remove corner text except on honor tiles. */
+/* Five-Element Crystal artwork with transparent corner numbers and single-character labels. */
 (function (root) {
   'use strict';
   const imageURL = root.MahjongImageURL || (value => value);
@@ -62,12 +62,15 @@
   const tiles = Object.create(null);
   const markup = Object.create(null);
   const cornerClip = 'polygon(12% 0,90% 0,100% 8%,100% 92%,90% 100%,10% 100%,0 92%,0 8%)';
-  // Only honors retain corner text; the other selected PNGs have no painted labels.
+  // Six honors already have painted corner text; preserve it without covering or doubling it.
   function cornerLabel(key) {
-    const honor = { FE: '東', FS: '南', FW: '西', FN: '北', DC: '中', DF: '發' }[key];
-    if (!honor) return '';
-    const color = key === 'DC' ? '#812c29' : key === 'DF' ? '#1a593f' : '#304a66';
-    return `<g data-crystal-label="${key}" font-family="Microsoft JhengHei,PingFang TC,sans-serif" font-weight="700" fill="${color}"><rect x="3.5" y="3.1" width="16.5" height="10.6" rx="1.8" fill="#f2f7fb" fill-opacity="0.96" stroke="#aabfce" stroke-width="0.25"/><text x="5" y="11.3" font-size="9">${honor}</text></g>`;
+    if (key === 'BACK') return '';
+    const suitColor = { W: '#b5222b', T: '#165ca8', B: '#187344' }[key[0]];
+    const label = suitColor ? key.slice(1) : key === 'DB' ? '白' :
+      key[0] === 'H' ? ['春', '夏', '秋', '冬', '梅', '蘭', '竹', '菊'][Number(key.slice(1)) - 1] : '';
+    if (!label) return '';
+    const color = suitColor || (key[0] === 'H' ? '#345b43' : '#304a66');
+    return `<text data-crystal-label="${key}" x="5" y="11.3" font-family="Microsoft JhengHei,PingFang TC,sans-serif" font-size="9" font-weight="700" fill="${color}">${label}</text>`;
   }
   for (const [key, [sheetKey, rectangle, legacyLabel]] of Object.entries(sourceTiles)) {
     const sheet = sheets[sheetKey];

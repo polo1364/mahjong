@@ -62,13 +62,19 @@ test('runtime PNGs and their art sources match their recorded hashes', () => {
   }
 });
 
-test('only the six labeled honors retain SVG text and corner labels', () => {
-  const labeledHonors = new Set(['FE', 'FS', 'FW', 'FN', 'DC', 'DF']);
+test('corner labels have suit colors or one character, with no background or duplicate painted honors', () => {
+  const paintedHonors = new Set(['FE', 'FS', 'FW', 'FN', 'DC', 'DF']);
   for (const key of art.keys) {
     const face = art.render(key);
-    const retainsLabel = labeledHonors.has(key);
-    assert.equal(/<text\b/.test(face), retainsLabel, `${key} SVG text`);
-    assert.equal(/data-crystal-label=/.test(face), retainsLabel, `${key} corner label`);
+    const addedLabel = key !== 'BACK' && !paintedHonors.has(key);
+    assert.equal(/<text\b/.test(face), addedLabel, `${key} SVG text`);
+    assert.equal(/data-crystal-label=/.test(face), addedLabel, `${key} corner label`);
+    assert.equal(/<rect\b/.test(face), false, `${key} no background box`);
+    if (!addedLabel) continue;
+    const label = face.match(/<text\b[^>]*>([^<]+)<\/text>/)[1];
+    const color = { W: '#b5222b', T: '#165ca8', B: '#187344' }[key[0]];
+    assert.equal(label, color ? key.slice(1) : key === 'DB' ? '白' : '春夏秋冬梅蘭竹菊'[Number(key.slice(1)) - 1]);
+    if (color) assert.ok(face.includes(`fill="${color}"`), `${key} suit color`);
   }
 });
 
