@@ -32,8 +32,8 @@ function end(s) {return send(s,{type:'finish',pid:null,reason:'draw'});}
 const basic=(s)=>send(s,{type:'discard',pid:0,key:'W1'});
 
 test('exact immutable catalogs, independent four-hero assignment and V1 opt-in boundary',()=>{
-  assert.equal(H.all.length,10);assert.equal(M.all.length,19);
-  assert.deepEqual(M.all.reduce((a,m)=>(a[m.tier]=(a[m.tier]||0)+1,a),{}),{small:10,elite:5,miniboss:3,boss:1});
+  assert.equal(H.all.length,10);assert.equal(M.all.length,34);
+  assert.deepEqual(M.all.reduce((a,m)=>(a[m.tier]=(a[m.tier]||0)+1,a),{}),{small:15,elite:10,miniboss:8,boss:1});
   for(const h of H.all){const s=C.create(77,null,{heroId:h.id});assert.equal(s.version,2);assert.equal(s.players[0].heroId,h.id);assert.equal(new Set(s.players.map(p=>p.heroId)).size,4);assert.ok(C.validate(s));assert.equal(h.image,`assets/cultivation-journey/heroes/${h.id}.png`);}
   const legacy=C.create(77);assert.equal(legacy.version,1);assert.equal(C.create(1,end(legacy),{heroId:H.all[0].id}).version,1);
   assert.throws(()=>C.create(1,null,{heroId:'bad'}),/hero/);

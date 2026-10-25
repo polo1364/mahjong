@@ -53,7 +53,8 @@
     const growth = (progression?.[kind] || 0) + (suffix ? progression?.[suffix] || 0 : 0);
     const format = value => `${value > 0 ? '+' : ''}${Math.round(value * 1000) / 10}%`;
     return (gear ? line('裝備常駐加成', format(gear), gear > 0 ? 'up' : 'down') : '') +
-      (growth ? line('境界／功法常駐加成', format(growth), growth > 0 ? 'up' : 'down') : '');
+      (growth ? line('境界／功法常駐加成', format(growth), growth > 0 ? 'up' : 'down') : '') +
+      line('奇遇', format((player.expeditionEffect?.[kind] || 0) + (suffix ? player.expeditionEffect?.[suffix] || 0 : 0)));
   }
   function threatNote(player) {
     if (!player.progression) return '';

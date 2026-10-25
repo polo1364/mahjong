@@ -9,7 +9,7 @@
     make('stealth','匿影香','battle','無強制挑釁時，被單體鎖定前降低目前仇恨 30%，重新判定目標。',{water:2}),
     make('edge','銳芒符','battle','首招直接攻擊技能基礎傷害增加 20%，整招最多增加 50；含胡牌終式。',{metal:1,fire:1}),
     make('guard','護元符','battle','承受未被取消或降級的蓄力攻擊時，該整次攻擊承傷降低 40%。',{metal:1,earth:1}),
-    ...[['metal','金魄屑'],['wood','木靈芽'],['water','水靈露'],['fire','火靈燼'],['earth','地脈砂'],['shard','劫晶碎片']].map(([id,name])=>make(id,name,'material',id==='shard'?'小王機率掉落、大 BOSS 必得；合成祈運及保級符。':'怪物掉落的合成材料；不是強化貨幣「靈砂」。')),
+    ...[['metal','金魄屑'],['wood','木靈芽'],['water','水靈露'],['fire','火靈燼'],['earth','地脈砂'],['shard','劫晶碎片']].map(([id,name])=>make(id,name,'material',id==='shard'?'小王機率掉落、大 BOSS 必得；進階地區首領額外保底 1 份。合成祈運及保級符。':'怪物掉落的合成材料；不是強化貨幣「靈砂」。')),
     make('weapon-stone','淬鋒石','forge','武器強化抵扣最多 2 份靈砂，不抵金幣。',{metal:2}),
     make('armor-stone','鍛甲石','forge','防具強化抵扣最多 2 份靈砂，不抵金幣。',{earth:2}),
     make('accessory-stone','蘊靈石','forge','飾品強化抵扣最多 2 份靈砂，不抵金幣。',{wood:1,water:1}),
@@ -44,6 +44,7 @@
     if(random(b)<rule[1]){const pool=m.tier==='boss'?battle:pools[spec.element];grant(pool[Math.floor(random(b)*pool.length)]);}
     if(random(b)<rule[2]){const roll=random(b);grant(roll<rule[4]?stones[Math.floor(random(b)*3)]:roll<rule[4]+rule[5]?'luck':'preserve');}
     if(random(b)<rule[3])grant('shard');
+    if(m.advanced===true&&spec.region&&m.tier==='miniboss')grant('shard');
     b.handLoot.push({monsterId:m.id,speciesId:m.speciesId,killer,awards});
   }
   function prepare(s){

@@ -1,0 +1,11 @@
+.expedition-result{display:flex;flex-wrap:wrap;gap:5px 14px;padding:8px 0;font-size:13px;line-height:1.5;color:#d8e8e6}
+.expedition-result strong{color:#f4d995}.expedition-result span{overflow-wrap:anywhere}
+.prep-left-body>.journey-expedition:not([hidden]){display:block!important;height:100%;overflow:auto;overscroll-behavior:contain}
+.expedition-card{padding:12px;font-size:14px;line-height:1.6}.expedition-card h2{font-size:22px}.expedition-card h3{font-size:17px;margin:12px 0 6px}
+.expedition-card p{margin:7px 0}.expedition-event,.expedition-boss{display:flex;flex-direction:column;gap:8px}
+.expedition-card button{white-space:normal;text-align:left;line-height:1.5;padding:10px;min-height:44px}.expedition-card button span,.expedition-card button em{display:block;font-size:13px;font-style:normal}
+.expedition-card button[aria-pressed=true]{border-color:#f4d995;background:#324439}.expedition-card button:disabled{opacity:.5}
+.expedition-status{color:#ffd6a0}.expedition-effect{font-size:13px;line-height:1.5;color:#bbd7d0}
+.cult-expedition-title{white-space:nowrap;letter-spacing:0;color:#e3d5a5}
+html.cultivation-mode #cultivationMonster .cult-monster-top small:has(.cult-expedition-title){letter-spacing:0}
+@media(max-height:500px){.expedition-card{font-size:12px;padding:8px}.expedition-card h2{font-size:18px}.expedition-result{font-size:11px;padding:3px 0}}

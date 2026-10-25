@@ -19,7 +19,7 @@ function game(seed = 1, { cultivation = false, heroId = null, equipment = false,
   if (html.includes('src="crystal-tiles.js"')) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../crystal-tiles.js'), 'utf8'), context);
   }
-  for (const file of ['cultivation-skills.js', 'cultivation-finishers.js', 'cultivation-heroes.js', 'cultivation-monster-skills.js', 'cultivation-monsters.js', 'cultivation-progression.js', 'cultivation-equipment.js', 'cultivation-items.js', 'cultivation-economy.js', 'cultivation-combat.js']) {
+  for (const file of ['cultivation-skills.js', 'cultivation-finishers.js', 'cultivation-heroes.js', 'cultivation-monster-skills.js', 'cultivation-monsters.js', 'cultivation-progression.js', 'cultivation-expedition.js', 'cultivation-equipment.js', 'cultivation-items.js', 'cultivation-economy.js', 'cultivation-combat.js']) {
     if (html.includes(`src="${file}"`) || html.includes(`src="${file}?`)) vm.runInContext(Object.hasOwn(scriptOverrides, file) ? scriptOverrides[file] : fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), context);
   }
   vm.runInContext(source, context);

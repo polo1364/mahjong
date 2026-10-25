@@ -47,7 +47,7 @@
   }
   function heroDetails(hero, player) {
     const life = player ? `${Number(player.hp).toLocaleString('en-US')} / ${Number(player.maxHp).toLocaleString('en-US')}` : Number(hero.hp || 1000).toLocaleString('en-US');
-    return `<p class="journey-role">${esc(hero.role)} · 生命 ${life}</p><h2>${esc(hero.name)}</h2>${player?.economy || player?.progression ? '<p class="journey-muted journey-stats-note">含裝備、境界與功法常駐加成；條件效果另依招式結算。</p>' : ''}${stats(hero, player)}${player?.progression ? (root.MahjongProgressionUI?.details(player) || '') : ''}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
+    return `<p class="journey-role">${esc(hero.role)} · 生命 ${life}</p><h2>${esc(hero.name)}</h2>${player?.economy || player?.progression ? '<p class="journey-muted journey-stats-note">含裝備、境界、功法與奇遇常駐加成；條件效果另依招式結算。</p>' : ''}${stats(hero, player)}${player ? (root.MahjongExpeditionUI?.details(player) || '') : ''}${player?.progression ? (root.MahjongProgressionUI?.details(player) || '') : ''}<div class="journey-passive"><h3>${esc(hero.passive.name)}</h3><p>${esc(hero.passive.description)}</p></div>`;
   }
   function chooseHero(onChoose, onCancel) {
     const heroes = root.MahjongCultivationHeroes.all;
@@ -96,7 +96,7 @@
     const hero = root.MahjongCultivationHeroes.get(player.heroId);
     const preview = root.MahjongCultivationCombat.journeyPreview(combat);
     const next = root.MahjongCultivationMonsters.get(preview.nextMonsterId);
-    const dialog = open('整備庭院', `<p class="journey-intro">第 ${esc(combat.handNumber || 1)} 局已結算。整理心法，再迎下一場論道。</p><div class="journey-preparation-grid"><article class="journey-prepared-hero journey-panel"><img class="journey-prepared-art" src="${esc(imageURL(hero.image))}" alt="${esc(hero.name)}" width="440" height="480"><div>${heroDetails(hero)}${passiveState(player, combat.monster.id)}<div class="journey-seals"><h3>下局劫印</h3><p>下一局生效，下一局結束解除。</p><ul>${seals(player)}</ul></div></div></article><div class="journey-preparation-side"><section class="journey-panel journey-road"><div><p class="journey-kicker">征途 · 下一場</p><h2>${esc(preview.nextMonsterName)}</h2><p class="journey-progress">${esc(progressText(preview.progress))}</p><p>${esc(preview.message)}</p><p class="journey-muted">道友生命回滿；護盾、一般狀態與仇恨重設。角色與征途進度沿用。</p></div>${next ? `<img src="${esc(imageURL(next.image))}" alt="${esc(next.name)}" width="220" height="240">` : ''}</section><section class="journey-panel"><h2>行囊 · 裝備</h2><div class="journey-equipment">${[['weapon', '武器'], ['armor', '防具'], ['accessory', '飾品']].map(([key, name]) => `<div class="journey-slot"><img src="assets/cultivation-journey/slots/${key}.webp" alt="" width="96" height="96"><strong>${name}</strong><span>空欄</span></div>`).join('')}</div></section><section class="journey-npcs"><article class="journey-panel"><img src="assets/cultivation-journey/npcs/merchant.webp" alt="雲遊商人" width="160" height="180"><div><h3>雲遊商人</h3><p>商品與交易規則待開放</p></div></article><article class="journey-panel"><img src="assets/cultivation-journey/npcs/blacksmith.webp" alt="鑄器師" width="160" height="180"><div><h3>鑄器師</h3><p>強化規則待開放</p></div></article></section></div></div><section class="journey-party journey-panel" aria-label="同行道友"><h2>同行道友</h2><div>${combat.players.map((member, pid) => { const identity = root.MahjongCultivationHeroes.get(member.heroId); return `<article><img src="${esc(imageURL(identity.image))}" alt="" width="100" height="110"><div><strong>${esc(identity.name)}${pid === 0 ? ' · 你' : ''}</strong><small>${esc(identity.role)}</small><p>下局劫印 ${member.pendingSeals?.length || 0}</p></div></article>`; }).join('')}</div></section><footer class="journey-footer"><p>返回首頁會封存庭院進度，下次從此處繼續。</p><div><button type="button" id="journeyHome">返回首頁</button><button type="button" class="primary" id="journeyNext">開始下一局 →</button></div></footer>`, 'journey-preparation-screen');
+    const dialog = open('整備庭院', `<p class="journey-intro">第 ${esc(combat.handNumber || 1)} 局已結算。整理心法，再迎下一場論道。</p><div class="journey-preparation-grid"><article class="journey-prepared-hero journey-panel"><img class="journey-prepared-art" src="${esc(imageURL(hero.image))}" alt="${esc(hero.name)}" width="440" height="480"><div>${heroDetails(hero)}${passiveState(player, combat.monster.id)}<div class="journey-seals"><h3>下局劫印</h3><p>下一局生效，下一局結束解除。</p><ul>${seals(player)}</ul></div></div></article><div class="journey-preparation-side"><section class="journey-panel journey-road"><div><p class="journey-kicker">征途 · 下一場</p><h2>${esc(preview.nextMonsterName)}</h2><p class="journey-progress">${esc(progressText(preview.progress))}</p><p>${esc(preview.message)}</p><p class="journey-muted">道友生命回滿；護盾、一般狀態與仇恨重設。角色與征途進度沿用。</p></div>${next ? `<img src="${esc(imageURL(next.thumbnail||next.image))}" alt="${esc(next.name)}" width="220" height="240">` : ''}</section><section class="journey-panel"><h2>行囊 · 裝備</h2><div class="journey-equipment">${[['weapon', '武器'], ['armor', '防具'], ['accessory', '飾品']].map(([key, name]) => `<div class="journey-slot"><img src="assets/cultivation-journey/slots/${key}.webp" alt="" width="96" height="96"><strong>${name}</strong><span>空欄</span></div>`).join('')}</div></section><section class="journey-npcs"><article class="journey-panel"><img src="assets/cultivation-journey/npcs/merchant.webp" alt="雲遊商人" width="160" height="180"><div><h3>雲遊商人</h3><p>商品與交易規則待開放</p></div></article><article class="journey-panel"><img src="assets/cultivation-journey/npcs/blacksmith.webp" alt="鑄器師" width="160" height="180"><div><h3>鑄器師</h3><p>強化規則待開放</p></div></article></section></div></div><section class="journey-party journey-panel" aria-label="同行道友"><h2>同行道友</h2><div>${combat.players.map((member, pid) => { const identity = root.MahjongCultivationHeroes.get(member.heroId); return `<article><img src="${esc(imageURL(identity.image))}" alt="" width="100" height="110"><div><strong>${esc(identity.name)}${pid === 0 ? ' · 你' : ''}</strong><small>${esc(identity.role)}</small><p>下局劫印 ${member.pendingSeals?.length || 0}</p></div></article>`; }).join('')}</div></section><footer class="journey-footer"><p>返回首頁會封存庭院進度，下次從此處繼續。</p><div><button type="button" id="journeyHome">返回首頁</button><button type="button" class="primary" id="journeyNext">開始下一局 →</button></div></footer>`, 'journey-preparation-screen');
     dialog.addEventListener('cancel', event => event.preventDefault());
     const nextButton = dialog.querySelector('#journeyNext');
     const homeButton = dialog.querySelector('#journeyHome');
@@ -104,12 +104,25 @@
     let navigating = false;
     let equipmentLocked = false;
     let progressionHost = null;
+    let expeditionHost = null;
     const updateNavigationLock = () => {
       const locked = equipmentLocked || progressionBusy;
       nextButton.disabled = homeButton.disabled = locked || navigating;
-      if (progressionHost) progressionHost.inert = equipmentLocked;
+      if (progressionHost) progressionHost.inert = locked;
+      if (expeditionHost) expeditionHost.inert = locked;
       callbacks.onLock?.(locked);
     };
+    if (combat.expedition && root.MahjongExpeditionUI && callbacks.progression) {
+      expeditionHost = document.createElement('section');
+      expeditionHost.className = 'journey-expedition';
+      expeditionHost.setAttribute('aria-label', '巡歷與奇遇');
+      dialog.querySelector('.journey-road').after(expeditionHost);
+      root.MahjongExpeditionUI.preparation(expeditionHost, combat, {
+        ...callbacks.progression,
+        onBusy(busy) { progressionBusy = busy; equipmentSession?.setNavigationLocked(busy); updateNavigationLock(); },
+        onUpdated(next) { close({progressionCommitted:true}); showPreparation(next, {...callbacks, progression:root.MahjongProgressionFlow.preparationOptions()}); }
+      });
+    }
     if (callbacks.progression && root.MahjongProgressionUI) {
       const host = document.createElement('section');
       progressionHost = host;
@@ -142,6 +155,7 @@
     }
     nextButton.onclick = () => {
       if (navigating || equipmentLocked) return;
+      if (callbacks.getState?.()?.cultivation?.expedition?.pendingEvent) { status.textContent = '請先到「巡歷」處理奇遇，或選擇離開。'; dialog.querySelector('[data-left="expedition"]')?.click(); dialog.classList.add('prep-left-open'); return; }
       navigating = true;
       nextButton.disabled = homeButton.disabled = true;
       close(); callbacks.onStart();

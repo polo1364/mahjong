@@ -43,6 +43,28 @@ const all=rows.map(([speciesId,key,name,type,damage,element,motion,ailment,extra
  hits:1,charged:false,heal:0,shield:0,strip:0,riposte:0,...extra,
  ailment:ailment?Object.freeze(ailment):null,audio:'assets/monster-skills/'+speciesId+'.'+key+'.mp3'
 }));
+// Regional species inherit their prototype's action budget, cadence and existing media.
+const regionalSpecies=Object.freeze([
+ ['rustblade-mantis','鏽刃螳','metal','frostfang-wolf'],
+ ['gilt-guard','鎏金傀衛','metal','golden-tiger'],
+ ['mountaincleaver-lion','斷岳金猊','metal','crimson-sword-demon'],
+ ['spirit-mushroom','寄靈菇','wood','moss-flower'],
+ ['thousandroot-nightmare','千鬚樹魘','wood','forest-vine-demon'],
+ ['miasma-queen','瘴林魘后','wood','nether-vine-queen'],
+ ['tideclam','潮鳴蚌','water','molten-shell-beetle'],
+ ['frostmirror-tortoise','寒鏡玄龜','water','abyss-jiaolong'],
+ ['abyss-whale','滄淵鯨王','water','nether-vine-queen'],
+ ['emberwing-sparrow','燼羽雀','fire','embertail-fox'],
+ ['flamecrown-ape','熾冠火魈','fire','blazing-lion'],
+ ['boneflame-phoenix','焚骨凰皇','fire','crimson-sword-demon'],
+ ['rockhorn-lizard','岩角蜥','earth','stoneback-boar'],
+ ['rift-scorpion','裂谷巨蠍','earth','mountain-colossus'],
+ ['earthvein-hou','鎮脈玄犼','earth','blackarmor-general']
+].map(([id,name,element,archetype])=>Object.freeze({id,name,element,archetype,region:element})));
+const originalSkills=all.slice();
+for(const species of regionalSpecies)for(const source of originalSkills.filter(s=>s.speciesId===species.archetype)){
+ all.push(Object.freeze({...source,id:species.id+source.id.slice(source.speciesId.length),speciesId:species.id,element:species.element,archetype:source.id}));
+}
 const get=id=>all.find(s=>s.id===id)||null;
 const forSpecies=id=>all.filter(s=>s.speciesId===id);
 function select(species,actionNumber,element){
@@ -66,6 +88,6 @@ function describe(skill){
  parts.push(skill.charged?'蓄力可打斷；封印可降為普攻':'不可打斷；可用防禦、護盾與降仇應對');
  return parts.join('；');
 }
-const api=Object.freeze({all:Object.freeze(all),get,forSpecies,select,describe,labels:Object.freeze(labels)});
+const api=Object.freeze({all:Object.freeze(all),regionalSpecies,get,forSpecies,select,describe,labels:Object.freeze(labels)});
 root.MahjongMonsterSkills=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

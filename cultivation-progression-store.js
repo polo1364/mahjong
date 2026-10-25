@@ -4,6 +4,9 @@
   const AUTO_KEY = 'cultivationAutoSaveV1';
   const AUTO_REVISION_KEY = 'cultivationAutoRevisionV1';
   const TRIAL_KEY = 'cultivationTrialSaveV1';
+  const EXPEDITION_KEY = 'cultivationExpeditionProfileV1';
+  const expeditionKey = id => `cultivationExpeditionJourneyV1:${id}`;
+  const eventKey = (journeyId, id) => `cultivationExpeditionEventV1:${journeyId}:${id}`;
   const receiptKey = (journeyId, handNumber) =>
     `cultivationProgressionReceiptV1:${journeyId}:${handNumber}`;
   const breakthroughKey = (journeyId, realm) =>
@@ -11,6 +14,8 @@
   const copy = value => structuredClone(value);
 
   function create({openDB, storeName = 'gameSaves', progression: P, validateSave} = {}) {
+    const X = root.MahjongCultivationExpedition;
+    const C = root.MahjongCultivationCombat;
     if (typeof openDB !== 'function' || typeof storeName !== 'string' || !storeName ||
         !P || typeof P.fresh !== 'function' || typeof P.validate !== 'function' ||
         typeof P.configure !== 'function' || typeof P.award !== 'function' ||
@@ -101,6 +106,12 @@
       get(PROFILE_KEY, value => done(copy(profileFrom(value)))));
     const readAutoRevision = () => transaction('readonly', ({get, done}) =>
       get(AUTO_REVISION_KEY, value => done(revisionFrom(value))));
+    function expeditionProfile(value) {
+      const profile = value === undefined ? X.createProfile() : value;
+      X.validateProfile(profile); return profile;
+    }
+    const readExpeditionProfile = () => transaction('readonly', ({get, done}) =>
+      get(EXPEDITION_KEY, value => done(copy(expeditionProfile(value)))));
     const readTrial = () => transaction('readonly', ({get, done}) =>
       get(TRIAL_KEY, value => done(copy(validTrial(value)))));
     const readParent = () => transaction('readonly', ({get, done}) =>
@@ -110,7 +121,7 @@
         done(entry ? copy(entry.parentEnvelope) : null);
       }));
 
-    async function settle(envelope) {
+    async function settle(envelope, expectedRevision) {
       const combat = validEnvelope(envelope);
       if (envelope.gameState.phase !== 'end' || !combat.ended || combat.trial)
         throw Error('Only completed normal cultivation hands can settle');
@@ -119,21 +130,87 @@
       if (earned === 0) return {profile: await readProfile(), earned: 0, duplicate: false};
       const {journeyId, handNumber} = identity(combat);
       return transaction('readwrite', ({get, put, done}) => {
+        const work = () => {
         get(PROFILE_KEY, value => {
           const profile = profileFrom(value);
           get(receiptKey(journeyId, handNumber), receipt => {
             if (receipt !== undefined) {
-              done({profile: copy(profile), earned: 0, duplicate: true});
+              done({profile: copy(profile), earned: 0, duplicate: true, expedition: receipt.expedition && copy(receipt.expedition)});
               return;
             }
             const next = {...profile, xp: profile.xp + earned, allocation: {...profile.allocation}};
             P.validate(next);
-            put(PROFILE_KEY, next);
-            put(receiptKey(journeyId, handNumber), {journeyId, handNumber, earned});
-            done({profile: copy(next), earned, duplicate: false});
+            const commit = extra => {
+              put(PROFILE_KEY, next);
+              put(receiptKey(journeyId, handNumber), {journeyId, handNumber, earned, ...extra});
+              done({profile: copy(next), earned, duplicate: false, ...copy(extra)});
+            };
+            if (!X || !combat.expedition) { commit({}); return; }
+            get(EXPEDITION_KEY, stored => {
+              get(expeditionKey(journeyId), anchor => {
+                if (anchor && (anchor.startHand !== combat.expedition.startHand || anchor.completed > combat.expedition.completed))
+                  throw Error('巡歷進度已更新，請讀取最新旅程。');
+                const out = C.finalizeExpedition(combat, {profile: expeditionProfile(stored),
+                  winner: envelope.gameState.winner, discarder: envelope.gameState.fromPlayer,
+                  declaredListen: envelope.gameState.players.map(player => player.declaredListen)});
+                put(EXPEDITION_KEY, out.profile);
+                put(expeditionKey(journeyId), out.state.expedition);
+                commit({expedition: out.state.expedition, expeditionProfile: out.profile});
+              });
+            });
           });
         });
+        };
+        if (expectedRevision === undefined) work();
+        else get(AUTO_REVISION_KEY, value => {
+          if (revisionFrom(value) !== expectedRevision) throw Error('另一個分頁已更新旅程，請讀取最新存檔。');
+          work();
+        });
       });
+    }
+
+    function initializeExpedition(envelope) {
+      const combat = validEnvelope(envelope);
+      if (!X || combat.trial || combat.journey?.phase !== 'preparation') throw Error('巡歷只能在安全整備啟用。');
+      const {journeyId, handNumber} = identity(combat);
+      return transaction('readwrite', ({get, put, done}) => get(expeditionKey(journeyId), stored => {
+        const expedition = stored ? copy(stored) : combat.expedition || X.create(journeyId, combat.rng || 1, handNumber + 1);
+        if (stored && combat.expedition?.completed === stored.completed &&
+            JSON.stringify(combat.expedition.receipts) === JSON.stringify(stored.receipts))
+          expedition.bossChoice = copy(combat.expedition.bossChoice);
+        X.validate(expedition);
+        if (!stored) put(expeditionKey(journeyId), expedition);
+        done(copy(expedition));
+      }));
+    }
+
+    function chooseEvent(envelope, choiceId, expectedRevision) {
+      expectedRevisionIsValid(expectedRevision);
+      const combat = validEnvelope(envelope);
+      if (!X || combat.trial || combat.journey?.phase !== 'preparation' || !combat.expedition?.pendingEvent)
+        throw Error('目前沒有可處理的奇遇。');
+      const {journeyId} = identity(combat), pendingId = combat.expedition.pendingEvent.id;
+      return transaction('readwrite', ({get, put, done}) => get(AUTO_REVISION_KEY, value => {
+        if (revisionFrom(value) !== expectedRevision) throw Error('另一個分頁已更新旅程，請讀取最新存檔。');
+        get(TRIAL_KEY, active => {
+          if (validTrial(active)) throw Error('渡劫期間不能處理奇遇。');
+          get(eventKey(journeyId, pendingId), receipt => {
+            if (receipt !== undefined) throw Error('此奇遇已處理，請讀取最新旅程。');
+            get(expeditionKey(journeyId), stored => {
+              if (!stored || stored.pendingEvent?.id !== pendingId) throw Error('奇遇資料已更新，請讀取最新旅程。');
+              const saved = copy(envelope);
+              saved.gameState.cultivation = X.chooseEvent(combat, choiceId);
+              validEnvelope(saved);
+              const revision = nextRevision(revisionFrom(value));
+              saved.progressionRevision = revision;
+              put(eventKey(journeyId, pendingId), {journeyId, choiceId});
+              put(expeditionKey(journeyId), saved.gameState.cultivation.expedition);
+              put(AUTO_KEY, saved); put(AUTO_REVISION_KEY, revision);
+              done({envelope: saved, revision});
+            });
+          });
+        });
+      }));
     }
 
     const configure = allocation => transaction('readwrite', ({get, put, done}) => {
@@ -295,7 +372,7 @@
       });
     }
 
-    return Object.freeze({readProfile, readAutoRevision, readTrial, readParent, settle, configure,
+    return Object.freeze({readProfile, readAutoRevision, readTrial, readParent, readExpeditionProfile, initializeExpedition, chooseEvent, settle, configure,
       beginTrial, saveTrial, finishTrial, saveAutoGuarded});
   }
   const api = Object.freeze({create});

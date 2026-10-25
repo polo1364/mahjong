@@ -253,6 +253,10 @@ const all = [
 const LIFE={small:1.35,elite:1.3,miniboss:1.25,boss:1.25},ATTACK=1.15;
 all.forEach(m=>{m.legacyHp=m.hp;m.hp=Math.round(m.hp*LIFE[m.tier]/50)*50;m.single=Math.round(m.single*ATTACK);m.all=Math.round(m.all*ATTACK);});
 const skills=typeof module!=="undefined"&&module.exports?require('./cultivation-monster-skills.js'):root.MahjongMonsterSkills;
+for(const regional of skills.regionalSpecies){
+ const source=all.find(m=>m.id===regional.archetype);
+ all.push({...source,...regional,image:'assets/cultivation-journey/monsters/'+regional.id+'.png',thumbnail:'assets/cultivation-journey/monsters/'+regional.id+'.thumb.webp'});
+}
 all.forEach(m=>{m.skillIds=Object.freeze(skills?skills.forSpecies(m.id).map(s=>s.id):[]);Object.freeze(m);}); const api=Object.freeze({all:Object.freeze(all),get:(id)=>all.find(monster=>monster.id===id)||null});
 root.MahjongCultivationMonsters=api; if(typeof module!=="undefined" && module.exports) module.exports=api;
 })(typeof window!=="undefined"?window:globalThis);

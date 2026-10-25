@@ -54,7 +54,7 @@
   function enhance(dialog) {
     if (dialog.classList.contains('prep-noscroll')) return;
     const wrap = dialog.querySelector('.journey-wrap'), grid = dialog.querySelector('.journey-preparation-grid'), equip = dialog.querySelector('.equip-ui');
-    const hero = dialog.querySelector('.journey-prepared-hero'), road = dialog.querySelector('.journey-preparation-side'), party = dialog.querySelector('.journey-party'), progression = dialog.querySelector('.journey-progression');
+    const hero = dialog.querySelector('.journey-prepared-hero'), road = dialog.querySelector('.journey-preparation-side'), party = dialog.querySelector('.journey-party'), progression = dialog.querySelector('.journey-progression'), expedition = dialog.querySelector('.journey-expedition');
     const header = dialog.querySelector('.journey-header'), intro = dialog.querySelector('.journey-intro'), footer = dialog.querySelector('.journey-footer');
     if (!wrap || !grid || !equip || !hero || !header || !footer) return;
     dialog.classList.add('prep-noscroll');
@@ -67,7 +67,7 @@
     header.append(leftToggle, footer);
     // Left column: one card at a time.
     const left = document.createElement('section'); left.className = 'prep-left';
-    const panes = [['hero', '角色', hero], ['progression', '修行', progression], ['road', '征途', road], ['party', '同行', party]].filter(([, , el]) => el);
+    const panes = [['hero', '角色', hero], ['progression', '修行', progression], ['expedition', '巡歷', expedition], ['road', '征途', road], ['party', '同行', party]].filter(([, , el]) => el);
     left.innerHTML = `<div class="prep-left-tabs" role="tablist" aria-label="庭院資訊">${panes.map(([id, name]) => `<button type="button" role="tab" data-left="${id}">${name}</button>`).join('')}<button type="button" class="prep-left-close" aria-label="收起角色資訊">×</button></div>`;
     left.querySelector('.prep-left-close').onclick = () => { dialog.classList.remove('prep-left-open'); dialog.querySelector('.prep-left-toggle')?.setAttribute('aria-expanded', 'false'); };
     const body = document.createElement('div'); body.className = 'prep-left-body';
@@ -99,7 +99,7 @@
   }
   function layoutLeft(dialog) {
     const pane = dialog.querySelector(`.prep-left-body > [data-left-pane="${leftTab}"]`); if (!pane) return;
-    if (leftTab === 'progression') {
+    if (leftTab === 'progression' || leftTab === 'expedition') {
       dialog.querySelector('.prep-left-body > .prep-pager')?.remove();
       pane.querySelectorAll('.prep-off').forEach(el => el.classList.remove('prep-off'));
       return;

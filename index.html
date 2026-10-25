@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="cultivation-choice.css">
 <link rel="stylesheet" href="cultivation-finish.css">
 <link rel="stylesheet" href="cultivation-progression-ui.css">
+<link rel="stylesheet" href="cultivation-expedition-ui.css">
 <script src="image-assets.js"></script>
 <script src="image-loading.js"></script>
 <script src="tile-names.js"></script>
@@ -50,6 +51,7 @@
 <script src="cultivation-monster-skills.js?v=monster-skills-1"></script>
 <script src="cultivation-monsters.js?v=monster-skills-1"></script>
 <script src="cultivation-progression.js"></script>
+<script src="cultivation-expedition.js"></script>
 <script src="cultivation-equipment.js?v=equipment-items-20261024-2"></script>
 <script src="cultivation-items.js?v=items-20261024-3"></script>
 <script src="cultivation-economy.js?v=items-20261024-3"></script>
@@ -58,6 +60,7 @@
 <script src="cultivation-presentation.js?v=monster-skills-1"></script>
 <script src="cultivation-progression-store.js"></script>
 <script src="cultivation-progression-ui.js"></script>
+<script src="cultivation-expedition-ui.js"></script>
 <script src="cultivation-progression-flow.js"></script>
 </head>
 <body>
@@ -957,7 +960,7 @@ let customPlayerName = null;
 let dealerStreak = 0;
 
 function startNewHand(isFirstGame = false, cultivationCarry = null, cultivationOptions = {}) {
-  if (gameMode === 'cultivation' && !isFirstGame) { startNewSession('cultivation'); return; }
+  if (gameMode === 'cultivation' && !isFirstGame && !cultivationCarry) { startNewSession('cultivation'); return; }
   window.MahjongTableLayout?.showTool('table');
   window.MahjongEffects?.clear();
   window.MahjongAudio?.stopAll();
@@ -1045,6 +1048,7 @@ function startNewHand(isFirstGame = false, cultivationCarry = null, cultivationO
     if (newDealer === S.initialDealer) {
       // 莊家輪回到初始莊家，進入下一圈
       newRound++;
+      if (newRound > 4 && gameMode === 'cultivation') newRound = 1;
       if (newRound > 4) {
         log(`🏁 四圈已打完，遊戲結束！`);
         showFinalScore();
@@ -1215,7 +1219,7 @@ function beginDealtHand(firstAIDelay) {
   const windKey = { '東': 'e', '南': 's', '西': 'w', '北': 'n' };
   const roundCue = 'round-' + windKey[roundName] + windKey[dealerWind];
   scheduleGame(() => {
-    playVoice(roundCue);
+    if (gameMode !== 'cultivation') playVoice(roundCue);
     if (dealerStreak > 0) playVoice('dealer-repeat');
   }, 500);
 
@@ -3708,15 +3712,15 @@ function startNewSession(mode = gameMode, options = {}) {
   const names = carry ? S.names?.slice() : null;
   window.MahjongCultivationJourneyUI?.close();
   gameMode = mode === 'cultivation' ? 'cultivation' : 'normal';
-  S = { players: Array.from({ length: 4 }, () => ({ points: RULES.initialPoints })), ...(names ? { names } : {}) };
+  if (!carry) S = { players: Array.from({ length: 4 }, () => ({ points: RULES.initialPoints })), ...(names ? { names } : {}) };
   // 清空戰況記錄（innerHTML），以免殘留先前訊息與標籤
   document.getElementById('log').innerHTML = '';
   // When starting a brand new game, reset the dealer streak counter.
-  dealerStreak = 0;
+  if (!carry) dealerStreak = 0;
   // 清除自動暫存
   if (!carry && mode !== 'cultivation') clearAutoSave();
   options.onStarted?.();
-  startNewHand(true, carry, { ...(options.heroId ? { heroId: options.heroId, equipment: options.equipment === true } : {}), ...(options.progression ? {progression:options.progression,progressionId:options.progressionId} : {}) });
+  startNewHand(!carry, carry, { ...(options.heroId ? { heroId: options.heroId, equipment: options.equipment === true } : {}), ...(options.progression ? {progression:options.progression,progressionId:options.progressionId} : {}) });
   return true;
 }
 
@@ -3847,8 +3851,11 @@ function restoreGame(data, expectedMode) {
 
 function resumeRestoredHand() {
   if (S.phase === 'end') {
-    if (S.cultivation?.journey?.phase === 'preparation' && (S.cultivation.version === 2 || (window.MahjongProgressionFlow && !S.cultivation.progression))) { showHandsAndContinue(); continueCultivationResult(); }
-    else if (S.cultivation?.version === 3 && S.cultivation.journey.phase === 'preparation') showCultivationPreparation();
+    if (S.cultivation?.journey?.phase === 'preparation' && (S.cultivation.version === 2 || (window.MahjongProgressionFlow && (!S.cultivation.progression || !S.cultivation.expedition)))) { showHandsAndContinue(); continueCultivationResult(); }
+    else if (S.cultivation?.version === 3 && S.cultivation.journey.phase === 'preparation') {
+      if(window.MahjongProgressionFlow?.restorePreparation)window.MahjongProgressionFlow.restorePreparation(S).then(restored=>{if(restored)showCultivationPreparation();}).catch(error=>log('讀取整備失敗：'+error.message));
+      else showCultivationPreparation();
+    }
     else showHandsAndContinue();
     return;
   }
@@ -4275,7 +4282,7 @@ function renderAll() {
   const remainDrawable = Math.max(0, S.wall.length);
   
   // Compose current round string: e.g. 東風東、東風南、南風西等
-  const roundStr = ['東','南','西','北'][S.round - 1] + '風' + (seatNames?.[S.dealer] || ['東','南','西','北'][S.dealer]);
+  const roundStr = S.cultivation && window.MahjongExpeditionUI ? window.MahjongExpeditionUI.title(S.cultivation) : ['東','南','西','北'][S.round - 1] + '風' + (seatNames?.[S.dealer] || ['東','南','西','北'][S.dealer]);
   // 更新局面資訊區：將當前風圈以更醒目的膠囊顯示
   document.getElementById('roundinfo').innerHTML =
     `<span class="round-pill">📍 ${roundStr}</span>` +
@@ -4292,7 +4299,7 @@ function renderAll() {
     const roundWind = ['東', '南', '西', '北'][S.round - 1];
     const dealerWind = seatNames?.[S.dealer] || ['東', '南', '西', '北'][S.dealer];
     const streakText = S.dealerStreak > 0 ? ` ${S.dealerStreak}本場` : ' 0本場';
-    centerRoundInfo.textContent = `${roundWind}風${seatNames[S.dealer]} · ${S.dealerStreak ? '連莊 '+S.dealerStreak : '起莊'}`;
+    centerRoundInfo.textContent = S.cultivation ? roundStr : `${roundWind}風${seatNames[S.dealer]} · ${S.dealerStreak ? '連莊 '+S.dealerStreak : '起莊'}`;
   }
   
   // 更新風位指示器

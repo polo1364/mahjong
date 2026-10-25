@@ -1,6 +1,8 @@
 /* V3 economy. All public transitions clone their input; combat hooks mutate only combat's private copy. */
 (function(root) { 'use strict';
   const E=typeof module!=='undefined'&&module.exports?require('./cultivation-equipment.js'):root.MahjongCultivationEquipment;
+  const M=typeof module!=='undefined'&&module.exports?require('./cultivation-monsters.js'):root.MahjongCultivationMonsters;
+  const sealSource=m=>M.get(m.speciesId)?.archetype||m.speciesId;
   const Items=typeof module!=='undefined'&&module.exports?require('./cultivation-items.js'):root.MahjongCultivationItems;
   const clone=x=>JSON.parse(JSON.stringify(x));
   const prices=Object.freeze([60,90,120,150]);
@@ -27,7 +29,7 @@
     return {catId:pool[Math.floor(random(e,key)*pool.length)].id,grade};
   }
   function drop(p,m) {
-    const e=p.economy,set=E.sets.find(s=>s.source===m.speciesId);
+    const e=p.economy,set=E.sets.find(s=>s.source===sealSource(m));
     if(set&&random(e,'loot')<(m.tier==='boss'?.7:.6)) {
       const missing=E.slots.filter(slot=>!e.inventory.some(i=>i.catId==='set-'+set.id+'-'+slot));
       const pool=missing.length?missing:E.slots;return {catId:'set-'+set.id+'-'+pool[Math.floor(random(e,'loot')*pool.length)],grade:set.grade};
@@ -44,7 +46,7 @@
       e.unlockedGrade=Math.max(e.unlockedGrade,{small:1,elite:2,miniboss:3,boss:4}[monster.tier]);
       let gear=null;
       if(random(e,'loot')<reward[2]) {const d=drop(p,monster),item=addItem(p,d.catId,d.grade);e.handLoot.items.push(item.uid);gear=clone(item);}
-      const set=E.sets.find(s=>s.source===monster.speciesId);
+      const set=E.sets.find(s=>s.source===sealSource(monster));
       if(set) {e.seals[set.id]++;e.handLoot.seals[set.id]=(e.handLoot.seals[set.id]||0)+1;}
       Items.credit(state,p,monster,killer);
       if(Items.enabled(state))e.items.handLoot[e.items.handLoot.length-1].resources={gold,sand:reward[1],gear,seal:set?.id||null};

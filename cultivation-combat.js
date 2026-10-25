@@ -17,6 +17,7 @@
   const Progression = typeof module !== "undefined" && module.exports ? require("./cultivation-progression.js") : root.MahjongCultivationProgression;
   const Economy = typeof module !== "undefined" && module.exports ? require("./cultivation-economy.js") : root.MahjongCultivationEconomy;
   const Items = typeof module !== 'undefined' && module.exports ? require('./cultivation-items.js') : root.MahjongCultivationItems;
+  const Expedition = typeof module !== "undefined" && module.exports ? require("./cultivation-expedition.js") : root.MahjongCultivationExpedition;
   const ELEMENTS = ["metal", "wood", "water", "fire", "earth"];
   const BEASTS = {
     metal: "金魄白虎",
@@ -260,8 +261,10 @@
   function drawSpecies(state, tier) {
     if (tier === "boss") return "five-phase-sovereign";
     const bag = state.journey[tier + "Bag"];
+    if(state.expedition&&tier!=='miniboss'){const element=Expedition.region(state.expedition.completed).id;for(let i=bag.length-1;i>=0;i--)if(Monsters.get(bag[i])?.element!==element)bag.splice(i,1);}
+    if(state.expedition&&tier==='miniboss')for(let i=bag.length-1;i>=0;i--)if(state.expedition.bossUsed?.includes(bag[i]))bag.splice(i,1);
     if (!bag.length) {
-      bag.push(...Monsters.all.filter(m => m.tier === tier).map(m => m.id));
+      bag.push(...Monsters.all.filter(m => m.tier === tier && (tier === "miniboss" ? !m.region && !state.expedition?.bossUsed?.includes(m.id) : state.expedition ? m.element === Expedition.region(state.expedition.completed).id : !m.region)).map(m => m.id));
       for (let i = bag.length - 1; i > 0; i--) {
         const j = Math.floor(random(state) * (i + 1));
         [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -271,7 +274,8 @@
   }
   function spawnJourney(state) {
     const j = state.journey;
-    const id = j.retrySpeciesId || (j.nextTier === "miniboss" && j.pendingMinibossId) || drawSpecies(state, j.nextTier);
+    const choice = state.expedition?.bossChoice;
+    const id = j.retrySpeciesId || (j.nextTier === "miniboss" && j.pendingMinibossId) || (j.nextTier === "miniboss" && choice ? choice.speciesId : drawSpecies(state, j.nextTier));
     j.retrySpeciesId = null;
     const species = Monsters.get(id);
     const index = state.monster ? state.monster.id + 1 : 1;
@@ -279,6 +283,16 @@
       name: species.name, element: species.element, hp: species.hp, maxHp: species.hp,
       shield: species.shield, armor: species.armor, statuses: [], nextAttack: null,
       attacks: 0, heals: 0, shields: 0 };
+    if (state.expedition && !state.trial) {
+      const retry=state.expedition.retryMonsters?.[id];
+      const advanced=retry?.speciesId===id?retry.advanced===true:choice?.speciesId===id&&choice.advanced===true;
+      const scale=retry?.speciesId===id?copy(retry.scale):copy(state.expedition.snapshot||Expedition.difficulty(state.expedition.recentIndices));
+      state.monster.scale=scale;state.monster.advanced=advanced;
+      state.monster.hp=state.monster.maxHp=Math.round(species.hp*scale.life*(advanced?1.15:1));
+      if(state.expedition.metrics&&!state.expedition.firstMonsterHp)state.expedition.firstMonsterHp=species.hp;
+      if(species.tier==='miniboss'){state.expedition.bossUsed=state.expedition.bossUsed||[];if(!state.expedition.bossUsed.includes(id))state.expedition.bossUsed.push(id);}
+      state.expedition.bossChoice=null;
+    }
     state.monster.nextAttack = telegraphJourney(state);
     delete state.postAttackControl;
     state.discardCount = 0;
@@ -317,6 +331,7 @@
   function advanceJourney(state) {
     const j = state.journey, tier = state.monster.tier;
     j.retrySpeciesId = null;
+    if(state.expedition?.retryMonsters)delete state.expedition.retryMonsters[state.monster.speciesId];
     if (tier === "small") { j.smallKills++; j.nextTier = j.smallKills >= 3 ? "elite" : "small"; }
     if (tier === "elite") { j.eliteKills++; j.smallKills = 0; j.nextTier = j.eliteKills >= 2 ? "miniboss" : "small"; }
     if (tier === "miniboss") {
@@ -326,6 +341,7 @@
     if (tier === "boss") {
       j.cycle++; j.smallKills = j.eliteKills = j.minibossKills = 0;
       j.minibossBag = []; j.pendingMinibossId = null; j.nextTier = "small";
+      if(state.expedition)state.expedition.bossUsed=[];
     }
   }
   function settleJourney(state) {
@@ -333,6 +349,7 @@
     j.phase = "result";
     if (state.monster.hp === 0) return;
     const m = state.monster;
+    if(state.expedition&&m.scale){state.expedition.retryMonsters=state.expedition.retryMonsters||{};state.expedition.retryMonsters[m.speciesId]={speciesId:m.speciesId,scale:copy(m.scale),advanced:m.advanced===true};}
     if (["small", "elite"].includes(m.tier)) j.retrySpeciesId = m.speciesId;
     if (m.tier === "miniboss") {
       j.smallKills = j.eliteKills = 0; j.pendingMinibossId = m.speciesId;
@@ -341,6 +358,7 @@
     if (m.tier === "boss") {
       j.smallKills = j.eliteKills = j.minibossKills = 0; j.pendingMinibossId = null;
       j.minibossBag = []; j.nextTier = "elite";
+      if(state.expedition)state.expedition.bossUsed=[];
     }
   }
   function prepare(input, options = {}) {
@@ -350,6 +368,8 @@
     const state = copy(input);
     if (state.version === 2 && options.equipment) { Economy.init(state, state.rng); state.version = 3; }
     state.journey.phase = "preparation";
+    if(state.version===3&&!state.expedition&&Expedition){state.expedition=Expedition.create(state.economy.journeyId,state.rng,state.handNumber+1);state.expedition.metrics=state.players.map(()=>({damage:0,heal:0,shield:0}));state.expedition.actions=state.players.map(()=>({meld:false,listen:false}));state.expedition.firstMonsterHp=0;}
+    if(options.bossChoice)state.expedition=Expedition.selectBoss(state,options.bossChoice,options.expeditionProfile||Expedition.createProfile(),Monsters.all).expedition;
     if (state.version === 3) Economy.prepare(state);
     if (state.version === 3) {
       if (options.progression && !state.progression) initProgression(state, options.progression, options.progressionId);
@@ -411,7 +431,7 @@
     validate(state);
     if (state.version < 2) return { message: "舊版旅程", nextMonsterId: null, nextMonsterName: "舊版五行異獸", progress: null };
     const simulation = copy(state), j = simulation.journey;
-    const speciesId = j.retrySpeciesId || (j.nextTier === "miniboss" && j.pendingMinibossId) || drawSpecies(simulation, j.nextTier);
+    const speciesId = j.retrySpeciesId || (j.nextTier === "miniboss" && j.pendingMinibossId) || (j.nextTier === "miniboss" && simulation.expedition?.bossChoice?.speciesId) || drawSpecies(simulation, j.nextTier);
     const next = Monsters.get(speciesId);
     let message = j.retrySpeciesId ? "同一隻異獸下局回滿重戰" : "繼續征途";
     if (state.ended && state.monster.hp > 0 && state.monster.tier === "miniboss") message = "小王未完成，退回小怪；重新達標挑戰同一隻小王";
@@ -447,6 +467,11 @@
     }
   }
   function validateJourney(state, fail, number, int) {
+    if(state.expedition){try{Expedition.validate(state.expedition);}catch{fail("expedition");}
+      if(!Array.isArray(state.expedition.metrics)||state.expedition.metrics.length!==4||
+          !Array.isArray(state.expedition.actions)||state.expedition.actions.length!==4||
+          state.expedition.actions.some(a=>!a||typeof a.meld!=='boolean'||typeof a.listen!=='boolean'))fail('expedition hand metrics');
+    }
     if (!Heroes || !Monsters) fail("journey catalogs");
     const j = state.journey;
     if (!j || !["combat", "result", "preparation"].includes(j.phase) ||
@@ -464,6 +489,8 @@
         !["small", "elite"].includes(Monsters.get(j.retrySpeciesId).tier))) fail("retry species");
     const ids = new Set();
     for (const p of state.players) {
+      if(p.expeditionEffect&&(!state.expedition||state.trial||p.pid!==0||JSON.stringify(p.expeditionEffect)!==JSON.stringify(state.expedition.activeEffect||{})))fail('expedition player effect');
+      if(p.shieldSources&&(!Array.isArray(p.shieldSources)||p.shieldSources.some(s=>!int(s.pid,0,3)||!number(s.amount,0,1000))))fail('shield provenance');
       if (!Heroes.get(p.heroId) || ids.has(p.heroId)) fail("hero identity");
       ids.add(p.heroId);
       if (!p.equipment || Object.keys(p.equipment).length !== 3 ||
@@ -477,7 +504,7 @@
     }
     const m = state.monster, species = Monsters.get(m?.speciesId);
     if (!species || m.tier !== species.tier || m.name !== species.name ||
-        (state.trial ? (m.speciesId!==state.trial.targetSpeciesId || m.maxHp!==Math.round(species.hp*state.trial.lifeScale)) : (m.maxHp !== species.hp && m.maxHp !== species.legacyHp)) || m.armor !== species.armor ||
+        (state.trial ? (m.speciesId!==state.trial.targetSpeciesId || m.maxHp!==Math.round(species.hp*state.trial.lifeScale)) : (m.scale ? (!number(m.scale.life,1,1.3)||!number(m.scale.damage,1,1.15)||m.maxHp!==Math.round(species.hp*m.scale.life*(m.advanced===true?1.15:1))) : (m.maxHp !== species.hp && m.maxHp !== species.legacyHp))) || m.armor !== species.armor ||
         (m.speciesId !== "five-phase-sovereign" && m.element !== species.element) ||
         !int(m.attacks) || !int(m.heals, 0, 2) || !int(m.shields, 0, 2)) fail("journey monster");
     if (m.speciesId === "five-phase-sovereign" && m.element !== ELEMENTS[Math.floor(m.attacks / 2) % 5]) fail("boss rotation");
@@ -678,6 +705,12 @@
       state.trial=copy(options.trial);
       for (const p of state.players) { p.activeSeals=[]; p.pendingSeals=[]; }
     }
+    if (state.version===3 && !state.trial && Expedition && options.expedition!==false) {
+      state.expedition=previous?.expedition?Expedition.activateHand(previous.expedition):Expedition.create(state.economy.journeyId,state.rng,state.handNumber);
+      state.expedition.snapshot=Expedition.difficulty(state.expedition.recentIndices);
+      state.expedition.metrics=state.players.map(()=>({damage:0,heal:0,shield:0}));state.expedition.actions=state.players.map(()=>({meld:false,listen:false}));state.expedition.firstMonsterHp=0;
+      state.players[0].expeditionEffect=copy(state.expedition.activeEffect||{});
+    }
     spawn(state);
     if (state.trial) {
       const species=Monsters.get(state.trial.targetSpeciesId);
@@ -819,11 +852,13 @@
   }
   function addShield(state, ctx, amount, duration, output) {
     const p = actor(state, ctx.pid);
+    trimShieldSources(p);
     amount *= heroFactor(state, p, 'shield') * (1 - Math.min(.15, sumStatus(p.statuses, 'shieldGainDown')));
     amount *= Finishers?.factor ? Finishers.factor(p, 'shield') : 1;
     if (state.version === 3 && !ctx.naturalRecovery) amount *= Equipment.factor(p, 'shield');
     const before = p.shield;
     p.shield = clamp(p.shield + Math.round(amount), 0, 1000);
+    if(state.expedition && !state.trial && p.shield>before){p.shieldSources=p.shieldSources||[];p.shieldSources.push({pid:ctx.sourcePid??ctx.pid,amount:p.shield-before});}
     p.shieldTurns = Math.max(p.shieldTurns, duration || 3);
     for (const s of p.statuses)
       if (["shieldEndDamage", "shieldBreakDamage", "shieldBreakHeal", "shieldAbsorbCounter"].includes(s.kind))
@@ -841,6 +876,7 @@
     if (state.version === 3 && !ctx.naturalRecovery) amount *= Equipment.factor(p, 'heal');
     const actual = Math.min(p.maxHp - p.hp, Math.max(0, Math.round(amount)));
     p.hp += actual;
+    if(state.expedition&&!state.trial&&!ctx.naturalRecovery)state.expedition.metrics[ctx.sourcePid??ctx.pid].heal+=actual;
     if (state.version >= 2 && passive(p, "su-lingheng") && !ctx.naturalRecovery && !ctx.passiveRecovery && !ctx.equipmentRecovery && !ctx.equipmentExtra && actual) storePassive(p, actual * 0.15);
     if (state.version === 3 && !ctx.naturalRecovery && !ctx.equipmentRecovery && !ctx.equipmentExtra && actual) Equipment.record(p, 'heal', actual);
     ctx.lastHeal = actual;
@@ -992,12 +1028,13 @@
       if(ctx.itemEdge&&ctx.itemHits>0){itemBonus=Math.min(ctx.itemPerHit,ctx.itemBudget);ctx.itemBudget-=itemBonus;ctx.itemHits--;}
       const damage = Math.max(0, Math.round((amount + flat + itemBonus) * multiplier * damageRoll(state)));
       flat = 0;
-      if (effect.shieldDamage)
-        m.shield = Math.max(0, (m.shield || 0) - effect.shieldDamage);
+      const stripped=effect.shieldDamage?Math.min(m.shield||0,effect.shieldDamage):0;
+      if (effect.shieldDamage) m.shield-=stripped;
       const absorbed = Math.min(m.shield || 0, damage);
       m.shield = (m.shield || 0) - absorbed;
       const actual = Math.min(m.hp, damage - absorbed);
       m.hp -= actual;
+      if(state.expedition&&!state.trial)state.expedition.metrics[ctx.pid].damage+=actual+absorbed+stripped;
       if (state.version === 3 && ctx.equipmentExtra) {
         p.equipmentState.extraDamage += Math.min(MAX_DAMAGE - p.damage, damage);
         p.equipmentState.extraHits++;
@@ -1547,6 +1584,7 @@
       }
     }
     p.shield = 0;
+    if(p.shieldSources)p.shieldSources=[];
     p.shieldTurns = 0;
     p.shieldAbsorbed = 0;
   }
@@ -1579,6 +1617,7 @@
     });
     emit(state, output, { type: "ailment", pid, kind });
   }
+  function trimShieldSources(p) { if(!p.shieldSources)return;let remaining=p.shield;for(const source of p.shieldSources){source.amount=Math.min(source.amount,remaining);remaining-=source.amount;}p.shieldSources=p.shieldSources.filter(x=>x.amount>0); }
   function hitPlayer(state, pid, amount, attackType, output, reactions, dot, hits = 1, noChain = false, itemReduction = 0) {
     const p = actor(state, pid);
     if (p.hp === 0) return;
@@ -1593,7 +1632,7 @@
         : 0;
     if (reduction && reductionValue) used(p, reduction);
     let dealt = Math.round(
-      amount * (1-itemReduction) * damageRoll(state) *
+      amount * (state.expedition&&!state.trial?(state.monster.scale?.damage||1):1) * (1-itemReduction) * damageRoll(state) *
         heroFactor(state, p, "taken") *
         (state.version === 3 ? Equipment.factor(p, 'taken', {top:!dot && target(state) === pid, aoe:!dot && attackType === 'all'}) : 1) *
         (state.version >= 2 && !dot && passive(p, "yue-zhenshan") && target(state) === pid ? 0.97 : 1) *
@@ -1617,10 +1656,12 @@
         used(p, gc);
       }
     }
+    trimShieldSources(p);
     const beforeShield = p.shield;
     const absorbed = Math.min(p.shield, dealt);
     context.lastAbsorbed = absorbed;
     p.shield -= absorbed;
+    if(state.expedition&&!state.trial&&absorbed){let remaining=absorbed;for(const source of p.shieldSources||[]){const used=Math.min(source.amount,remaining);source.amount-=used;remaining-=used;state.expedition.metrics[source.pid].shield+=used;}p.shieldSources=(p.shieldSources||[]).filter(x=>x.amount>0);}
     p.shieldAbsorbed += absorbed;
     if (state.version >= 2 && passive(p, "luo-xuanyu") && absorbed) storePassive(p, absorbed * 0.15);
     if (state.version === 3 && absorbed) Equipment.record(p, 'shield', absorbed);
@@ -2021,6 +2062,7 @@
         break;
       }
       case "meld": {
+        if(state.expedition&&!state.trial)state.expedition.actions[event.pid].meld=true;
         const skill = findSkill(event.action, event.key, event.keys);
         const ctx = cast(state, event.pid, skill, output, {
           secret: event.pid !== 0 && event.action === "concealed",
@@ -2565,7 +2607,16 @@
       aggroValue + nextSkillValue + penalty(reference) - penalty(projected)
     );
   }
+  function finalizeExpedition(input,options={}) {
+    const state=copy(input);if(!state.expedition||state.trial)return {state,profile:copy(options.profile||Expedition.createProfile()),result:null};
+    if(!state.ended)throw Error('Expedition settlement requires ended hand');
+    const e=state.expedition,actions=copy(e.actions);
+    for(let pid=0;pid<4;pid++)actions[pid].listen=!!options.declaredListen?.[pid];
+    const out=Expedition.settle(e,{handNumber:state.handNumber,metrics:e.metrics,actions,winner:options.winner??null,discarder:options.discarder??null,firstMonsterHp:e.firstMonsterHp,monsterDamage:e.metrics.reduce((n,m)=>n+m.damage,0)},options.profile||Expedition.createProfile());
+    state.expedition=out.expedition;delete state.players[0].expeditionEffect;return {state,profile:out.profile,result:out.result};
+  }
   const api = Object.freeze({
+    finalizeExpedition,
     create,
     prepare,
     journeyPreview,

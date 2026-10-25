@@ -19,8 +19,8 @@ function fixture(skill,hero='yun-zhiwei'){
 function enemy(s){s=clone(s);s.discardCount=4;s.enemyDue=s.monster.id;return C.apply(s,{id:s.seq+1,type:'enemy',monsterId:s.monster.id});}
 function meld(s,id){const sk=S.get(id);return C.apply(s,{id:s.seq+1,type:'meld',pid:0,action:sk.action,...(sk.family==='honor'?{key:sk.combo}:{keys:[...sk.combo].map(n=>sk.family+n)})});}
 function withOp(kind,op='control'){return S.all.find(s=>s.effects.some(e=>e.op===op&&e.kind===kind));}
-test('35 stable unique skills and distinct motion recipes; all 19 species linked',()=>{
- assert.equal(K.all.length,35);assert.equal(new Set(K.all.map(s=>s.id)).size,35);assert.equal(new Set(K.all.map(s=>s.motion)).size,35);
+test('65 stable unique skills sharing 35 motion recipes; all 34 species linked',()=>{
+ assert.equal(K.all.length,65);assert.equal(new Set(K.all.map(s=>s.id)).size,65);assert.equal(new Set(K.all.map(s=>s.motion)).size,35);
  for(const m of M.all)assert.deepEqual(m.skillIds,K.forSpecies(m.id).map(s=>s.id));
  for(const s of K.all){assert.ok(Object.isFrozen(s));assert.ok(K.describe(s).includes(String(s.damage)));}
 });

@@ -9,10 +9,10 @@ const catalog = require('../cultivation-catalog.js');
 const rows = catalog.records();
 
 test('catalog covers every live skill and finisher without the retired common finisher', () => {
-  assert.equal(rows.length, 242);
-  assert.equal(new Set(rows.map(r => r.id)).size, 242);
+  assert.equal(rows.length, 272);
+  assert.equal(new Set(rows.map(r => r.id)).size, 272);
   assert.equal(rows.filter(r => !r.finisher && !r.monster).length, 169);
-  assert.equal(rows.filter(r => r.monster).length, 35);
+  assert.equal(rows.filter(r => r.monster).length, 65);
   assert.equal(rows.filter(r => r.finisher).length, 38);
   assert.ok(!rows.some(r => r.id === 'finish.hu'));
   for (const source of skills.all.filter(s => s.id !== 'finish.hu')) {

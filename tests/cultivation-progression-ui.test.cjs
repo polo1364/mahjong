@@ -114,7 +114,7 @@ test('shared hero stat values include additive progression factor and role detai
   assert.equal(JourneyUI.statValues(hero,player).damage,101);
   assert.equal(global.MahjongCultivationEquipment.factor(player,'damage',{basic:true}),1.07);
   const html = JourneyUI.heroDetails(hero,player);
-  assert.match(html,/含裝備、境界與功法常駐加成/);
+  assert.match(html,/含裝備、境界、功法與奇遇常駐加成/);
   assert.match(html,/築基真人/);
   assert.match(html,/御劍訣/);
 });

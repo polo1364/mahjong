@@ -231,7 +231,8 @@ test('new gear auto-equips into an empty slot and never replaces worn gear', () 
 // Damage variance (2026-10-24): every hit rolls 90–110% on its own RNG stream.
 test('damage variance rolls each hit within 90-110%, replays identically and leaves monster patterns alone', () => {
   const run = (variance, seed) => {
-    let s = C.create(seed, null, { heroId: 'yun-zhiwei', equipment: true, damageVariance: variance });
+    // Isolate the original RNG contract from expedition species selection and kill timing.
+    let s = C.create(seed, null, { heroId: 'yun-zhiwei', equipment: true, expedition: false, damageVariance: variance });
     const hits = [], hurts = [], telegraphs = [];
     for (let i = 0; i < 40 && !s.ended; i++) {
       const r = sendFx(s, { type: 'discard', pid: i % 4, key: 'W' + (1 + i % 9) }); s = r.state;
