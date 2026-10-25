@@ -92,6 +92,14 @@
   }
   function layoutRight(dialog) {
     const panel = dialog.querySelector('#equipPanel'); if (!panel) return;
+    // A card plus fixed controls can exceed a phone's remaining height even on a single page.
+    const scroll = root.matchMedia('(max-height: 560px)').matches;
+    panel.classList.toggle('prep-scroll', scroll);
+    if (scroll) {
+      panel.querySelector(':scope > .prep-pager')?.remove();
+      panel.querySelectorAll('.prep-off').forEach(el => el.classList.remove('prep-off'));
+      return;
+    }
     const tab = dialog.querySelector('.equip-tabs [aria-selected="true"]')?.dataset.tab || 'tab';
     // 鑄器師 is laid out to fit as one page so its main action never moves behind a pager.
     if (tab === 'forge') { panel.querySelector(':scope > .prep-pager')?.remove(); panel.querySelectorAll('.prep-off').forEach(el => el.classList.remove('prep-off')); return; }

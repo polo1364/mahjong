@@ -81,7 +81,7 @@
     const player = () => state.cultivation.players[0];
     function command(type, args={}) { return {commandId:`ui-${Date.now().toString(36)}-${++serial}`,pid:0,type,...args}; }
     async function act(type,args={}) {
-      note=''; const request=command(type,args);if(type==='forge')forgeOptions={stone:false,charm:'none'};const result=await session.run(request); showResult(result);
+      note=''; const request=command(type,args);if(type==='forge'||type==='transfer')forgeOptions={stone:false,charm:'none'};const result=await session.run(request); showResult(result);
     }
     function showResult(result) {
       note = result.code==='save-failed' ? `儲存失敗：${result.message}。交易尚未套用；請重試原交易。` : !result.ok ? errors[result.code]||`操作未完成（${result.code}）。` : result.target ? `強化${result.success?'成功':'失敗'}：+${result.before} → +${result.after}；已扣 ${result.gold} 金幣、${result.sand} 靈砂並保存。` : '交易已保存。';
@@ -118,7 +118,7 @@
       const locked=session.busy||session.pending||navigating||!!confirmation;
       callbacks.onLock?.(session.busy||session.pending||!!confirmation);
       host.innerHTML=`<div class="equip-wallet" aria-label="目前資源"><b>金幣 <span>${p.economy.gold}</span></b><b>靈砂 <span>${p.economy.sand}</span></b><span>${E.sets.filter(s=>p.economy.seals[s.id]).map(s=>`${esc(s.name)}王印 ${p.economy.seals[s.id]}`).join(' · ')}</span></div><div class="equip-tabs" role="tablist" aria-label="整備用途">${[...(itemsOn?[['loot','本局收穫'],['items','道具行囊']]:[]),['inventory','行囊配裝'],['shop','雲遊商人'],['forge','鑄器師']].map(([id,name])=>`<button role="tab" type="button" data-tab="${id}" aria-selected="${tab===id}" aria-controls="equipPanel"${locked?' disabled':''}>${name}</button>`).join('')}</div><div class="equip-notice" role="status" aria-live="polite">${session.busy?'正在儲存交易，請稍候…':esc(note)}${session.pending&&!session.busy?'<button type="button" id="equipRetry">重試原交易</button>':''}</div>${confirmationMarkup()}<div id="equipPanel" role="tabpanel" aria-label="${{loot:'本局收穫',items:'道具行囊',inventory:'行囊配裝',shop:'雲遊商人',forge:'鑄器師'}[tab]}"${locked?' inert':''}>${tab==='loot'?U.loot(state.cultivation,lootPid):tab==='items'?U.inventory(p,itemFilter):tab==='inventory'?inventoryMarkup():tab==='shop'?shopMarkup()+(itemsOn?U.shop(p):''):forgeMarkup()}</div>${itemsOn?U.prepared(p):''}`;
-      host.querySelectorAll('[data-tab]').forEach(button=>button.onclick=()=>{if(itemsOn)return act('item-tab',{tab:button.dataset.tab});tab=button.dataset.tab;note='';render();});
+      host.querySelectorAll('[data-tab]').forEach(button=>button.onclick=()=>{if(button.dataset.tab==='forge')forgeOptions={stone:false,charm:'none'};if(itemsOn)return act('item-tab',{tab:button.dataset.tab});tab=button.dataset.tab;note='';render();});
       const category=host.querySelector('#supplyCategory');if(category)category.onchange=()=>{itemFilter=category.value;render();};
       const lootPlayer=host.querySelector('#supplyLootPlayer');if(lootPlayer)lootPlayer.onchange=()=>{lootPid=Number(lootPlayer.value);render();};
       const fs=host.querySelector('#supplyForgeStone'),fc=host.querySelector('#supplyForgeCharm');
