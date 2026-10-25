@@ -20,8 +20,9 @@
   function update() {
     const S = game();
     if (!S || !S.players || S.phase === 'end' || S.phase === 'deal') { current = null; hide(); return; }
-    const last = S.lastDiscard;
-    if (last?.tile) current = { from: last.from, tile: last.tile };
+    // lastPlayed survives the tile entering the river (lastDiscard is cleared as soon as nobody can claim it).
+    const last = S.lastDiscard || S.lastPlayed;
+    current = last?.tile ? { from: last.from, tile: last.tile } : null;
     // The live discard waits outside the river until claims are settled; once claimed it leaves, and so does the spotlight.
     const live = S.lastDiscard?.tile?.id === current?.tile.id;
     if (!current || (!live && !S.players[current.from]?.discards.some(t => t.id === current.tile.id))) { current = null; hide(); return; }

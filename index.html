@@ -4503,7 +4503,8 @@ function renderAll() {
         
         // 最新棄牌高亮
         const isLatest = idx === p.discards.length - 1;
-        const latestClass = !isLatest ? '' : S.lastDiscard?.from === i ? 'discard-latest discard-current' : 'discard-latest';
+        // Only the table's most recent discard is highlighted; older seats' last tiles look like the rest of the river.
+        const latestClass = isLatest && S.lastPlayed?.tile?.id === t.id ? 'discard-latest discard-current' : '';
         
         return `<div class="tile mini ${suitClass} ${latestClass}" title="${text}" aria-label="${text}">${tileFace(t)}</div>`;
       }).join('');
