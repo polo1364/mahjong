@@ -410,11 +410,14 @@
     const failed = combat.result?.reason === 'defeat' || combat.result?.reason === 'all-weak' || combat.result?.reason === 'allWeak' || combat.players.every(player => player.hp <= 0);
     const won = Number.isInteger(state.winner) && state.winner >= 0;
     const head = panel.querySelector('.rs-head');
+    // Resize refreshes the combat summary; retain the settlement UI and its async handlers.
+    const progressionResult = head?.querySelector('.progression-result');
     if (head) head.innerHTML = `<div class="eyebrow">修仙論道 · 第 ${number(combat.handNumber || 1)} 局 · 傷害結算</div><h3>${failed ? '全員虛弱 · 挑戰結束' : `${leaders.length > 1 ? '並列首席' : '本局首席'} · ${leaders.map(row => escape(playerName(state, row.pid))).join('、')}`}</h3><div class="rs-summary"><span class="rs-from">${won ? `${escape(playerName(state, state.winner))}${(combat.finisher?.method === 'selfDraw' || (!combat.finisher && state.fromPlayer === -1)) ? '自摸' : combat.finisher?.method === 'robKong' ? '搶槓' : '點胡'}，終式已計分` : '無胡牌終式'}</span><span>擊敗 ${number(combat.kills?.length)} 隻 · 傷害含過量傷害</span></div>`;
     if (head && (combat.finisher || combat.players.some(p => p.pendingSeals?.length || p.expiredSeals?.length))) {
       head.insertAdjacentHTML('beforeend', `<button type="button" class="cult-finish-detail">終式 ${number(combat.finisher?.total || 0)} 傷害 · 查看連招與劫印</button>`);
       head.querySelector('.cult-finish-detail').onclick = () => information('終式連招與跨局劫印', finishSheet(state, combat), 'cult-finish-sheet');
     }
+    if (progressionResult) head.append(progressionResult);
     panel.querySelectorAll('.result-player').forEach((row, pid) => {
       const identity = row.querySelector('.rs-name');
       if (combat.version >= 2 && identity?.firstChild?.nodeType === 3) identity.firstChild.textContent = playerName(state, pid);

@@ -51,7 +51,10 @@ html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
   html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { width: min(340px, calc(100vw - 20px)); border-radius: 14px; background: linear-gradient(165deg, #10223af2, #08121ff7); }
   .cult-battle-feed.is-open .cult-feed-toggle { border-bottom: 1px solid #e2c27e2b; }
   .cult-battle-feed.is-open .cult-feed-more, .cult-battle-feed.is-open .cult-feed-body { display: block; }
-  .cult-battle-feed.is-open .cult-feed-body { max-height: calc(100dvh - 140px); overflow: hidden; }
+  .cult-battle-feed.is-open .cult-feed-body { max-height: calc(100dvh - 140px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+  .cult-battle-feed.is-open .cft-row { grid-template-columns: 66px minmax(0, 1fr) minmax(42px, max-content) minmax(34px, max-content); }
+  .cult-battle-feed.is-open #cultivationLog li { white-space: normal; overflow-wrap: anywhere; }
+  .cult-battle-feed.is-open #cultivationStatusReference p { display: block; overflow: visible; overflow-wrap: anywhere; }
 }
 @media (max-width: 899px) and (orientation: portrait) {
   html.cultivation-mode:not(.start-screen-active) .cult-battle-feed { top: max(64px, calc(env(safe-area-inset-top) + 56px)); }
@@ -189,13 +192,10 @@ html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
 @media (prefers-reduced-motion: reduce) {
   .journey-selection-screen .journey-hero-option, .journey-selection-screen .journey-hero-option img { transition: none; }
 }
-/* Short landscape: status and log side by side so the popover fits the height. */
+/* Short landscape: keep the narrow popover readable and scroll all three sections. */
 @media (max-height: 599px) and (min-width: 600px) {
   html.cultivation-mode:not(.start-screen-active) .cult-battle-feed { top: 74px; }
-  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { width: min(600px, calc(100vw - 20px)); }
-  .cult-battle-feed.is-open .cult-feed-body { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; max-height: calc(100dvh - 130px); }
-  .cult-battle-feed.is-open #cultivationStatusReference { margin: 0; padding: 0 12px 0 0; border-bottom: 0; border-right: 1px dashed #e2c27e33; }
-  .cult-battle-feed.is-open #cultivationLog li:nth-child(n+7) { display: none; }
+  .cult-battle-feed.is-open .cult-feed-body { max-height: calc(100dvh - 130px); }
 }
 
 /* ---------- Table lookup (flower / meld skill card) ---------- */

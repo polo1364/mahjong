@@ -50,6 +50,9 @@
 
 /* ---------- Claim buttons: the hu button never stretches ---------- */
 html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-size: 30px !important; letter-spacing: 0; }
+@media (min-height: 521px) {
+  html.cultivation-mode .bottom-area #controls.table-actions { bottom: calc(100% + 4px) !important; }
+}
 /* Short landscape screens: smaller buttons at the right end of the hand, clear of the monster in the centre. */
 @media (max-height: 520px) and (orientation: landscape) {
   html .bottom-area #controls.table-actions { left: auto !important; right: 0 !important; justify-content: flex-end !important; gap: 8px; bottom: calc(100% + 8px) !important; }
@@ -73,6 +76,28 @@ html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-s
   html.cultivation-mode #cultivationMonster .cult-boss-tags { justify-content: flex-start; }
   html.cultivation-mode #cultivationMonster .cult-boss-intent { justify-self: start; }
   html.cultivation-mode #cultivationMonster .cult-boss-turn { justify-content: flex-start; }
+}
+@media (max-height: 350px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster { row-gap: 1px; }
+}
+/* Reserve a clear action row while the player chooses a claim on a narrow phone. */
+@media (max-height: 520px) and (max-width: 950px) and (orientation: landscape) {
+  html.cultivation-mode .bottom-area #controls.table-actions { bottom: calc(100% - 4px) !important; }
+  html.cultivation-mode .bottom-area #controls.table-actions button,
+  html.cultivation-mode .bottom-area #controls.table-actions #btnHu { width: 44px !important; height: 44px !important; font-size: 18px !important; }
+}
+@media (max-height: 520px) and (max-width: 700px) and (orientation: landscape) {
+  html.cultivation-mode .mahjong-table:has(#controls.table-actions button:not(:disabled)) .center-area { margin-top: -18px; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster.cult-monster {
+    --boss-w: 340px; grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) !important; gap: 2px 6px; padding: 4px;
+  }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 3; min-height: 28px !important; height: 100%; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-top { grid-column: 2; grid-row: 1; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-top small { white-space: normal; font-size: 8px; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-hp { grid-column: 2; grid-row: 2; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-tags { grid-column: 2; grid-row: 3; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-intent { grid-column: 3; grid-row: 1 / span 2; }
+  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-turn { grid-column: 3; grid-row: 3; }
 }
 .cfs-cols { display: flex; flex-direction: column; gap: 10px; } .cfs-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cult-finish-sheet .cfs-seal-card header { position: static; padding: 0; background: none; border: 0; }
