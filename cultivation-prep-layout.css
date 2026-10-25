@@ -328,3 +328,25 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
 /* Wallet: only seals you hold are listed, and they wrap instead of being cut off. */
 .prep-noscroll .equip-wallet > span { white-space: normal; overflow: visible; font-size: 12px; line-height: 1.35; color: #e6d9f2; }
 .prep-noscroll .equip-wallet > span:empty { display: none; }
+
+/* ---- 行囊配裝 comparison on short screens: chosen vs worn side by side, actions always in view ---- */
+@media (max-height: 560px) {
+  .prep-noscroll #equipPanel[aria-label="行囊配裝"], .prep-noscroll #equipPanel:has(> .equip-inventory-layout) { display: flex; }
+  .prep-noscroll #equipPanel > .equip-inventory-layout { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+  .prep-noscroll .equip-comparison { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 6px 8px !important; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 8px; align-content: start; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) > :nth-child(1) { grid-column: 1; grid-row: 1; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) > :nth-child(2) { grid-column: 1; grid-row: 2; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) > :nth-child(3) { grid-column: 2; grid-row: 1; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) > :nth-child(4) { grid-column: 2; grid-row: 2; }
+  .prep-noscroll .equip-comparison:has(.equip-actions) > :nth-child(n+5) { grid-column: 1 / -1; }
+  .prep-noscroll .equip-comparison h3 { margin: 0 0 3px !important; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prep-noscroll .equip-comparison > .equip-card { margin: 0 !important; padding: 3px 6px !important; grid-template-columns: 32px minmax(0, 1fr) !important; }
+  .prep-noscroll .equip-comparison > .equip-card > img { width: 32px !important; height: 32px !important; }
+  .prep-noscroll .equip-comparison > .equip-card strong { font-size: 13px !important; }
+  .prep-noscroll .equip-comparison .equip-delta { margin: 4px 0 !important; font-size: 11px; line-height: 1.35; }
+  .prep-noscroll .equip-comparison .equip-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px !important; }
+  .prep-noscroll .equip-comparison .equip-actions button { min-height: 30px; padding: 2px 10px; font-size: 12px; }
+}
+/* No set pieces involved: drop the empty 換裝後套裝 heading. */
+.prep-noscroll .equip-comparison h3:has(+ .equip-sets:not(:has(details[open]))) { display: none; }
