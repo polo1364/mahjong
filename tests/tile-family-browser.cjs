@@ -9,6 +9,7 @@ async function bounds(page,selector,label){const box=await page.locator(selector
   server=http.createServer((req,res)=>{const p=new URL(req.url,'http://local').pathname;const file=path.resolve(root,'.'+(p==='/'?'/index.html':decodeURIComponent(p)));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(err,data)=>{if(err)return res.writeHead(404).end();res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png'})[path.extname(file)]||'application/octet-stream');res.end(data);});});
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
   const url=process.env.TILE_FAMILY_URL||`http://127.0.0.1:${server.address().port}/`;
+  report.url=url;
   for(const [name,engine]of [['chromium',chromium],['webkit',webkit]]){
     const browser=await engine.launch({headless:true});try{
       const context=await browser.newContext({viewport:{width:844,height:390},hasTouch:true,serviceWorkers:'block'}),page=await context.newPage();
@@ -20,7 +21,10 @@ async function bounds(page,selector,label){const box=await page.locator(selector
         const label=`${name}-${w}x${h}`;await page.setViewportSize({width:w,height:h});
         await page.evaluate(()=>{S=JSON.parse(window.familyOriginal);cancelGameTimers();S.waitReact=null;S.turn=0;if(S.players[0].hand.length===16-S.players[0].melds.length*3)drawTile(0);renderAll();});
         for(const [key,title,base]of [['W1','赤晶',55],['T1','靈珠',40],['B1','飛劍',50],['FE','字牌',60]]){
-          await page.evaluate(key=>{const t=generateTiles().find(t=>tileKey(t)===key);S.players[0].hand[0]=t;renderAll();document.querySelector('#yourHand button[onclick="onClickYourTile(0)"]').focus({preventScroll:true});},key);
+          await page.evaluate(key=>{const t=generateTiles().find(t=>tileKey(t)===key);S.players[0].hand[0]=t;renderAll();},key);
+          // Image-ready redraws replace hand buttons; focus only after that redraw completes.
+          await page.waitForFunction(()=>!MahjongImages.isLoading());
+          await page.locator('#yourHand button[onclick="onClickYourTile(0)"]').evaluate(el=>el.focus({preventScroll:true}));
           await page.locator('#cultInsight:not([hidden])').waitFor();
           const text=await page.locator('#cultInsight').innerText();check(label+' '+key+' base',text.includes(title+'普攻')&&text.includes(String(base)),text);
           await bounds(page,'#cultInsight',label+' '+key+' tooltip');
