@@ -27,9 +27,9 @@ test('an identical fresh next-attack buff does not manufacture another benefit',
 });
 test('hybrid heal attacks retain their separate recovery rules after small damage tuning',()=>{
   for(const [action,keys,damage,hp] of [
-    ['chow',['W4','W5','W6'],100,595],
-    ['chow',['B4','B5','B6'],100,625],
-    ['pong',['DC','DC','DC'],180,617]
+    ['chow',['W4','W5','W6'],115,595],
+    ['chow',['B4','B5','B6'],105,625],
+    ['pong',['DC','DC','DC'],198,629]
   ]){
     const s=fixture();s.monster.element='earth';s.monster.armor=0;s.players[0].hp=500;
     const r=C.apply(s,{id:1,type:'meld',pid:0,action,keys});
@@ -41,7 +41,7 @@ test('hybrid heal attacks retain their separate recovery rules after small damag
 test('tuned lifesteal is still limited to actual HP lost, not overkill or shields',()=>{
   const s=fixture();s.monster.element='earth';s.monster.armor=0;s.monster.hp=10;s.players[0].hp=500;
   const r=C.apply(s,{id:1,type:'meld',pid:0,action:'pong',key:'DC'});
-  assert.equal(r.state.players[0].damage,180);
+  assert.equal(r.state.players[0].damage,198);
   assert.equal(r.state.players[0].hp,507);
   assert.equal(r.state.kills.length,1);
   s.monster.shield=500;

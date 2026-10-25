@@ -31,7 +31,7 @@ test('伏虎待機 preserves the promised penetration on its guard counter', () 
   state = cast(state, 'FW.concealed');
   state = enemy(state);
   const counter = skills.get('FW.concealed').effects.find(effect => effect.kind === 'guardCounter');
-  assert.equal(counter.amount, 343);
+  assert.equal(counter.amount, 377);
   assert.equal(counter.penetration, 0.7);
   assert.equal(state.players[0].damage, Math.round(counter.amount * (1 - 0.8 * (1 - counter.penetration))));
 });
@@ -41,7 +41,7 @@ test('a previously placed delayed fire mark still deals half damage while its ow
   state.players[0].hp = 0;
   state.players[0].weak = true;
   state = enemy(state);
-  assert.equal(state.players[0].damage, 170);
+  assert.equal(state.players[0].damage, 196);
   assert.equal(state.players[0].hp, 0);
   assert.equal(state.players[0].statuses.some(status => status.kind === 'mark'), false);
 });
@@ -91,7 +91,7 @@ test('the fixed delayed shield strike retains ownership and cannot consume a nex
 test('丹陽爆 armor break accepts a real ongoing self damage boost, not only next-skill boosts', () => {
   let state = cast(fixture(), 'B.added.8888');
   state = cast(state, 'W.exposed.3333');
-  assert.equal(state.players[0].damage, 350);
+  assert.equal(state.players[0].damage, 403);
   assert.equal(state.monster.statuses.find(status => status.kind === 'armor').value, 0.3);
   let noBoost = cast(fixture(), 'W.pong.888');
   noBoost = cast(noBoost, 'W.exposed.3333');

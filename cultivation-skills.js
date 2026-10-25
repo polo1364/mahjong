@@ -6,6 +6,45 @@
   const byId = Object.create(null);
   const elements = { W: 'fire', T: 'water', B: 'metal', FE: 'wood', FS: 'fire', FW: 'metal', FN: 'water', DC: 'fire', DF: 'wood', DB: 'earth', H1: 'wood', H2: 'water', H3: 'fire', H4: 'water', H5: 'wood', H6: 'wood', H7: 'wood', H8: 'metal' };
   const power = { chow: 100, pong: 120, exposed: 240, concealed: 260, added: 200, flower: 60, formation: 320, finish: 300 };
+  const familyBalance = {
+    W: { name: '赤晶', basic: 55, damage: 115, recovery: 100, role: '爆發、灼燒' },
+    T: { name: '靈珠', basic: 40, damage: 85, recovery: 110, role: '回復、續戰' },
+    B: { name: '飛劍', basic: 50, damage: 105, recovery: 100, role: '連擊、穿透' },
+    honor: { name: '字牌', basic: 60, damage: 110, recovery: 100, role: '碰槓威力、特殊效果' },
+    flower: { name: '花牌', basic: null, damage: 110, recovery: 115, role: '補花支援、集齊成陣' },
+  };
+  function familyFor(tile) {
+    const key = tileKey(tile);
+    if (/^[WTB][1-9]$/.test(key)) return key[0];
+    if (/^(?:F[ESWN]|D[CFB])$/.test(key)) return 'honor';
+    if (/^H[1-8]$/.test(key)) return 'flower';
+    return null;
+  }
+  function basicDamage(tile) { return familyBalance[familyFor(tile)]?.basic ?? null; }
+  // Change only fixed operands when constructing the catalogue. Stored effects and
+  // resource-based conversions never pass through this function again.
+  function balanceEffects(effects, family, finisher) {
+    const balance = !finisher && familyBalance[family === 'formation' ? 'flower' : family];
+    if (!balance) return effects;
+    const damageValues = new Set(['nextFlatDamage']);
+    const recoveryValues = new Set(['hot', 'shieldBreakHeal', 'onHitHeal', 'onHitShield', 'deathGuard']);
+    return effects.map(effect => {
+      const next = { ...effect };
+      const adjust = (key, percent) => {
+        if (typeof next[key] === 'number') next[key] = Math.round(next[key] * percent / 100);
+      };
+      if (['damage', 'dot', 'mark', 'buff'].includes(effect.op)) adjust('amount', balance.damage);
+      if (effect.op === 'damage') adjust('shieldDamage', balance.damage);
+      if (['heal', 'shield'].includes(effect.op)) adjust('amount', balance.recovery);
+      if (effect.op === 'buff') {
+        adjust('heal', balance.recovery);
+        if (damageValues.has(effect.kind)) adjust('value', balance.damage);
+        if (recoveryValues.has(effect.kind)) adjust('value', balance.recovery);
+      }
+      if (effect.onKill) next.onKill = balanceEffects(effect.onKill, family, false);
+      return next;
+    });
+  }
   const D = (amount, options) => ({ op: 'damage', amount, ...options });
   const H = (amount, options) => ({ op: 'heal', amount, cap: 500, ...options });
   const S = (amount, options) => ({ op: 'shield', amount, cap: 600, duration: 3, ...options });
@@ -32,7 +71,7 @@
 
   function add(id, action, family, combo, name, description, element, effects, options) {
     if (byId[id]) throw new Error('Duplicate cultivation skill: ' + id);
-    const skill = freeze({ id, action, family, combo, name, description, element, effects, power: power[action], ...options });
+    const skill = freeze({ id, action, family, combo, name, description, element, effects: balanceEffects(effects, family, options?.finisher), power: power[action], ...options });
     all.push(skill);
     byId[id] = skill;
     return skill;
@@ -394,7 +433,7 @@
     return skill && Array.isArray(skill.effects) ? skill.effects.map(effectDetail) : [];
   }
 
-  const api = freeze({ all, get, find, elementFor, details, labels, version: 1 });
+  const api = freeze({ all, get, find, elementFor, familyFor, basicDamage, familyBalance, details, labels, version: 1 });
   root.MahjongCultivationSkills = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

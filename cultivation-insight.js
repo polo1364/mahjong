@@ -26,8 +26,17 @@
     try {
       const copy = JSON.parse(JSON.stringify(state));
       // A flower already in front of its owner is re-played as if newly revealed.
-      if (event.type === 'flower') copy.players[pid].flowers = copy.players[pid].flowers.filter(k => k !== event.key);
-      const result = C().apply(copy, { id: copy.seq + 1, monsterId: copy.monster.id, ...event });
+      if (event.type === 'flower') {
+        copy.players[pid].flowers = [];
+        copy.players[pid].formations = [];
+      }
+      // Preview only the selected skill, not other flowers already waiting for a turn.
+      if (event.type === 'flower') delete copy.players[pid].pendingFlowerSkills;
+      let result = C().apply(copy, { id: copy.seq + 1, monsterId: copy.monster.id, ...event });
+      if (event.type === 'flower' && result.state.players[pid].pendingFlowerSkills?.length && !result.state.ended) {
+        const turn = C().apply(result.state, { id: result.state.seq + 1, type: 'turn', pid });
+        result = { state: turn.state, effects: [...result.effects, ...turn.effects] };
+      }
       const mine = result.effects.filter(e => e.pid === pid);
       const sum = (type, filter = () => true) => mine.filter(e => e.type === type && filter(e)).reduce((n, e) => n + (e.amount || 0), 0);
       return { damage: result.state.players[pid].damage - state.players[pid].damage, basic: sum('damage', e => e.source === 'basic'),
@@ -70,7 +79,8 @@
     const element = combat.tileElement(key), mult = combat.elementMultiplier(element, m.element);
     const armorCut = Math.max(0, (m.armor || 0) - (m.statuses || []).filter(s => s.kind === 'armor').reduce((n, s) => n + (s.value || 0), 0));
     const hero = root.MahjongCultivationHeroes?.get(p.heroId), ps = p.passiveState || {};
-    const rows = [line('晶石普攻', 50)];
+    const family = K().familyBalance[K().familyFor(key)];
+    const rows = [line(family.name + '普攻', K().basicDamage(key))];
     if (p.heroId === 'shen-gufeng' && (ps.discards + 1) % 3 === 0 && ps.swordUses < 5) rows.push(line('劍意（第 3n 次出牌）', '+10', 'up'));
     if (ps.stored > 0) rows.push(line(hero?.passive?.name || '儲存加傷', '+' + Math.round(ps.stored), 'up'));
     if (p.equipmentState?.stored > 0) rows.push(line('裝備儲傷', '+' + Math.round(p.equipmentState.stored), 'up'));
@@ -120,7 +130,9 @@
     rows.push(threatNote(player));
     if (sim && top(sim.heal) > 0) rows.push(line('回復', fmt(sim.heal), 'up'));
     if (sim && top(sim.shield) > 0) rows.push(line('護盾', fmt(sim.shield), 'up'));
-    return { title: `${esc(owner)} · ${esc(source)}`, sub: `${esc(skill.name)}${cast ? '（已施放）' : ''}`,
+    const pending = player.pendingFlowerSkills?.includes(skill.id);
+    if (skill.action === 'flower' && skill.effects.some(e => e.op === 'damage')) rows.push('<div class="ins-detail">補花攻擊於自己的回合施放；灼燒、反擊依原條件觸發。</div>');
+    return { title: `${esc(owner)} · ${esc(source)}`, sub: `${esc(skill.name)}${pending ? '（待自己的回合）' : cast ? '（已施放）' : ''}`,
       body: details + rows.join('') + total(sim && top(sim.damage) > 0 ? '現在施放' : '現在施放', sim ? (top(sim.damage) > 0 ? fmt(sim.damage) : effectText(sim)) : '—') };
   }
   function secretCard(pid) {

@@ -155,7 +155,7 @@ test('draw and defeat finish without Hu damage', () => {
 
 test('combat save preserves RNG, monster forecast, initial flowers and counters without replay', () => {
   const { run } = setup();
-  run(`let saved=saveData();let before=JSON.stringify(S.cultivation);restoreGame(saved,'cultivation');`);
+  run(`settleCultivationFlowers();let saved=saveData();let before=JSON.stringify(S.cultivation);restoreGame(saved,'cultivation');`);
   assert.equal(run('JSON.stringify(S.cultivation)===before'), true);
   assert.equal(run(`gameSaveKey('auto')+'|'+gameSaveKey('manual')`), 'cultivationAutoSaveV1|cultivationManualSaveV1');
   run('let original=S');

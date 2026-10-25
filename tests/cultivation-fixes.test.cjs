@@ -85,7 +85,7 @@ test('recasting a DoT never downgrades the caster\'s stronger one', () => {
   for (const id of ['W.chow.123', 'W.added.1111']) {
     const burn = cast(s, id).monster.statuses.filter(x => x.kind === 'burn');
     assert.equal(burn.length, 1);
-    assert.equal(burn[0].amount, 110, id);
+    assert.equal(burn[0].amount, 127, id);
     assert.equal(burn[0].penetration, 0.6, id);
   }
 });
@@ -269,13 +269,13 @@ test('equipment bonuses: every piece changes damage, taken damage, heal, shield 
     const b = E.bonuses(p), armor = 1 - s.monster.armor, el = C.elementMultiplier(C.tileElement('W1'), s.monster.element);
     const basic = send1(s, { type: 'discard', pid: 0, key: 'W1' });
     const dealt = basic.effects.find(e => e.type === 'damage' && e.source === 'basic').amount;
-    assert.ok(Math.abs(dealt - 50 * el * armor * (1 + b.damage + b.basic)) <= 1, cat.id + ' damage');
+    assert.ok(Math.abs(dealt - 55 * el * armor * (1 + b.damage + b.basic)) <= 1, cat.id + ' damage');
     assert.ok(Math.abs(basic.state.players[0].aggro - dealt * (1 - b.aggro)) <= 1, cat.id + ' aggro');
     const hit = JSON.parse(JSON.stringify(s)); hit.players[0].aggro = 999; hit.enemyDue = hit.monster.id; hit.discardCount = 4;
     Object.assign(hit.monster.nextAttack, { type: 'single', damage: 200, cancelled: false, charged: false });
     const hurt = send1(hit, { type: 'enemy' }).effects.find(e => e.type === 'hurt' && e.pid === 0);
     assert.ok(Math.abs(hurt.amount - 200 * (1 - b.taken - b.topTaken)) <= 1, cat.id + ' taken');
     const h = JSON.parse(JSON.stringify(s)); h.players[0].hp = 500;
-    assert.ok(Math.abs(send1(h, { type: 'flower', pid: 0, key: 'H1' }).effects.find(e => e.type === 'heal').amount - 100 * (1 + b.heal)) <= 1, cat.id + ' heal');
+    assert.ok(Math.abs(send1(h, { type: 'flower', pid: 0, key: 'H1' }).effects.find(e => e.type === 'heal').amount - 115 * (1 + b.heal)) <= 1, cat.id + ' heal');
   }
 });

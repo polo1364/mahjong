@@ -41,10 +41,10 @@ test('exact immutable catalogs, independent four-hero assignment and V1 opt-in b
 
 test('hero damage multiplier applies exactly once on basic, multihit and secondary damage',()=>{
   let s=fixture('shen-gufeng');let r=C.apply(s,{id:1,type:'discard',pid:0,key:'W1'});
-  assert.equal(r.effects.find(e=>e.type==='damage').amount,Math.round(50*1.04*1.25*.88));
+  assert.equal(r.effects.find(e=>e.type==='damage').amount,Math.round(55*1.04*1.25*.88));
   s=fixture('chi-ling');s.players[0].passiveState.fireMonsterId=s.monster.id;
   const after=meld(s,'B.chow.123');
-  assert.equal(after.players[0].damage,Math.round(35*1.05*.88)*2+Math.round(50*1.05*.94));
+  assert.equal(after.players[0].damage,Math.round(37*1.05*.88)*2+Math.round(53*1.05*.94));
 });
 
 test('Shen sword quota is 3rd own discard, max five per hand',()=>{
@@ -55,7 +55,7 @@ test('Shen sword quota is 3rd own discard, max five per hand',()=>{
 
 test('Chi first direct skill grants 5 percent of whole skill once, capped and reset next encounter/hand',()=>{
   let s=fixture('chi-ling');const before=s.players[0].damage;s=meld(s,'B.chow.123');
-  assert.equal(s.players[0].damage-before,Math.round((35+6)*1.05*.88)+Math.round(35*1.05*.88)+Math.round(50*1.05*.94));
+  assert.equal(s.players[0].damage-before,Math.round((37+6.35)*1.05*.88)+Math.round(37*1.05*.88)+Math.round(53*1.05*.94));
   const once=s.players[0].passiveState.fireMonsterId;s=meld(s,'B.chow.123');assert.equal(s.players[0].passiveState.fireMonsterId,once);
   s=kill(s);assert.notEqual(s.monster.id,once);s=meld(s,'W.chow.234');assert.equal(s.players[0].passiveState.fireMonsterId,s.monster.id);
   s=C.create(999,end(s));assert.equal(s.players[0].passiveState.fireMonsterId,null);
@@ -221,7 +221,7 @@ test('whole multihit/finisher kill switches once; last finisher persists seals a
 
 test('monster penalty exact own-discard lifetimes and burn damage; first-strike is only first counted action',()=>{
   let s=fixture('yun-zhiwei','moss-flower',2);s=enemy(s).state;s.players[0].hp=500;
-  s=meld(s,'T.pong.666');assert.equal(s.players[0].hp,643);s=basic(s);assert.ok(!s.players[0].statuses.some(st=>st.kind==='healingDown'));
+  s=meld(s,'T.pong.666');assert.equal(s.players[0].hp,657);s=basic(s);assert.ok(!s.players[0].statuses.some(st=>st.kind==='healingDown'));
   s=fixture('yun-zhiwei','abyss-jiaolong',2);s=enemy(s,{type:'all'}).state;s=meld(s,'W.chow.567');assert.equal(s.players[0].shield,138);
   s=basic(s);assert.ok(s.players[0].statuses.some(st=>st.kind==='shieldGainDown'));s=basic(s);assert.ok(!s.players[0].statuses.some(st=>st.kind==='shieldGainDown'));
   s=fixture('yun-zhiwei','embertail-fox',2);s=enemy(s,{damage:0}).state;const hp=s.players[0].hp;s=basic(basic(basic(s)));assert.equal(s.players[0].hp,hp-20);
@@ -245,18 +245,18 @@ test('V2 cumulative kill history passes the legacy per-hand 1000 limit without l
 
 test('Chi pure DoT gets one whole-skill budget spread over original ticks, survives saves and never expands on refresh',()=>{
   let s=fixture('chi-ling');s=meld(s,'W.pong.111');
-  let dot=s.monster.statuses.find(st=>st.op==='dot');assert.equal(dot.passiveBonus,8.25);assert.equal(dot.passiveBonusTicks,3);assert.equal(s.players[0].passiveState.fireMonsterId,s.monster.id);
-  const saved=JSON.stringify(s);s=JSON.parse(saved);s=meld(s,'W.pong.111');dot=s.monster.statuses.find(st=>st.op==='dot');assert.equal(dot.passiveBonus,8.25);
+  let dot=s.monster.statuses.find(st=>st.op==='dot');assert.equal(dot.passiveBonus,63*3*.05);assert.equal(dot.passiveBonusTicks,3);assert.equal(s.players[0].passiveState.fireMonsterId,s.monster.id);
+  const saved=JSON.stringify(s);s=JSON.parse(saved);s=meld(s,'W.pong.111');dot=s.monster.statuses.find(st=>st.op==='dot');assert.equal(dot.passiveBonus,63*3*.05);
   const initial=s.players[0].damage;
   for(let i=0;i<3;i++)s=enemy(s,{damage:0}).state;
-  assert.equal(s.players[0].damage-initial,3*Math.round((55+2.75)*1.05*1.25*.88));
+  assert.equal(s.players[0].damage-initial,3*Math.round((63+3.15)*1.05*1.25*.88));
   assert.ok(!s.monster.statuses.some(st=>st.op==='dot'));
   s=meld(s,'W.pong.111');assert.equal(s.monster.statuses.find(st=>st.op==='dot').passiveBonus,undefined);
 });
 
 test('Chi mixed direct plus DoT shares one capped first-skill bonus; extended tick has no new budget',()=>{
   let s=fixture('chi-ling');s=meld(s,'W.chow.123');
-  assert.equal(s.players[0].damage,Math.round((75+(75+30*3)*.05)*1.05*1.25*.88));
+  assert.equal(s.players[0].damage,Math.round((86+(86+35*3)*.05)*1.05*1.25*.88));
   assert.equal(s.monster.statuses.find(st=>st.op==='dot').passiveBonus,undefined);
   s=fixture('chi-ling');s=meld(s,'W.pong.111');s=meld(s,'W.chow.234');
   const dot=s.monster.statuses.find(st=>st.op==='dot');assert.equal(dot.ticks,4);assert.equal(dot.passiveBonusTicks,3);
@@ -264,24 +264,24 @@ test('Chi mixed direct plus DoT shares one capped first-skill bonus; extended ti
   assert.equal(s.monster.statuses.find(st=>st.op==='dot').passiveBonus,0);
   const before=s.players[0].damage;s=enemy(s,{damage:0}).state;
   // Existing armor debuff is expired by the fourth tick; no second passive budget.
-  assert.equal(s.players[0].damage-before,Math.round(55*1.05*1.25*.88));
+  assert.equal(s.players[0].damage-before,Math.round(63*1.05*1.25*.88));
 });
 
 test('Chi consuming own DoT carries only remaining bonus; corrupt persisted bonus is rejected',()=>{
   let s=fixture('chi-ling');s=meld(s,'W.pong.111');
   let bad=clone(s);bad.monster.statuses[0].passiveBonus=26;assert.throws(()=>C.validate(bad),/passive DoT/);
   bad=clone(s);bad.monster.statuses[0].passiveBonusTicks=-1;assert.throws(()=>C.validate(bad),/passive DoT/);
-  s=enemy(s,{damage:0}).state;const remaining=s.monster.statuses.find(st=>st.op==='dot').passiveBonus;assert.equal(remaining,5.5);
+  s=enemy(s,{damage:0}).state;const remaining=s.monster.statuses.find(st=>st.op==='dot').passiveBonus;assert.equal(remaining,63*3*.05*2/3);
   const before=s.players[0].damage;s=meld(s,'W.exposed.1111');
-  assert.equal(s.players[0].damage-before,Math.round(170*1.05*1.25*.88)+Math.round((55*3+5.5)*1.05*1.25*.88));
+  assert.equal(s.players[0].damage-before,Math.round(196*1.05*1.25*.88)+Math.round((63*3+remaining)*1.05*1.25*.88));
   assert.equal(s.monster.statuses.filter(st=>st.op==='dot').length,0);
 });
 
 test('Chi delayed attack and effective shield conversion are attack skills, with one saved bonus and no empty conversion spend',()=>{
   let s=fixture('chi-ling');s=meld(s,'W.concealed.1111');
-  assert.equal(s.players[0].statuses.find(st=>st.kind==='mark').passiveBonus,17);
+  assert.equal(s.players[0].statuses.find(st=>st.kind==='mark').passiveBonus,19.55);
   s=enemy(JSON.parse(JSON.stringify(s)),{damage:0}).state;
-  assert.equal(s.players[0].damage,Math.round(357*1.05*1.25*.88));assert.equal(s.players[0].statuses.filter(st=>st.kind==='mark').length,0);
+  assert.equal(s.players[0].damage,Math.round(410.55*1.05*1.25*.88));assert.equal(s.players[0].statuses.filter(st=>st.kind==='mark').length,0);
   s=fixture('chi-ling');s=meld(s,'W.added.5555');assert.equal(s.players[0].passiveState.fireMonsterId,null);
   s.players[0].shield=100;s.players[0].shieldTurns=3;s=meld(s,'W.added.5555');
   assert.equal(s.players[0].damage,Math.round(105*1.05*1.25*.88));assert.equal(s.players[0].passiveState.fireMonsterId,s.monster.id);

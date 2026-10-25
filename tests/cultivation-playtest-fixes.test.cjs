@@ -46,7 +46,7 @@ test('a forecast handles kills and existing DoTs without charging twice', () => 
 });
 
 test('tuned shield and parry counters score once and create damage-matched aggro', () => {
-  for (const [action, keys, expected] of [['chow', ['W5', 'W6', 'W7'], 77], ['pong', ['B3', 'B3', 'B3'], 185]]) {
+  for (const [action, keys, expected] of [['chow', ['W5', 'W6', 'W7'], 88], ['pong', ['B3', 'B3', 'B3'], 194]]) {
     let state = C.apply(threatened(1000), { id: 1, type: 'meld', pid: 0, action, keys }).state;
     state.enemyDue = state.monster.id; state.discardCount = 4;
     const result = C.apply(state, { id: 2, type: 'enemy', monsterId: state.monster.id });

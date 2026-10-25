@@ -5,7 +5,7 @@
   const families = { W: '赤晶', T: '靈珠', B: '飛劍', honor: '字牌', flower: '花牌', formation: '花陣', finish: '胡牌台型', monster: '怪物技能' };
   const elements = { fire: '火', water: '水', metal: '金', wood: '木', earth: '土', neutral: '無屬性' };
   const purposes = { attack: '攻擊', heal: '治療', defense: '防禦', counter: '反擊', aggro: '仇恨', control: '控制', support: '輔助' };
-  const triggers = { chow: '合法吃牌成功時', pong: '合法碰牌成功時', exposed: '明槓成功時', concealed: '暗槓成功時', added: '加槓成功且未被搶胡時', flower: '補入並公開此花牌時', formation: '集齊花組時，每局一次' };
+  const triggers = { chow: '合法吃牌成功時', pong: '合法碰牌成功時', exposed: '明槓成功時', concealed: '暗槓成功時', added: '加槓成功且未被搶胡時', flower: '補花支援立即生效；補花攻擊於自己的回合施放', formation: '集齊花組每局一次；攻擊花陣於自己的回合施放' };
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const normalize = value => String(value).normalize('NFKC').toLowerCase().replace(/\s+/g, '');
   function keysFor(skill) {
@@ -99,6 +99,7 @@
       const row = rows.find(row => row.id === item.skillId);
       return row ? { ...row, completion: item.status } : null;
     }).filter(Boolean) : [];
+    const familyGuide = Object.values(root.MahjongCultivationSkills.familyBalance).map(f => `<p>${escape(f.name)}：${escape(f.role)}；${f.basic === null ? '無打牌普攻' : '普攻 ' + f.basic}，技能固定傷害 ${f.damage}%、固定回復／護盾 ${f.recovery}%。</p>`).join('');
     let page = 0, comparing = false;
     dialog = document.createElement('dialog');
     dialog.id = 'cultivationCodex'; dialog.className = 'cult-codex';
@@ -106,7 +107,7 @@
     const options = values => Object.entries(values).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
     dialog.innerHTML = `<header class="codex-header"><div><span class="codex-eyebrow">雀仙門 · 修仙秘卷</span><h2 id="cultivationCodexTitle">技能圖鑑</h2><p>169 種牌組技能 · 38 項終式對照</p></div><button type="button" id="cultivationCodexClose" aria-label="關閉技能圖鑑">關閉 ×</button></header>
       <div class="codex-scroll"><section class="codex-filters" aria-label="搜尋與篩選"><label class="codex-search">搜尋招式、牌型或效果<input id="cultivationSkillSearch" type="search" placeholder="例如：123、青龍、東、碰碰胡、反擊" autocomplete="off"></label><label>動作<select id="cultivationAction"><option value="">全部動作</option>${options(actions)}</select></label><label>牌系<select id="cultivationFamily"><option value="">全部牌系</option>${options(families)}</select></label><label>用途<select id="cultivationPurpose"><option value="">全部用途</option>${options(purposes)}</select></label><button type="button" id="cultivationFilterReset">重設篩選</button></section>
-      <details class="codex-guide"><summary>如何出招？胡牌與劫印怎麼算？</summary><div><p>每次合法出牌自動普攻。吃、碰、明槓、暗槓、加槓各有對應技能，合法組牌成功後額外施放。治療、護盾、增益及淨化只作用自己，怪物減益全員共用。</p><p>普通胡牌連招預算為 min(1500, 240＋60×台數)，先分配基本起手，再依成立台型分配其餘傷害；整套只消耗一次「下一招」增益。元素、護甲、虛弱及條件增傷會影響實際傷害。</p><p>門清自摸取代門清與自摸，暗刻只計最高階，平胡僅可點胡。七搶一、八仙過海在牌組與終式中均可查到，但使用同一花胡終式，不重複施放。</p><p>點胡／搶槓由放槍者承受下一局劫印；七搶一由持單花者承受。自摸不施加劫印。不同效果並存，同類取最強；傷害最多降低 35%、治療及護盾最多降低 30%、承傷最多增加 25%、新增仇恨最多增加 35%。</p><p>劫印持續到下一局結束，包含該局終式；普通淨化、續局與門規套用重開不會提前解除；「重開論道」或「重新開始修仙旅程」會清除連戰與劫印。怪物鎖定未虛弱玩家中仇恨最高者，結算依累積傷害排名。</p><p>圖鑑展示完整牌組作為規則參考，不代表其他玩家的實際暗槓。</p></div></details>
+      <details class="codex-guide"><summary>五類牌特色、出招與胡牌規則</summary><div>${familyGuide}<p>補花支援立即生效，補花攻擊與攻擊花陣待自己的回合施放；灼燒與反擊仍依原條件觸發。七搶一與八仙過海依原胡牌時機結算。</p><p>每次合法出牌自動普攻。吃、碰、明槓、暗槓、加槓各有對應技能，合法組牌成功後額外施放。治療、護盾、增益及淨化只作用自己，怪物減益全員共用。</p><p>普通胡牌連招預算為 min(1500, 240＋60×台數)，先分配基本起手，再依成立台型分配其餘傷害；整套只消耗一次「下一招」增益。元素、護甲、虛弱及條件增傷會影響實際傷害。</p><p>門清自摸取代門清與自摸，暗刻只計最高階，平胡僅可點胡。七搶一、八仙過海在牌組與終式中均可查到，但使用同一花胡終式，不重複施放。</p><p>點胡／搶槓由放槍者承受下一局劫印；七搶一由持單花者承受。自摸不施加劫印。不同效果並存，同類取最強；傷害最多降低 35%、治療及護盾最多降低 30%、承傷最多增加 25%、新增仇恨最多增加 35%。</p><p>劫印持續到下一局結束，包含該局終式；普通淨化、續局與門規套用重開不會提前解除；「重開論道」或「重新開始修仙旅程」會清除連戰與劫印。怪物鎖定未虛弱玩家中仇恨最高者，結算依累積傷害排名。</p><p>圖鑑展示完整牌組作為規則參考，不代表其他玩家的實際暗槓。</p></div></details>
       <div class="codex-results-heading"><p id="cultivationSkillCount" role="status" aria-live="polite"></p><span>勾選最多 3 招比較</span></div><div id="cultivationSkillList" class="codex-grid"></div>
       <nav class="codex-pages" aria-label="圖鑑分頁"><button type="button" id="cultivationPrev">← 上一頁</button><span id="cultivationPage"></span><button type="button" id="cultivationNext">下一頁 →</button></nav></div>
       <footer class="codex-footer"><span id="cultivationSelected" role="status">已選 0 / 3 招</span><button type="button" id="cultivationClearCompare">清空</button><button type="button" id="cultivationCompare">比較招式</button></footer>`;

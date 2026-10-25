@@ -22,7 +22,7 @@ function game(seed = 1, { cultivation = false, heroId = null, equipment = false,
   for (const file of ['cultivation-skills.js', 'cultivation-finishers.js', 'cultivation-heroes.js', 'cultivation-monster-skills.js', 'cultivation-monsters.js', 'cultivation-progression.js', 'cultivation-expedition.js', 'cultivation-equipment.js', 'cultivation-items.js', 'cultivation-economy.js', 'cultivation-combat.js']) {
     if (html.includes(`src="${file}"`) || html.includes(`src="${file}?`)) vm.runInContext(Object.hasOwn(scriptOverrides, file) ? scriptOverrides[file] : fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), context);
   }
-  vm.runInContext(source, context);
+  vm.runInContext(scriptOverrides['index.html']?.match(/<script>([\s\S]*?)<\/script>/)[1] || source, context);
   const run = code => vm.runInContext(code, context);
   const logMessage = run('log');
   // Legacy fixtures still begin as V1. Only explicit new-journey actions pick a V2 hero.

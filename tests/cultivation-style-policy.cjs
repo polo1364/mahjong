@@ -34,7 +34,7 @@ function installStylePolicy(rotation) {
     if(!S.cultivation)return ordinaryDiscard(pid);
     const pl=S.players[pid],style=styleOf(pid);
     return aiDiscardPlan(pl.hand,pl.melds,aiPublicInfo(pid),tile=>canDiscardTile(pid,tile),tile=>
-      50*window.MahjongCultivationCombat.elementMultiplier(window.MahjongCultivationSkills.elementFor(tileKey(tile)),S.cultivation.monster.element)
+      (window.MahjongCultivationSkills.basicDamage?.(tileKey(tile))??50)*window.MahjongCultivationCombat.elementMultiplier(window.MahjongCultivationSkills.elementFor(tileKey(tile)),S.cultivation.monster.element)
       +30*potential(pl.hand.filter(t=>t!==tile),style))?.tile;
   };
   window.cultivationTestStyles={styles:styles.map((_,pid)=>styleOf(pid)),traits};

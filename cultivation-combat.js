@@ -1396,6 +1396,25 @@
       return Skills.find(action, keys || key);
     return null;
   }
+  function flowerSkill(state, pid, skill, output) {
+    if (skill.effects.some(effect => effect.op === 'damage')) {
+      const p = actor(state, pid);
+      (p.pendingFlowerSkills ||= []).push(skill.id);
+      emit(state, output, { type: 'flowerPending', pid, skillId: skill.id, name: skill.name });
+      return;
+    }
+    finishKill(state, cast(state, pid, skill, output), output, false);
+  }
+  function releaseFlowers(state, pid, output) {
+    const p = actor(state, pid);
+    // Clear before casting: saving/retrying a turn cannot repeat an already released skill.
+    const pending = p.pendingFlowerSkills || [];
+    delete p.pendingFlowerSkills;
+    for (const id of pending) {
+      if (state.ended) break;
+      finishKill(state, cast(state, pid, Skills.get(id), output), output, false);
+    }
+  }
   function cast(state, pid, skill, output, options) {
     if (!skill) throw new Error("Unknown cultivation skill");
     const ctx = makeContext(state, pid, skill, options && options.secondary);
@@ -2031,24 +2050,29 @@
     if (event.monsterId !== undefined && event.monsterId !== state.monster.id)
       return { state, effects: output };
     if (
-      ["discard", "meld", "flower"].includes(event.type) ||
+      ["turn", "discard", "meld", "flower"].includes(event.type) ||
       (event.type === "finish" && event.pid !== null && event.pid !== undefined)
     ) {
       if (!Number.isInteger(event.pid) || event.pid < 0 || event.pid > 3)
         throw new Error("Invalid combat actor");
     }
     switch (event.type) {
+      case "turn":
+        releaseFlowers(state, event.pid, output);
+        break;
       case "discard": {
         if (!/^(?:[WTB][1-9]|F[ESWN]|D[CFB])$/.test(event.key))
           throw new Error("Invalid discard tile");
+        releaseFlowers(state, event.pid, output);
+        if (state.ended) break;
         if (state.version >= 2) { const ps = actor(state, event.pid).passiveState; ps.discards++; ps.counterReady = true; }
         const before = state.monster.id;
         const wasWeak = actor(state, event.pid).hp === 0;
         const skill = {
           id: "basic",
-          name: "晶石普攻",
+          name: Skills.familyBalance[Skills.familyFor(event.key)].name + "普攻",
           element: tileElement(event.key),
-          effects: [{ op: "damage", amount: 50 }],
+          effects: [{ op: "damage", amount: Skills.basicDamage(event.key) }],
         };
         const ctx = cast(state, event.pid, skill, output, { basic: true });
         finishKill(state, ctx, output, false);
@@ -2062,8 +2086,11 @@
         break;
       }
       case "meld": {
-        if(state.expedition&&!state.trial)state.expedition.actions[event.pid].meld=true;
         const skill = findSkill(event.action, event.key, event.keys);
+        if (!skill) throw new Error("Unknown cultivation skill");
+        releaseFlowers(state, event.pid, output);
+        if (state.ended) break;
+        if(state.expedition&&!state.trial)state.expedition.actions[event.pid].meld=true;
         const ctx = cast(state, event.pid, skill, output, {
           secret: event.pid !== 0 && event.action === "concealed",
         });
@@ -2082,13 +2109,7 @@
           const context = makeContext(state, event.pid, { id: "flower-passive", element: "wood" }, true);
           context.passiveRecovery = true; heal(state, context, 15, false, false, output); addShield(state, context, 15, 3, output);
         }
-        const ctx = cast(
-          state,
-          event.pid,
-          findSkill("flower", event.key),
-          output,
-        );
-        finishKill(state, ctx, output, false);
+        flowerSkill(state, event.pid, findSkill("flower", event.key), output);
         if (state.ended) break;
         for (const [id, keys] of [
           ["seasons", ["H1", "H2", "H3", "H4"]],
@@ -2100,8 +2121,7 @@
           ) {
             p.formations.push(id);
             const form = Skills.get("formation." + id);
-            const c = cast(state, event.pid, form, output);
-            finishKill(state, c, output, false);
+            flowerSkill(state, event.pid, form, output);
           }
         break;
       }
@@ -2443,6 +2463,13 @@
             : ["H5", "H6", "H7", "H8"];
         if (!required.every((k) => p.flowers.includes(k)))
           fail("formation ownership");
+      }
+      if (p.pendingFlowerSkills !== undefined) {
+        const pending = p.pendingFlowerSkills;
+        if (!Array.isArray(pending) || pending.length > 3 || new Set(pending).size !== pending.length ||
+            pending.some(id => !['H3.flower', 'H8.flower', 'formation.gentlemen'].includes(id) ||
+              (id === 'formation.gentlemen' ? !p.formations.includes('gentlemen') : !p.flowers.includes(id.slice(0, 2)))))
+          fail('pending flower skills');
       }
     }
     if (new Set(flowers).size !== flowers.length) fail("duplicate flower");

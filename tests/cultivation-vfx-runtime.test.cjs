@@ -118,12 +118,13 @@ test('queued damage retains the previous species after the engine advances to th
   assert.ok(painted.at(-1).endsWith(species.image));
 });
 
-test('one H8 batch switches artwork between its first kill and the following flower formation',async()=>{
+test('one own-turn H8 batch switches artwork between its first kill and the following flower formation',async()=>{
   const h=harness();await h.api.loaded;
   let before=C.create(77,null,{heroId:'shen-gufeng'});
   for(const key of ['H5','H6','H7'])before=C.apply(before,{type:'flower',pid:0,key,id:before.seq+1}).state;
   before.monster.hp=1;before.monster.shield=0;
-  const result=C.apply(before,{type:'flower',pid:0,key:'H8',id:before.seq+1});
+  before=C.apply(before,{type:'flower',pid:0,key:'H8',id:before.seq+1}).state;
+  const result=C.apply(before,{type:'turn',pid:0,id:before.seq+1});
   const firstHit=result.effects.find(effect=>effect.type==='damage'&&effect.monsterId===before.monster.id);
   const formationHit=result.effects.find(effect=>effect.type==='damage'&&effect.skillId==='formation.gentlemen');
   assert.notEqual(formationHit.monsterId,before.monster.id);

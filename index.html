@@ -849,8 +849,19 @@ function cultivationEvent(event) {
   window.MahjongCultivationEquipmentUI?.notifyLoot(before, next.state);
   if (event.type === 'meld' || event.type === 'flower') {
     const skill = window.MahjongCultivationSkills.find(event.action || 'flower', event.keys || event.key);
-    if (skill) log(`✨ ${playerName(event.pid)} 施放${event.action === 'concealed' && event.pid !== 0 ? '秘術' : '「' + skill.name + '」'}`);
+    if (skill && !next.effects.some(e => e.type === 'flowerPending' && e.skillId === skill.id)) log(`✨ ${playerName(event.pid)} 施放${event.action === 'concealed' && event.pid !== 0 ? '秘術' : '「' + skill.name + '」'}`);
   }
+  for (const e of next.effects.filter(e => e.type === 'flowerPending')) log(`🌸 ${playerName(e.pid)}「${e.name}」待命，自己的回合施放`);
+  if (event.type === 'turn') for (const e of next.effects.filter(e => e.type === 'skill')) log(`✨ ${playerName(e.pid)} 施放「${e.name}」`);
+}
+
+function settleCultivationFlowers() {
+  if (!S?.cultivation || S.phase !== 'play' || S.waitReact || S.pendingKong) return S?.phase === 'play';
+  if (S.cultivation.players[S.turn].pendingFlowerSkills?.length) {
+    cultivationEvent({ type: 'turn', pid: S.turn });
+    if (S.cultivation.ended) { finishCultivationFailure(); return false; }
+  }
+  return true;
 }
 
 function finishCultivationFailure() {
@@ -871,7 +882,7 @@ function settleCultivationEnemy(allowSelfDraw = true) {
   }
   if (!S?.cultivation || !S.cultivation.enemyDue) {
     if (S?.cultivation) S.cultivationAwaitingSelfDraw = false;
-    return S?.phase === 'play';
+    return S?.phase === 'play' && settleCultivationFlowers();
   }
   if (S.phase !== 'play' || S.waitReact || S.pendingKong) return false;
   const player = S.players[S.turn];
@@ -890,6 +901,7 @@ function settleCultivationEnemy(allowSelfDraw = true) {
   S.cultivationAwaitingSelfDraw = false;
   cultivationEvent({ type: 'enemy', monsterId: S.cultivation.monster.id });
   if (S.cultivation.ended) { finishCultivationFailure(); return false; }
+  if (!settleCultivationFlowers()) return false;
   renderAll();
   return true;
 }
@@ -1203,6 +1215,7 @@ function beginDealtHand(firstAIDelay) {
     }
   }
   if (resolveFlowerWin()) return;
+  if (S.dealer === 0 && !settleCultivationFlowers()) return;
   S.remain = S.wall.length;
   renderAll();
   // Save as soon as the hand is playable, so a reload in its first seconds resumes this hand, not the last preparation.
@@ -1302,6 +1315,7 @@ function receiveTile(pid, tile, replacement) {
     if (S.phase !== 'deal') playVoice('flower', { pid, tileKey: tileKey(tile) });
     log(`🌸 ${playerName(pid)} 亮出 ${keyToText(tileKey(tile))}，補花`);
     if (resolveFlowerWin()) return null;
+    if (S.phase === 'play' && S.turn === pid && !settleCultivationFlowers()) return null;
     replacement = true;
     tile = takeReplacement();
   }
@@ -1624,7 +1638,7 @@ function aiDiscardPlan(hand, melds, info, legal = ()=>true, combatValue = null) 
 }
 function aiChooseDiscard(pid) {
   const pl=S.players[pid];
-  const attackValue = S.cultivation ? tile => 50 * window.MahjongCultivationCombat.elementMultiplier(
+  const attackValue = S.cultivation ? tile => window.MahjongCultivationSkills.basicDamage(tileKey(tile)) * window.MahjongCultivationCombat.elementMultiplier(
     window.MahjongCultivationSkills.elementFor(tileKey(tile)), S.cultivation.monster.element) : null;
   return aiDiscardPlan(pl.hand,pl.melds,aiPublicInfo(pid),tile=>canDiscardTile(pid,tile),attackValue)?.tile;
 }

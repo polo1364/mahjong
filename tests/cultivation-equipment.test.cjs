@@ -36,10 +36,10 @@ test('new V3 explicit opt-in; V1/V2 untouched; migration only at prepare, no ret
 
 test('damage base/trait use one equipment factor and retain hero, element, armor, seal factors',()=>{
   const s=species(fixture('shen-gufeng'),'whetgold-rat');give(s,'chi-xiao-sword',5,10);give(s,'chiyao-pendant',1);
-  const r=basic(s);assert.equal(r.effects.find(e=>e.type==='damage').amount,Math.round(50*1.04*1.09*1.25*.88));
+  const r=basic(s);assert.equal(r.effects.find(e=>e.type==='damage').amount,Math.round(55*1.04*1.09*1.25*.88));
   const active=species(fixture('yun-zhiwei'),'whetgold-rat');give(active,'xuanfu-staff',1);active.players[0].statuses=[{kind:'followup',amount:50,duration:2,charges:1}];const baseline=clone(active);baseline.players[0].equipment.weapon=null;
   const a=meld(active,'B.chow.123').effects.filter(e=>e.type==='damage'),b=meld(baseline,'B.chow.123').effects.filter(e=>e.type==='damage');
-  assert.equal(a[0].amount,Math.round(35*1.04*.88));assert.equal(a.at(-1).source,'followup');assert.equal(a.at(-1).amount,Math.round(50*1.02*.88));assert.equal(b.length,a.length);
+  assert.equal(a[0].amount,Math.round(37*1.04*.88));assert.equal(a.at(-1).source,'followup');assert.equal(a.at(-1).amount,Math.round(50*1.02*.88));assert.equal(b.length,a.length);
 });
 
 test('counter-only traits exclude followup and apply to actual reaction',()=>{
@@ -197,7 +197,7 @@ test('natural death guard guarantee remains exactly one, no gear recovery scalin
 });
 
 test('xuanfu applies to active DOT, chixiao ignores pure DOT, and equipment extra cannot produce a followup',()=>{
-  let s=species(fixture(),'blackarmor-general');give(s,'xuanfu-staff');s=meld(s,'W.pong.111').state;let r=enemy(s);const dot=r.effects.find(e=>e.source==='dot'&&e.pid===0);assert.equal(dot.amount,Math.round(55*1.04*(1-s.monster.armor)));
+  let s=species(fixture(),'blackarmor-general');give(s,'xuanfu-staff');s=meld(s,'W.pong.111').state;let r=enemy(s);const dot=r.effects.find(e=>e.source==='dot'&&e.pid===0);assert.equal(dot.amount,Math.round(63*1.04*(1-s.monster.armor)));
   s=species(fixture(),'blackarmor-general');set(s,'chixiao');for(let n=0;n<4;n++)s=meld(s,'W.pong.111').state;assert.equal(s.players[0].equipmentState.chixiaoCount,0);
   s=species(fixture(),'blackarmor-general');set(s,'chixiao');s.players[0].statuses=[{kind:'followup',amount:20,duration:10,charges:10}];for(let n=0;n<3;n++){r=meld(s,'W.chow.234');assert.equal(r.effects.filter(e=>e.source==='followup'&&e.skillId!=='equipment').length,1);s=r.state;}assert.equal(r.effects.filter(e=>e.skillId==='equipment').length,1);
 });

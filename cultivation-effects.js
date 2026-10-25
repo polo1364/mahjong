@@ -485,7 +485,11 @@
       } else if (s.action === 'flower') event = { type: 'flower', pid: 0, key: s.combo };
       else event = { type: 'meld', pid: 0, action: s.action, ...(['W', 'T', 'B'].includes(s.family) ? { keys: [...s.combo].map(n => s.family + n) } : { key: s.combo }) };
     }
-    const result = C.apply(state, { ...event, id: 1, monsterId: state.monster.id });
+    let result = C.apply(state, { ...event, id: 1, monsterId: state.monster.id });
+    if (result.state.players[0].pendingFlowerSkills?.length && !result.state.ended) {
+      const turn = C.apply(result.state, { type: 'turn', pid: 0, id: result.state.seq + 1 });
+      result = { state: turn.state, effects: [...result.effects, ...turn.effects] };
+    }
     return { plan: P.plan(result.effects), state, effects: result.effects };
   }
   function showPreview(id) {

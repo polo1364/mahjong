@@ -109,7 +109,11 @@ for (const skill of Skills.all)
     if (skill.id === "formation.seasons") p.flowers = ["H1", "H2", "H3"];
     if (skill.id === "formation.gentlemen") p.flowers = ["H5", "H6", "H7"];
     const before = clone(s);
-    const result = C.apply(s, { id: 1, ...eventFor(skill) });
+    let result = C.apply(s, { id: 1, ...eventFor(skill) });
+    if (result.state.players[0].pendingFlowerSkills?.length) {
+      const turn = C.apply(result.state, { id: result.state.seq + 1, type: 'turn', pid: 0 });
+      result = { state: turn.state, effects: [...result.effects, ...turn.effects] };
+    }
     const after = result.state;
     assert.deepEqual(s, before, "reducer must not mutate original state");
     assert.equal(C.validate(after), true);
@@ -435,7 +439,7 @@ test("status guard blocks one ailment, heals or retaliates with ownership", () =
   s.discardCount = 4;
   s = send(s, { type: "enemy" });
   assert.ok(!s.players[0].statuses.some((x) => x.negative));
-  assert.equal(s.players[0].hp, 500);
+  assert.equal(s.players[0].hp, 524);
   assert.ok(!status(s, "statusGuard"));
 });
 test("flower groups execute once and no flower skill prematurely ends a hand", () => {

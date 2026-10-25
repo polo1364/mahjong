@@ -46,7 +46,7 @@ function baseline(){
   write('expedition-baseline.json',report);console.log(JSON.stringify(report));
 }
 if(require.main===module&&process.argv[2]==='baseline') baseline();
-module.exports={legalHand,ai,snap,baseline};
+module.exports={legalHand,ai,snap,baseline,gearPolicy};
 
 
 
