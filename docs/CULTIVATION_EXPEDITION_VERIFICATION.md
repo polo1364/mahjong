@@ -54,6 +54,13 @@ PWA預快取91項，重建與 `--check` 通過，24項瀏覽器檢查通過，�
 
 ## 重現
 
+### 2026-10-25 手機巡歷與奇遇複查
+
+- 重現奇遇／首領提交後重建整備頁，手機巡歷面板關閉、捲動歸零；修正為保留面板開啟狀態及捲動位置。
+- 有待處理奇遇時，開始下一局會開啟巡歷並捲至奇遇選項，同步開關的無障礙狀態。
+- `node tests/expedition-layout-browser.cjs`：Chromium／WebKit，568×320、667×375、844×390、942×435與1440×900；20個奇遇逐一檢查按鈕文字邊界、遮擋、橫向溢出及44px奇遇按鈕。另核對提交後面板、捲動及直式提醒，共208項。測試以獨立瀏覽器的明示事件／資源fixture涵蓋長文字、資源不足、取代效果提示及進階首領，不作平衡證據；未測實體手機。
+- 本機報告：`artifacts/expedition-layout-report.json`，修正前證據另存`expedition-layout-before.json`；全套Node回歸1,098項通過。
+
 ```powershell
 node --test --test-concurrency=4 tests/*.test.cjs
 node tests/expedition-balance.cjs baseline

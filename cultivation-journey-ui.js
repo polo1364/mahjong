@@ -120,7 +120,20 @@
       root.MahjongExpeditionUI.preparation(expeditionHost, combat, {
         ...callbacks.progression,
         onBusy(busy) { progressionBusy = busy; equipmentSession?.setNavigationLocked(busy); updateNavigationLock(); },
-        onUpdated(next) { close({progressionCommitted:true}); showPreparation(next, {...callbacks, progression:root.MahjongProgressionFlow.preparationOptions()}); }
+        onUpdated(next) {
+          const panelOpen = dialog.classList.contains('prep-left-open');
+          const scrollTop = expeditionHost.scrollTop;
+          close({progressionCommitted:true});
+          const nextDialog = showPreparation(next, {...callbacks, progression:root.MahjongProgressionFlow.preparationOptions()});
+          // Restore after the preparation layout has moved the new pane into its scroll area.
+          requestAnimationFrame(() => {
+            if (!nextDialog.isConnected) return;
+            nextDialog.classList.toggle('prep-left-open', panelOpen);
+            nextDialog.querySelector('.prep-left-toggle')?.setAttribute('aria-expanded', String(panelOpen));
+            nextDialog.querySelector('.journey-expedition').scrollTop = scrollTop;
+            nextDialog.querySelector('[data-left="expedition"]')?.focus({preventScroll:true});
+          });
+        }
       });
     }
     if (callbacks.progression && root.MahjongProgressionUI) {
@@ -155,7 +168,14 @@
     }
     nextButton.onclick = () => {
       if (navigating || equipmentLocked) return;
-      if (callbacks.getState?.()?.cultivation?.expedition?.pendingEvent) { status.textContent = '請先到「巡歷」處理奇遇，或選擇離開。'; dialog.querySelector('[data-left="expedition"]')?.click(); dialog.classList.add('prep-left-open'); return; }
+      if (callbacks.getState?.()?.cultivation?.expedition?.pendingEvent) {
+        status.textContent = '請先到「巡歷」處理奇遇，或選擇離開。';
+        dialog.classList.add('prep-left-open');
+        dialog.querySelector('.prep-left-toggle')?.setAttribute('aria-expanded', 'true');
+        dialog.querySelector('[data-left="expedition"]')?.click();
+        dialog.querySelector('.expedition-event')?.scrollIntoView({block:'start'});
+        return;
+      }
       navigating = true;
       nextButton.disabled = homeButton.disabled = true;
       close(); callbacks.onStart();
@@ -181,6 +201,7 @@
     };
     dialog.querySelector('#journeyTitle').focus({ preventScroll: true });
     dialog.scrollTop = 0;
+    return dialog;
   }
   root.MahjongCultivationJourneyUI = Object.freeze({ chooseHero, showPreparation, close, heroDetails, passiveState, statValues });
 })(typeof window !== 'undefined' ? window : globalThis);
