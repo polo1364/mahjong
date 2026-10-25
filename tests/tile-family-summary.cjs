@@ -6,7 +6,11 @@ const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
 for(const r of Object.values(reports)) {
   assert.equal(r.passed,true,`${r.mode} incomplete`);
   assert.deepEqual(r.sourceHashes,reports.calibration.sourceHashes,'Mixed production source revisions');
-  for(const [file,hash]of Object.entries(r.sourceHashes.after))assert.equal(sha(fs.readFileSync(path.join(root,file))),hash,`Source changed: ${file}`);
+  for(const [file,hash]of Object.entries(r.sourceHashes.after)) {
+    const content=fs.readFileSync(path.join(root,file),'utf8'),lf=content.replace(/\r\n/g,'\n');
+    // Git autocrlf may rewrite the checkout after a merge; accept only equivalent line endings.
+    assert.ok([content,lf,lf.replace(/\n/g,'\r\n')].some(text=>sha(text)===hash),`Source changed: ${file}`);
+  }
 }
 function summarize(rows) {
   const hands=rows.flatMap(r=>r.hands),mean=k=>+(hands.reduce((n,h)=>n+h[k],0)/hands.length).toFixed(2);
