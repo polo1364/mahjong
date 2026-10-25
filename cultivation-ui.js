@@ -275,7 +275,7 @@
     if (!body || document.getElementById('cultivationCatalog')) return;
     const section = document.createElement('section');
     section.id = 'cultivationCatalog'; section.className = 'cult-catalog';
-    section.innerHTML = `<div class="cult-catalog-entry"><div><h3>修仙技能圖鑑</h3><p>169 種牌組技能 · 38 項終式 · 35 招怪物技能<br>牌組、花陣、劫印與妖獸招式，一起查找比較。</p></div><button type="button" id="cultivationCatalogOpen">開啟圖鑑 →</button></div>
+    section.innerHTML = `<div class="cult-catalog-entry"><div><h3>修仙技能圖鑑</h3><p>169 種牌組技能 · 38 項終式 · ${root.MahjongMonsterSkills?.all.length || 0} 招怪物技能<br>牌組、花陣、劫印與妖獸招式，一起查找比較。</p></div><button type="button" id="cultivationCatalogOpen">開啟圖鑑 →</button></div>
       <details class="cult-log-details"><summary>修仙戰況</summary><div id="cultivationStatusReference"></div><ol id="cultivationLog"></ol></details>`;
     section.querySelector('#cultivationCatalogOpen').onclick = () => root.MahjongCultivationCatalog?.open();
     body.prepend(section);

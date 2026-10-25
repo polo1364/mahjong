@@ -84,7 +84,8 @@ html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
 .role-main .journey-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; }
 .role-main .journey-stats > div { padding: 10px 12px; border: 1px solid #e2c27e33; border-radius: 12px; background: #ffffff08; text-align: center; }
 .role-main .journey-stats dt { font-size: 12px; color: #9fb3bf; letter-spacing: 2px; }
-.role-main .journey-stats dd { margin: 2px 0 0; font: 700 26px/1.1 "Segoe UI", sans-serif; color: #fff1cf; }
+.role-main .journey-stats dd { margin: 2px 0 0; font: 700 26px/1.1 "Segoe UI", sans-serif; color: #fff1cf; white-space: nowrap; }
+.role-main .journey-stats .journey-stat-gain { display: block; margin: 4px 0 0; white-space: nowrap; }
 .role-main .journey-stats dd small { font-size: 12px; color: #c9a868; }
 .role-main .journey-passive { position: relative; padding: 14px 16px 14px 58px; border: 1px solid #e2c27e55; border-left: 1px solid #e2c27e55; border-radius: 14px; background: linear-gradient(110deg, #e2c27e1f, #ffffff05 70%); }
 .role-main .journey-passive::before { content: "被動"; position: absolute; left: 12px; top: 14px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 700 12px/1 "DFKai-SB", "KaiTi", serif; color: #2a1a08; background: linear-gradient(#fff1c8, #d9ad5c); }
@@ -95,7 +96,7 @@ html.cultivation-mode:not(.start-screen-active) .cult-battle-feed {
 .role-main .journey-counters dd { margin: 0; font-weight: 700; color: #fff1cf; }
 .role-main > .journey-muted { margin: 0; }
 .role-main .equip-role-info { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.role-main .equip-role-info > h3, .role-main .equip-role-info > p:nth-of-type(n+4), .role-main .equip-role-info > .equip-sets { grid-column: 1 / -1; }
+.role-main .equip-role-info > h3, .role-main .equip-role-info > p:nth-of-type(n+4), .role-main .equip-role-info > .equip-sets, .role-main .equip-role-info > .supply-carried { grid-column: 1 / -1; }
 .role-main .equip-role-info > h3 { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font: 700 16px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; color: #f3dca4; }
 .role-main .equip-role-info > h3::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #e2c27e66, transparent); }
 .role-main .equip-role-info > p { margin: 0; font-size: 12px; color: #c9d6e2; }

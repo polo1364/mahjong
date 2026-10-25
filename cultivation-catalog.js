@@ -196,7 +196,7 @@
     }
     find('#cultivationSkillSearch').value=initial.query || '';
     find('#cultivationFamily').value=initial.family || '';
-    if(root.MahjongMonsterSkills)find('.codex-header p').textContent='169 種牌組技能 · 38 項終式 · 35 招怪物技能';
+    if(root.MahjongMonsterSkills)find('.codex-header p').textContent=`169 種牌組技能 · 38 項終式 · ${root.MahjongMonsterSkills.all.length} 招怪物技能`;
     document.body.append(modal); update(); modal.showModal(); find('#cultivationCodexClose').focus({ preventScroll: true });
   }
   const api = Object.freeze({ open, close, records, filter, keysFor, roles, meldReference, flowerReference });
