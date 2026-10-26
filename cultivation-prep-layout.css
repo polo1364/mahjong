@@ -66,8 +66,8 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
 /* Compact cards: picture left, text right, actions in one row */
 .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; gap: 8px !important; }
 .prep-noscroll .supply-card, .prep-noscroll .equip-card {
-  display: grid !important; grid-template-columns: 58px minmax(0, 1fr) !important; gap: 4px 10px !important; align-items: start;
-  margin: 0 !important; padding: 8px 10px !important; min-height: 0 !important; border-radius: 12px !important;
+  display: grid !important; grid-template-columns: 58px minmax(0, 1fr) !important; gap: 4px 10px !important; 
+  margin: 0 !important;  min-height: 0 !important; border-radius: 12px !important;
 }
 .prep-noscroll .supply-card > img, .prep-noscroll .supply-card > .item-art-pending, .prep-noscroll .equip-card > img { width: 58px !important; height: 58px !important; object-fit: contain; }
 .prep-noscroll .supply-card h3, .prep-noscroll .equip-card strong { margin: 0 !important; font-size: 15px !important; display: flex; justify-content: space-between; gap: 6px; }
@@ -91,8 +91,8 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
 .prep-noscroll .equip-filters { display: flex; flex-wrap: wrap; gap: 6px 12px; }
 .prep-noscroll .equip-filters select { min-height: 34px; padding: 4px 8px; }
 .prep-noscroll .equip-inventory-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr) !important; gap: 10px; align-items: start; }
-.prep-noscroll .equip-item-list { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 6px !important; align-content: start; }
-.prep-noscroll .equip-item { display: grid !important; grid-template-columns: 40px minmax(0, 1fr) !important; align-items: center; gap: 2px 8px; min-height: 0 !important; padding: 6px 8px !important; text-align: left; writing-mode: horizontal-tb !important; }
+.prep-noscroll .equip-item-list { display: grid !important;  gap: 6px !important; align-content: start; }
+.prep-noscroll .equip-item {  grid-template-columns: 40px minmax(0, 1fr) !important; align-items: center; gap: 2px 8px; min-height: 0 !important;   writing-mode: horizontal-tb !important; }
 .prep-noscroll .equip-item img { width: 40px !important; height: 40px !important; grid-row: span 2; }
 .prep-noscroll .equip-item * { writing-mode: horizontal-tb !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .prep-noscroll .equip-comparison { padding: 10px 12px !important; }
@@ -121,7 +121,7 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
 }
 @media (max-height: 560px) {
   dialog.journey-screen.prep-noscroll { padding: 6px 10px; }
-  .prep-noscroll .journey-preparation-grid { grid-template-columns: 230px minmax(0, 1fr) !important; }
+
   .prep-noscroll .journey-wrap { gap: 6px; }
   .prep-noscroll .journey-header { padding-bottom: 4px; }
   .prep-noscroll .journey-header > div:first-child > p:first-child, .prep-noscroll .journey-header .journey-intro { display: none; }
@@ -135,13 +135,13 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
   .prep-left-body .journey-prepared-hero h2 { font-size: 17px; }
   .prep-left-body .journey-stats > div { padding: 3px 4px; } .prep-left-body .journey-stats dd { font-size: 15px; }
   .prep-noscroll .equip-ui { gap: 4px; }
-  .prep-noscroll .equip-wallet { padding: 3px 10px; font-size: 12px; }
+  .prep-noscroll .equip-wallet {  font-size: 12px; }
   .prep-noscroll .equip-tabs button { min-height: 30px; font-size: 12px; letter-spacing: 0; }
   .prep-noscroll #equipPanel { padding: 6px 8px; gap: 5px; }
   .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid, .prep-noscroll .equip-redemptions { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
   .prep-noscroll .supply-card p, .prep-noscroll .equip-card p, .prep-noscroll .equip-card small { -webkit-line-clamp: 1; }
   .prep-noscroll .supply-card details { display: none; }
-  .prep-noscroll .supply-prepared { padding: 3px 10px; font-size: 12px; }
+  .prep-noscroll .supply-prepared {  font-size: 12px; }
   .prep-noscroll .equip-npc-intro p { display: none; }
   .prep-pager { bottom: 4px; } .prep-pager button { min-height: 26px; padding: 1px 10px; font-size: 12px; }
   #equipPanel:has(> .prep-pager), .prep-left-body:has(> .prep-pager) { padding-bottom: 38px; }
@@ -161,7 +161,7 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
 .prep-noscroll .equip-ui { position: relative; }
 .prep-noscroll .equip-notice { position: absolute; right: 12px; top: 6px; z-index: 3; max-width: 46%; padding: 3px 10px; border-radius: 999px; background: #0b1d24ee; border: 1px solid #a6b19955; color: #cfe3d6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
 .prep-noscroll .equip-notice:has(button) { pointer-events: auto; }
-.prep-noscroll .equip-wallet > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.prep-noscroll .equip-wallet > span {   text-overflow: ellipsis; min-width: 0; }
 .prep-noscroll .equip-wallet { display: flex; align-items: center; gap: 14px; padding-right: 46%; }
 /* Next-hand items: one slim row */
 .prep-noscroll .supply-prepared { display: flex !important; align-items: center; gap: 10px; }
@@ -193,9 +193,9 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
   .prep-noscroll .supply-card h3, .prep-noscroll .equip-card strong { font-size: 13px !important; }
   .prep-noscroll .supply-card .supply-recipe, .prep-noscroll .equip-card .equip-grade { display: none; }
   .prep-noscroll .supply-card button, .prep-noscroll .equip-card button { min-height: 26px !important; padding: 2px 8px !important; font-size: 11.5px !important; }
-  .prep-noscroll .supply-card > div > .equip-actions { flex-direction: row; }
+
   .prep-noscroll .equip-npc-intro, .prep-noscroll .supply-shop-title { display: none !important; }
-  .prep-noscroll .supply-toolbar h2 { font-size: 14px; }
+
   .prep-noscroll .supply-prepared { padding: 2px 10px !important; }
   .prep-noscroll .supply-prepared small { display: none; }
   .prep-noscroll .supply-slot { padding: 2px 8px !important; } .prep-noscroll .supply-slot img { width: 22px !important; height: 22px !important; }
@@ -226,7 +226,7 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
   .prep-noscroll .equip-item-list { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; }
   .prep-noscroll .equip-item .equip-card { grid-template-columns: 32px minmax(0, 1fr) !important; padding: 3px 6px !important; }
   .prep-noscroll .equip-item .equip-card > img { width: 32px !important; height: 32px !important; }
-  .prep-noscroll .equip-item .equip-card p { display: none; }
+
   .prep-noscroll .equip-inventory-layout { grid-template-columns: minmax(0, 1fr) minmax(200px, .8fr) !important; }
   .prep-noscroll .equip-comparison > .equip-card p, .prep-noscroll .equip-comparison > .equip-card small { display: none; }
 }
@@ -243,10 +243,10 @@ dialog.prep-noscroll .prep-off.prep-off { display: none !important; }
   .prep-noscroll .equip-inventory-layout:not(:has(.equip-comparison .equip-card)) { grid-template-columns: minmax(0, 1fr) !important; }
 }
 @media (max-height: 560px) {
-  .prep-noscroll .supply-card > div { grid-template-columns: minmax(0, 1fr); }
-  .prep-noscroll .supply-card > div > .equip-actions { grid-column: 1; grid-row: auto; flex-direction: row; justify-content: flex-start; }
+
+  .prep-noscroll .supply-card > div > .equip-actions {    justify-content: flex-start; }
   .prep-noscroll .supply-card h3 { white-space: nowrap; }
-  .prep-noscroll .supply-card > div > p { display: none; }
+
   .prep-noscroll .supply-grid, .prep-noscroll .equip-shop-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
 }
 

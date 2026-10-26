@@ -1,0 +1,25 @@
+/* 修仙指引 tip card: top centre so it never covers the hand or the claim buttons. */
+.cult-guide {
+  position: fixed; z-index: 2147483000; top: 12px; left: 50%; transform: translateX(-50%);
+  width: min(460px, calc(100vw - 32px)); box-sizing: border-box; padding: 12px 16px 12px;
+  border: 1.5px solid #e2c27e; border-radius: 14px; color: #e9eef6;
+  background: linear-gradient(170deg, #142246f5, #080d22f5); box-shadow: 0 14px 36px #000c, 0 0 0 4px #e2c27e1f;
+  font: 13px/1.6 "Microsoft JhengHei", sans-serif; animation: cult-guide-in .25s ease-out both;
+  /* Taps pass through to the table or panel underneath; only 知道了 is clickable. */
+  pointer-events: none;
+}
+.cult-guide-kicker { margin: 0; font-size: 11px; letter-spacing: 3px; color: #9fb3bf; }
+.cult-guide h3 { margin: 0 0 4px; font: 700 17px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 2px; color: #f3dca4; }
+.cult-guide p { margin: 0; }
+.cult-guide button {
+  display: block; margin: 8px 0 0 auto; min-height: 34px; padding: 4px 18px; border-radius: 999px;
+  border: 1px solid #fff1c8; color: #2a1a08; font: 700 13px "Microsoft JhengHei", sans-serif;
+  background: linear-gradient(#fff1c8, #d9ad5c); cursor: pointer; pointer-events: auto;
+}
+@keyframes cult-guide-in { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .cult-guide { animation: none; } }
+@media (max-height: 520px) {
+  .cult-guide { top: 6px; padding: 8px 12px; font-size: 12px; line-height: 1.5; width: min(520px, calc(100vw - 24px)); }
+  .cult-guide h3 { font-size: 15px; }
+  .cult-guide button { margin-top: 4px; min-height: 30px; }
+}

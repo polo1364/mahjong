@@ -39,7 +39,7 @@ function baseline(){
     const first=snap(run,'S.cultivation.monster'); if(!M.get(first.speciesId)) throw Error(JSON.stringify({first,heroId,version:run('S.cultivation.version')})); const baseHp=M.get(first.speciesId).hp;
     legalHand(run,timers);
     const damage=run('S.cultivation.expedition.metrics.reduce((n,m)=>n+m.damage,0)');
-    rows.push({heroId,seed,firstSpeciesId:first.speciesId,baseHp,effectiveDamage:damage,index:damage/baseHp*100});
+    rows.push({heroId,seed,firstSpeciesId:first.speciesId,baseHp,effectiveDamage:damage,index:damage/require('../cultivation-expedition.js').referenceHp*100});
   }
   const values=rows.map(r=>r.index).sort((a,b)=>a-b),A=(values[4]+values[5])/2,B=A*1.6;
   const report={scope:'Ten unequipped fresh hero teams; one legal AI hand per hero. Production metrics of actual monster HP and shield loss, with overkill excluded. Fresh journey and no progression grants.',sourceHashes:Object.fromEntries(Object.entries(frozenScripts).map(([f,s])=>[f,crypto.createHash('sha256').update(s).digest('hex')])),combatSourceHash:crypto.createHash('sha256').update(original).digest('hex'),A,B,rows};

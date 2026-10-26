@@ -2,7 +2,9 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const {chromium} = require('playwright');
+const {playwright, skipReason} = require('./optional-playwright.cjs');
+if (!playwright) { require('node:test').test('progression IndexedDB store', {skip: skipReason}, () => {}); return; }
+const {chromium} = playwright;
 
 const root = path.resolve(__dirname, '..');
 const server = http.createServer((request, response) => {

@@ -1,0 +1,15 @@
+/* 存檔備份 row on the home screen and its confirmation dialog. */
+.save-backup-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; max-width: 410px; margin-top: 10px; color: #b3c6cf; font: 12px/1.4 "Microsoft JhengHei", sans-serif; }
+.save-backup-row > span { letter-spacing: 2px; }
+.save-backup-row button { min-height: 32px; padding: 4px 14px; border-radius: 999px; border: 1px solid #e2c27e66; background: #ffffff0d; color: #f3dca4; font: inherit; cursor: pointer; }
+.save-backup-row button:disabled { opacity: .5; cursor: default; }
+.save-backup-row p { flex-basis: 100%; margin: 0; min-height: 1.4em; font-size: 11px; }
+.save-backup-dialog { width: min(440px, calc(100vw - 32px)); padding: 18px 20px; border: 1.5px solid #e2c27e; border-radius: 16px; color: #e9eef6; background: linear-gradient(170deg, #121c40, #070b1e); font: 14px/1.6 "Microsoft JhengHei", sans-serif; }
+.save-backup-dialog::backdrop { background: #03121bcc; }
+.save-backup-dialog h2 { margin: 0 0 8px; font: 700 20px/1.3 "DFKai-SB", "KaiTi", serif; letter-spacing: 3px; color: #f3dca4; }
+.save-backup-dialog p { margin: 4px 0; }
+.save-backup-warn { color: #ffd7b7; }
+.save-backup-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+.save-backup-actions button { min-height: 40px; padding: 6px 18px; border-radius: 999px; border: 1px solid #e2c27e88; background: #ffffff0d; color: #f3dca4; font: inherit; cursor: pointer; }
+.save-backup-actions button.primary { color: #2a1a08; font-weight: 700; background: linear-gradient(#fff1c8, #d9ad5c); border-color: #fff1c8; }
+@media (max-height: 520px) { .save-backup-row { margin-top: 6px; font-size: 11px; } .save-backup-row button { min-height: 28px; padding: 2px 12px; } }

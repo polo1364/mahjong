@@ -3,8 +3,9 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const http=require('node:http');
-const {chromium}=require('playwright');
-test('expedition IndexedDB settlements, events, aborts, stale tabs and old saves',async()=>{
+const {playwright,skipReason}=require('./optional-playwright.cjs');
+const {chromium}=playwright||{};
+test('expedition IndexedDB settlements, events, aborts, stale tabs and old saves',{skip:skipReason},async()=>{
   const server=http.createServer((req,res)=>res.end('<title>isolated expedition storage</title>'));
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const browser=await chromium.launch({headless:true});
