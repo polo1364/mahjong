@@ -11,6 +11,10 @@ BACKUP = os.path.join(os.path.dirname(ROOT), 'mahjong-original-assets')
 # Longest side in pixels for each folder (None keeps the size, 0.5 halves it); first match wins.
 RULES = [
     ('assets/pwa', 'skip'), ('assets/cultivation-preview', 'skip'), ('assets/audio', 'skip'),
+    # 2026-10-28 art requests (docs/ART_REQUESTS_2026-10-28.md).
+    ('assets/cultivation-expedition/regions', 1536), ('assets/cultivation-expedition/events', 768),
+    ('assets/cultivation-progression/realms', 256), ('assets/cultivation-progression/skills', 256),
+    ('assets/cultivation-progression/trial', 1280), ('assets/cultivation-equipment/seals', 256),
     ('assets/cultivation-journey/monsters', 768), ('assets/cultivation-journey/heroes', 768),
     ('assets/cultivation-journey/npcs', 384), ('assets/cultivation-journey/slots', 256),
     ('assets/cultivation-journey', 1600),

@@ -9,3 +9,19 @@
 .cult-expedition-title{white-space:nowrap;letter-spacing:0;color:#e3d5a5}
 html.cultivation-mode #cultivationMonster .cult-monster-top small:has(.cult-expedition-title){letter-spacing:0}
 @media(max-height:500px){.expedition-card{font-size:12px;padding:8px}.expedition-card h2{font-size:18px}.expedition-result{font-size:11px;padding:3px 0}}
+/* Event choices: icon chips for every cost and reward. */
+.exp-trade{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.exp-trade>b{color:#e2c27e;font-weight:400;padding:0 2px}
+.exp-res{display:inline-flex;align-items:center;gap:4px;padding:1px 8px 1px 2px;border-radius:999px;background:#ffffff10;border:1px solid #ffffff1a;font-weight:600;white-space:nowrap}
+.exp-res img{width:24px;height:24px;object-fit:contain}
+.exp-coin{display:grid;place-items:center;width:20px;height:20px;margin:2px;border-radius:50%;font:700 11px/1 "DFKai-SB","KaiTi",serif;font-style:normal;color:#2a1a08}
+.exp-coin-gold{background:radial-gradient(circle at 35% 30%,#fff1c8,#d9ad5c 70%)}
+.exp-coin-gold::before{content:'金'}.exp-coin-sand::before{content:'砂'}
+.exp-coin-sand{background:radial-gradient(circle at 35% 30%,#d8fbf4,#6fbcae 70%)}
+/* Boss choice: portrait cards. */
+.exp-boss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.expedition-card button.exp-boss-card{display:flex;align-items:center;gap:10px;padding:6px 10px}
+.exp-boss-card img{flex:none;width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid #e2c27e55;background:#0b1d24}
+.exp-boss-card strong,.exp-boss-card small{display:block}.exp-boss-card small{font-size:12px;color:#bfd3cc}
+@media(max-height:500px){.exp-res img{width:20px;height:20px}.exp-boss-card img{width:44px;height:44px}.exp-boss-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+.expedition-card button .exp-res{display:inline-flex;font-size:inherit}

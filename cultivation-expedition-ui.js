@@ -10,6 +10,16 @@
     'weapon-stone': '淬鋒石', 'armor-stone': '鍛甲石', 'accessory-stone': '蘊靈石', luck: '祈運符', preserve: '鎮器保級符' };
   const effectText = effect => (effect ? Object.entries(effect).filter(([key]) => kinds[key]).map(([key, value]) => `${kinds[key]} ${percent(value)}`).join('、') : '');
   const resourceText = values => Object.entries(values).map(([key, value]) => `${resources[key] || key} ×${value}`).join('、');
+  const imageURL = value => (root.MahjongImageURL ? root.MahjongImageURL(value) : value);
+  // Each resource as an icon chip: item art where it exists, a small seal for 金幣／靈砂.
+  function resourceChips(values) {
+    return Object.entries(values).map(([key, value]) => {
+      const art = root.MahjongCultivationItems?.get?.(key)?.image;
+      const icon = art ? `<img src="${esc(imageURL(art.replace(/\.png$/, '.webp')))}" alt="" width="24" height="24" loading="lazy" decoding="async">`
+        : `<i class="exp-coin exp-coin-${key === 'sand' ? 'sand' : 'gold'}" aria-hidden="true"></i>`;
+      return `<span class="exp-res">${icon}${esc(resources[key] || key)} ×${value}</span>`;
+    }).join('');
+  }
 
   function title(combat) {
     if (combat.trial) return `渡劫・${root.MahjongCultivationProgression.realms[combat.trial.targetRealm].name}`;
@@ -31,7 +41,7 @@
   function choiceButton(combat, choice, pendingEffect) {
     let affordable = true;
     try { X().chooseEvent(combat, choice.id); } catch (_) { affordable = false; }
-    return `<button type="button" data-expedition-event="${choice.id}" ${affordable ? '' : 'disabled data-unaffordable'}><strong>${esc(resourceText(choice.cost) || '接受代價')} → ${esc(resourceText(choice.reward) || '下局加成')}</strong>`
+    return `<button type="button" data-expedition-event="${choice.id}" ${affordable ? '' : 'disabled data-unaffordable'}><strong class="exp-trade">${resourceChips(choice.cost) || '接受代價'}<b aria-hidden="true">→</b>${resourceChips(choice.reward) || '下局加成'}</strong>`
       + (choice.effect ? `<span>下局${esc(effectText(choice.effect))}</span>` : '')
       + (choice.effect && pendingEffect ? '<em>此效果會取代目前待生效的奇遇。</em>' : '')
       + (affordable ? '' : '<span>資源不足</span>') + '</button>';
@@ -44,12 +54,13 @@
   }
   function bossMarkup(expedition, choices) {
     if (!choices.length) return '';
-    return '<div class="expedition-boss"><h3>選擇下場小王</h3>' + choices.map((choice, i) => {
+    return '<div class="expedition-boss"><h3>選擇下場小王</h3><div class="exp-boss-grid">' + choices.map((choice, i) => {
       const monster = root.MahjongCultivationMonsters.get(choice.speciesId);
       const selected = expedition.bossChoice?.speciesId === choice.speciesId && !!expedition.bossChoice.advanced === choice.advanced;
       const label = choice.advanced ? '進階：生命 ×1.15、額外劫晶碎片 ×1' : monster.region ? '地區首領' : '原小王';
-      return `<button type="button" data-expedition-boss="${i}" aria-pressed="${selected}">${esc(monster.name)} · ${label}</button>`;
-    }).join('') + '</div>';
+      const art = monster.thumbnail || monster.image.replace(/\.png$/, '.webp');
+      return `<button type="button" class="exp-boss-card" data-expedition-boss="${i}" aria-pressed="${selected}"><img src="${esc(imageURL(art))}" alt="" width="56" height="56" loading="lazy" decoding="async"><span><strong>${esc(monster.name)}</strong><small>${label}</small></span></button>`;
+    }).join('') + '</div></div>';
   }
   function preparation(host, combat, options = {}) {
     if (!combat.expedition) return;
