@@ -98,7 +98,7 @@
       } else {
         const monster = rect(document.getElementById('cultivationMonster'), bounds);
         // Boss layout: the beast stands in the panel's stage slot, framed by its name plate and intent.
-        const slot = rect(document.querySelector('#cultivationMonster .cult-monster-stage'), bounds);
+        const slot = rect(document.querySelector('#cultivationMonster .cult-monster-body'), bounds) || rect(document.querySelector('#cultivationMonster .cult-monster-stage'), bounds);
         this.inStage = !!(slot && slot.w > 24 && slot.h > 24);
         this.beastSize = this.inStage ? Math.min(slot.w, slot.h * 1.5) : Math.min(190, Math.max(72, this.w * .17));
         const card = monster || { x: this.w / 2 - 60, y: this.h * .4, w: 120, h: 120 };
@@ -111,7 +111,10 @@
             this.target = { x: card.x + card.w / 2, y: Math.max(65, card.y - this.beastSize * .4 - 8) };
         }
         const safe = p => ({ x: Math.max(45, Math.min(this.w - 45, p.x)), y: Math.max(45, Math.min(this.h - 85, p.y)) });
+        this.arenaActive = !!rect(document.getElementById('cultArenaPlayer0'), bounds);
         this.players = Array.from({ length: 4 }, (_, pid) => {
+          const icon = rect(document.getElementById('cultArenaPlayer' + pid), bounds);
+          if (icon) return center(icon);
           const info = rect(document.getElementById('playerInfo' + pid), bounds);
           if (!info) return safe({ x: this.w / 2, y: this.h * .75 });
           const c = center(info), angle = Math.atan2(this.target.y - c.y, this.target.x - c.x);
@@ -286,9 +289,10 @@
       const enemyAura = ['dot', 'debuff', 'mark', 'removeBuff'].includes(item.op) || ['control', 'interrupted', 'kill', 'spawn'].includes(item.type);
       const from = item.type === 'hurt' ? target : actor;
       const to = item.type === 'hurt' ? actor : attack || enemyAura ? target : actor;
-      const size = Math.min(this.w * .32, 125 + item.profile.tier * 22);
+      const iconLabel = this.arenaActive && to === actor, labelDirection = actor.y < target.y ? 1 : -1;
+      const size = this.arenaActive ? Math.min(attack ? 100 : 60, this.beastSize * .8 + item.profile.tier * 8) : Math.min(this.w * .32, 125 + item.profile.tier * 22);
       if (item.type === 'skill' || item.type === 'finisherPart') {
-        this.text(item.label, this.w / 2, this.demo ? 28 : this.bannerY ?? Math.max(32, target.y - 80), Math.sin(progress * Math.PI), '#ffe3a2', this.w < 450 ? 15 : 19); return;
+        this.text(item.label, this.arenaActive ? actor.x : this.w / 2, this.arenaActive ? actor.y : this.demo ? 28 : this.bannerY ?? Math.max(32, target.y - 80), Math.sin(progress * Math.PI), '#ffe3a2', this.arenaActive ? (this.h < 600 ? 12 : 15) : this.w < 450 ? 15 : 19); return;
       }
       if (item.type === 'kill' || item.type === 'spawn') {
         this.texture(item.type === 'kill' ? 'dust' : 'seal', to.x, to.y, size * (1 + progress), 0, (1 - progress) * .7);
@@ -299,7 +303,7 @@
         if (progress > .6 || !attack) {
           const hit=clamp((progress-.6)/.4);
           if(attack){this.texture(item.art.impact,to.x,to.y,size*(.35+hit*.5),0,(1-hit)*.55);this.fragments(to.x,to.y,hit,item,size*.5);}
-          this.text(item.label,to.x,to.y-35-hit*24,Math.min(1,(1-progress)*4),item.art.color,attack?21:14);
+          this.text(item.label,to.x,iconLabel?to.y+labelDirection*(12+hit*6):to.y-35-hit*24,Math.min(1,(1-progress)*4),item.art.color,attack?21:14);
         }
         return;
       }
@@ -318,7 +322,7 @@
         this.texture(item.art.impact, to.x, to.y, size * (reduced ? .64 : .55 + hit * .65), reduced ? 0 : hit * .25, (1 - hit) * .95);
         if (!reduced) this.fragments(to.x, to.y, hit, item, size * .65);
         const label = item.type === 'hurt' && item.absorbed ? `${item.label} · 擋 ${Math.round(item.absorbed)}` : item.label;
-        this.text(label, to.x, to.y - 28 - (reduced ? 0 : hit * 30), Math.min(1, (1 - hit) * 2.5), item.type === 'hurt' ? '#ffb5a0' : item.art.color, item.type === 'damage' ? 21 : 14);
+        this.text(label, to.x, iconLabel ? to.y + labelDirection * (12 + (reduced ? 0 : hit * 6)) : to.y - 28 - (reduced ? 0 : hit * 30), Math.min(1, (1 - hit) * 2.5), item.type === 'hurt' ? '#ffb5a0' : item.art.color, item.type === 'damage' ? 21 : 14);
       }
     }
     draw(now) {

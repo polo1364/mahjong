@@ -461,6 +461,43 @@ html.feedback-reduced .discard-spotlight { animation: none; }
 .cult-insight .ins-detail { padding: 1px 0 1px 10px; position: relative; color: #d3dde4; font-size: 11.5px; }
 .cult-insight .ins-detail::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; transform: rotate(45deg); background: #e2c27e; }
 .cult-insight .ins-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px; padding-top: 6px; border-top: 1px solid #e2c27e44; }
+
+/* Four combat portraits share the existing boss stage; no extra seat-card content. */
+html.cultivation-mode #cultivationMonster.cult-monster { --boss-stage: 250px; }
+html.cultivation-mode #cultivationMonster .cult-monster-stage { position: relative; height: var(--boss-stage); min-height: 0; overflow: visible; }
+.cult-monster-body { position: absolute; inset: 64px 72px; pointer-events: none; }
+.cult-arena-player { --portrait: 44px; position: absolute; width: 72px; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; }
+.cult-arena-player[data-pid="0"] { left: 50%; bottom: 0; transform: translateX(-50%); }
+.cult-arena-player[data-pid="1"] { left: 50%; top: 0; transform: translateX(-50%); }
+.cult-arena-player[data-pid="2"] { left: 0; top: 50%; transform: translateY(-50%); }
+.cult-arena-player[data-pid="3"] { right: 0; top: 50%; transform: translateY(-50%); }
+.cult-arena-portrait { width: var(--portrait); height: var(--portrait); display: grid; place-items: center; border: 1px solid #d8b56a; border-radius: 50%; background: radial-gradient(circle at 40% 30%,#2b4b54,#081c28); box-shadow: 0 2px 8px #0009; position: relative; }
+.cult-arena-art { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
+.cult-arena-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; transform: scale(1.65); transform-origin: center 15%; }
+.cult-arena-player > b { max-width: 100%; font: 600 11px/1.2 "Microsoft JhengHei",sans-serif; color: #f6e4b5; white-space: nowrap; text-shadow: 0 1px 3px #000; }
+.cult-arena-hp { height: 3px; width: 42px; background: #071c21; border: 1px solid #aa925f88; border-radius: 3px; overflow: hidden; }
+.cult-arena-hp i { display: block; height: 100%; background: #8bd6aa; }
+.cult-arena-player.has-shield .cult-arena-portrait { box-shadow: 0 0 0 3px #75bcf855,0 0 12px #75bcf877; }
+.cult-arena-player.is-weak .cult-arena-portrait img { filter: grayscale(1); opacity: .55; }
+.cult-arena-player.is-turn .cult-arena-portrait { outline: 2px solid #9ff1fb; outline-offset: 2px; }
+.cult-arena-player.is-turn .cult-arena-portrait::after { content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 10px; height: 7px; background: #ffe5a1; clip-path: polygon(0 0,50% 40%,100% 0,100% 45%,50% 100%,0 45%); }
+@media (max-height: 950px) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-stage: 210px; } }
+@media (max-height: 820px) { html.cultivation-mode #cultivationMonster.cult-monster { --boss-stage: 220px; } }
+@media (min-height: 600px) and (max-height: 820px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 560px; display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 4px 12px; }
+  html.cultivation-mode #cultivationMonster.cult-monster > * { grid-column: 2; }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 5; }
+}
+@media (max-height: 599px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 420px; --boss-stage: 154px; grid-template-columns: 200px minmax(0,1fr); }
+  .cult-monster-body { inset: 48px 50px; }
+  .cult-arena-player { --portrait: 30px; width: 48px; gap: 1px; }
+  .cult-arena-player > b { font-size: 9px; }
+  .cult-arena-hp { width: 29px; }
+}
+@media (max-width: 700px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 340px; grid-template-columns: 160px minmax(0,1fr); }
+}
 .cult-insight .ins-total span { color: #f3dca4; font-weight: 700; } .cult-insight .ins-total b { font: 800 22px/1 "Segoe UI", sans-serif; color: #fff1cf; }
 .cult-insight .ins-combo { margin-top: 5px; font-size: 11.5px; color: #9fd9e6; } .cult-insight .ins-combo b { color: #f3dca4; }
 @media (max-width: 700px) { .cult-insight { width: min(300px, calc(100vw - 24px)); } }

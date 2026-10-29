@@ -17,7 +17,7 @@ function harness(){
  const listeners={},frames=new Map(),nodes=new Map(),voices=[],context2d=new Proxy({drawImage:(image,...args)=>draws.push({image,args})},{get:(o,k)=>o[k]||(()=>{})});let frameId=0;
  const node=()=>({dataset:{},style:{},getContext:()=>context2d,getBoundingClientRect:()=>({left:0,top:0,width:800,height:500}),getClientRects:()=>[{}],setAttribute(){},append(){},remove(){},set width(v){this._width=v;resizeWrites++;},get width(){return this._width;},set height(v){this._height=v;resizeWrites++;},get height(){return this._height;}});
  nodes.set('playersGrid',node());
- const document={currentScript:{src:'http://localhost/cultivation-monster-effects.js'},hidden:false,body:node(),querySelectorAll:()=>[],getElementById:id=>nodes.get(id),createElement:()=>node(),addEventListener:(name,fn)=>listeners[name]=fn};
+ const document={currentScript:{src:'http://localhost/cultivation-monster-effects.js'},hidden:false,body:node(),querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>nodes.get(id),createElement:()=>node(),addEventListener:(name,fn)=>listeners[name]=fn};
  const prefs={enabled:true,volume:.5};
  const root={MahjongMonsterSkills:K,MahjongMonsterPresentation:P,MahjongCultivationPresentation:Player,MahjongCultivationMonsters:M,MahjongAudio:{getState:()=>prefs},addEventListener(){}};
  class Audio{constructor(src){this.src=src;this.dataset={};this.paused=true;voices.push(this);}addEventListener(){}play(){this.paused=false;return Promise.resolve();}pause(){this.paused=true;}remove(){}}

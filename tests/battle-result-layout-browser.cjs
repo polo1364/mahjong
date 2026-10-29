@@ -61,7 +61,8 @@ async function result(page,label){
     const browser=await engine.launch({headless:true});try{
       const context=await browser.newContext({viewport:{width:844,height:390},hasTouch:true,serviceWorkers:'block'}),page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
       await page.goto(url);await page.waitForFunction(()=>MahjongStartScreen?.state==='home'&&!document.querySelector('#startGameBtn').disabled);await page.locator('#startGameBtn').click();await page.locator('#cultivationModeBtn').click();await page.locator('#journeyChooseConfirm').click();await page.locator('.opening-skip').click({timeout:10000}).catch(()=>{});await page.waitForFunction(()=>S?.phase==='play'&&S.cultivation);
-      await page.evaluate(()=>{cancelGameTimers();window.layoutBattleOriginal=JSON.parse(JSON.stringify(S));S.turn=0;S.waitReact=null;renderAll();cancelGameTimers();});
+      await page.waitForFunction(()=>!MahjongImages.isLoading());await page.getByRole('button',{name:'知道了',exact:true}).click();
+      await page.evaluate(()=>{cancelGameTimers();window.layoutBattleOriginal=JSON.parse(JSON.stringify(S));S.turn=0;S.waitReact=null;renderAll();cancelGameTimers(true);});
       for(const [width,height]of [[568,320],[667,375],[844,390],[942,435],[1440,900]]){
         await page.setViewportSize({width,height});await page.waitForTimeout(160);await battle(page,`${engineName}-${width}x${height}`);
         await page.evaluate(()=>showReactionPanel(['hu','chow','pong','kong'].map(type=>({type,pid:0}))));await page.waitForTimeout(320);const reactionIssues=await controls(page,'#controls');

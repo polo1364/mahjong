@@ -51,7 +51,7 @@
 /* ---------- Claim buttons: the hu button never stretches ---------- */
 html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-size: 30px !important; letter-spacing: 0; }
 @media (min-height: 521px) {
-  html.cultivation-mode .bottom-area #controls.table-actions { bottom: calc(100% + 4px) !important; }
+  html.cultivation-mode .bottom-area #controls.table-actions { bottom: calc(100% - 8px) !important; }
 }
 /* Short landscape screens: smaller buttons at the right end of the hand, clear of the monster in the centre. */
 @media (max-height: 520px) and (orientation: landscape) {
@@ -63,19 +63,23 @@ html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-s
 /* ---------- Phone landscape: monster panel as one tidy card ---------- */
 @media (max-height: 520px) and (orientation: landscape) {
   html.cultivation-mode #cultivationMonster.cult-monster {
-    --boss-w: 300px; grid-template-columns: 84px minmax(0, 1fr) !important; column-gap: 8px; row-gap: 3px; padding: 6px 10px 6px 4px;
+    --boss-w: 420px; grid-template-columns: 200px minmax(0, 1fr); grid-template-rows: repeat(5, max-content) minmax(0, 1fr); column-gap: 8px; row-gap: 0; padding: 6px 10px 6px 4px;
     border-radius: 14px; border: 1px solid #e2c27e44;
     /* The monster is painted on the effects layer underneath: keep its column see-through. */
-    background: radial-gradient(ellipse 60% 70% at 46px 50%, color-mix(in srgb, var(--element) 26%, transparent), transparent 70%), linear-gradient(90deg, transparent 0 92px, #0c1b22e0 112px, #060f15ea);
+    background: radial-gradient(ellipse 60% 70% at 104px 50%, color-mix(in srgb, var(--element) 26%, transparent), transparent 70%), linear-gradient(90deg, transparent 0 208px, #0c1b22e0 228px, #060f15ea);
     box-shadow: 0 8px 20px #0009; text-shadow: none;
   }
-  html.cultivation-mode #cultivationMonster .cult-monster-stage { min-height: 84px !important; background: none; }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { grid-row: 1 / span 6; background: none; }
   html.cultivation-mode #cultivationMonster .cult-monster-top > span { align-items: flex-start; }
-  html.cultivation-mode #cultivationMonster .cult-monster-top strong { font-size: 17px; letter-spacing: 3px; padding-left: 0; }
-  html.cultivation-mode #cultivationMonster .cult-enemy-bar { height: 12px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top strong { font-size: 15px; letter-spacing: 3px; padding-left: 0; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top strong, html.cultivation-mode #cultivationMonster .cult-monster-top small { line-height: 1.15; }
+  html.cultivation-mode #cultivationMonster .cult-enemy-bar { height: 12px; margin: 0; }
   html.cultivation-mode #cultivationMonster .cult-boss-tags { justify-content: flex-start; }
-  html.cultivation-mode #cultivationMonster .cult-boss-intent { justify-self: start; }
-  html.cultivation-mode #cultivationMonster .cult-boss-turn { justify-content: flex-start; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { justify-self: start; padding: 2px 8px 2px 2px; }
+  html.cultivation-mode #cultivationMonster .cult-intent-icon { width: 22px; height: 22px; font-size: 13px; }
+  html.cultivation-mode #cultivationMonster .cult-boss-turn { justify-content: flex-start; gap: 1px 6px; }
+  html.cultivation-mode #cultivationMonster .cult-countdown, html.cultivation-mode #cultivationMonster .cult-target { font-size: 9px; }
+  html.cultivation-mode #cultivationMonster .cult-target { padding: 0 6px; line-height: 11px; }
 }
 @media (max-height: 350px) and (orientation: landscape) {
   html.cultivation-mode #cultivationMonster.cult-monster { row-gap: 1px; }
@@ -87,19 +91,35 @@ html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-s
   html.cultivation-mode .bottom-area #controls.table-actions #btnHu { width: 44px !important; height: 44px !important; font-size: 18px !important; }
 }
 @media (max-height: 520px) and (max-width: 700px) and (orientation: landscape) {
-  html.cultivation-mode .mahjong-table:has(#controls.table-actions button:not(:disabled)) .center-area { margin-top: -18px; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster.cult-monster {
-    --boss-w: 340px; grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) !important; gap: 2px 6px; padding: 4px;
+  html.cultivation-mode .mahjong-table .center-area { margin-top: -6px; }
+  html.cultivation-mode #cultivationMonster.cult-monster {
+    --boss-w: 340px; --boss-stage: 138px; grid-template-columns: 160px minmax(0, 1fr); column-gap: 6px; padding: 4px;
+    background: linear-gradient(90deg, transparent 0 166px, #0c1b22e0 182px, #060f15ea);
   }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 3; min-height: 28px !important; height: 100%; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-top { grid-column: 2; grid-row: 1; }
+  html.cultivation-mode #cultivationMonster .cult-monster-body { inset: 48px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-extra { font-size: 8px; line-height: 1.2; }
+  html.cultivation-mode #cultivationMonster .cult-attack b { font-size: 9px; }
   html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-monster-top small { white-space: normal; font-size: 8px; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-hp { grid-column: 2; grid-row: 2; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-tags { grid-column: 2; grid-row: 3; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-intent { grid-column: 3; grid-row: 1 / span 2; }
-  html.cultivation-mode:has(#controls.table-actions button:not(:disabled)) #cultivationMonster .cult-boss-turn { grid-column: 3; grid-row: 3; }
 }
 .cfs-cols { display: flex; flex-direction: column; gap: 10px; } .cfs-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+/* The narrowest tables keep the countdown under the arena, clear of claims. */
+@media (max-height: 350px) and (orientation: landscape) {
+  html.cultivation-mode .mahjong-table .center-area { margin-top: 0; }
+  html.cultivation-mode .bottom-area #controls.table-actions { bottom: calc(100% - 6px) !important; }
+  html.cultivation-mode .bottom-area #controls.table-actions button, html.cultivation-mode .bottom-area #controls.table-actions #btnHu { width: 42px !important; height: 42px !important; font-size: 17px !important; }
+  html.cultivation-mode #cultivationMonster.cult-monster { --boss-w: 280px; --boss-stage: 90px; grid-template-columns: 110px minmax(0,1fr); grid-template-rows: repeat(5,max-content); column-gap: 4px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-stage { grid-column: 1; grid-row: 1 / span 4; }
+  html.cultivation-mode #cultivationMonster .cult-monster-body { inset: 32px; }
+  html.cultivation-mode #cultivationMonster .cult-monster-top { grid-column: 2; grid-row: 1; }
+  html.cultivation-mode #cultivationMonster .cult-boss-hp { grid-column: 2; grid-row: 2; }
+  html.cultivation-mode #cultivationMonster .cult-boss-tags { grid-column: 2; grid-row: 3; }
+  html.cultivation-mode #cultivationMonster .cult-boss-intent { grid-column: 2; grid-row: 4; padding: 2px; }
+  html.cultivation-mode #cultivationMonster .cult-boss-turn { grid-column: 1; grid-row: 5; transform: translateX(24px); }
+  html.cultivation-mode #cultivationMonster .cult-countdown { flex-wrap: wrap; gap: 1px 4px; font-size: 8px; }
+  .cult-arena-player { --portrait: 20px; width: 32px; }
+  .cult-arena-player > b { font-size: 7px; }
+  .cult-arena-hp { height: 2px; width: 24px; }
+}
 .cult-finish-sheet .cfs-seal-card header { position: static; padding: 0; background: none; border: 0; }
 @media (max-height: 520px) and (min-width: 700px) {
   .cult-information.cult-finish-sheet { width: min(900px, calc(100vw - 24px)); }

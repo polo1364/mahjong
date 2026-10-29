@@ -25,8 +25,9 @@
    const rect=node=>{if(!node?.getClientRects().length)return null;const r=node.getBoundingClientRect();return{x:r.left-b.left,y:r.top-b.top,w:r.width,h:r.height};};
    if(this.demo){this.source={x:this.w*.5,y:this.h*.24};this.targets=[{x:this.w*.5,y:this.h*.79},{x:this.w*.16,y:this.h*.57},{x:this.w*.84,y:this.h*.57},{x:this.w*.73,y:this.h*.23}];this.exclusions=[];}
    else{const m=rect(document.getElementById('cultivationMonster'))||{x:this.w*.4,y:this.h*.4,w:140,h:100},size=Math.min(190,Math.max(72,this.w*.17));this.source={x:m.x+m.w+size*.48+9,y:m.y+m.h*.46};if(this.source.x+size/2>this.w-68)this.source={x:m.x+m.w/2,y:Math.max(65,m.y-size*.4-8)};
-    this.targets=Array.from({length:4},(_,pid)=>{const r=rect(document.getElementById('playerInfo'+pid))||{x:this.w/2,y:this.h*.75,w:0,h:0};const x=r.x+r.w/2,y=r.y+r.h/2,angle=Math.atan2(this.source.y-y,this.source.x-x);return{x:Math.max(40,Math.min(this.w-40,x+Math.cos(angle)*(r.w/2+30))),y:Math.max(40,Math.min(this.h-85,y+Math.sin(angle)*(r.h/2+32)))};});
-    this.exclusions=[...document.querySelectorAll('#yourHand,[id^="handBack"],[id^="playerInfo"],#cultivationMonster,.actions,.reaction-panel,#tableMenuBtn')].map(rect).filter(Boolean);
+    const body=rect(document.querySelector('#cultivationMonster .cult-monster-body'));this.arenaSize=body?Math.min(75,Math.max(42,body.h)):null;if(body)this.source={x:body.x+body.w/2,y:body.y+body.h/2};
+    this.targets=Array.from({length:4},(_,pid)=>{const icon=rect(document.getElementById('cultArenaPlayer'+pid));if(icon)return{x:icon.x+icon.w/2,y:icon.y+icon.h/2};const r=rect(document.getElementById('playerInfo'+pid))||{x:this.w/2,y:this.h*.75,w:0,h:0};const x=r.x+r.w/2,y=r.y+r.h/2,angle=Math.atan2(this.source.y-y,this.source.x-x);return{x:Math.max(40,Math.min(this.w-40,x+Math.cos(angle)*(r.w/2+30))),y:Math.max(40,Math.min(this.h-85,y+Math.sin(angle)*(r.h/2+32)))};});
+    this.exclusions=[...document.querySelectorAll('#yourHand,[id^="handBack"],[id^="playerInfo"],#cultivationMonster > :not(.cult-monster-stage),.actions,.reaction-panel,#tableMenuBtn')].map(rect).filter(Boolean);
    }
   }
   texture(name,x,y,size,rotation=0,alpha=1,stretch=1,beast=null){const sprite=P.sprites[name],entry=images.get(name==='beast'?'beast:'+beast:sprite?sprite[0]:name),img=entry?.image;if(!img)return;
@@ -42,7 +43,7 @@
    this.runs.push({event,hits,monster,start,played:false});this.runs=this.runs.slice(-6);this.canvas.dataset.events=String(Number(this.canvas.dataset.events||0)+1);this.canvas.dataset.lastSkill=event.skillId;this.canvas.dataset.targets=event.targets.join(',');this.wake();}
   wake(){if(!this.frame)this.frame=requestAnimationFrame(t=>this.draw(t));}
   layer(l,t,target,beast){const u=(t-l.start)/(l.end-l.start);if(u<0||u>1)return;const from=this.source,to=target,e=1-Math.pow(1-u,3),distance=Math.hypot(to.x-from.x,to.y-from.y),angle=Math.atan2(to.y-from.y,to.x-from.x);
-   const baseSize=Math.min(this.demo?130:110,Math.max(55,this.w*.13))*l.size,fade=Math.min(1,u*8,(1-u)*6);
+   const baseSize=(this.arenaSize??Math.min(this.demo?130:110,Math.max(55,this.w*.13)))*l.size,fade=Math.min(1,u*8,(1-u)*6);
    for(let i=0;i<l.count;i++){const k=l.count===1?0:(i/(l.count-1)-.5),a=i/l.count*Math.PI*2;let x=to.x,y=to.y,rot=0,size=baseSize,stretch=1;
     switch(l.path){
      case'flight':case'fan':case'leap':case'arc':x=mix(from.x,to.x,e);y=mix(from.y,to.y,e);rot=l.sprite==='ice-fangs'?angle-Math.PI/2:l.sprite==='dragon-wave'?angle:angle+Math.PI/2;
@@ -75,10 +76,10 @@
     // A delayed first frame starts picture and sound together; stale attacks stay silent.
     if(!run.played){if(t>.25&&t<=.5){run.start=now;t=0;}run.played=true;if(t<.25)sound(skill,this);}const recipe=R[skill.motion];if(root.MahjongCultivationEffects?.enabled===false&&!this.demo)continue;
     const targets=run.event.targets.map(pid=>this.targets[pid]).filter(Boolean);
-    for(const target of targets){if(reduced.matches){if(t<.35)this.texture(recipe.layers.at(-1).sprite,target.x,target.y,75,0,1,1,run.monster.speciesId);}
+    for(const target of targets){if(reduced.matches){if(t<.35)this.texture(recipe.layers.at(-1).sprite,target.x,target.y,this.arenaSize??75,0,1,1,run.monster.speciesId);}
      else for(const layer of recipe.layers){if(target!==targets[0]&&['source','source-rise','source-orbit','windup'].includes(layer.path))continue;this.layer(layer,t,target,run.monster.speciesId);}
     }
-    if(t>.7&&t<1.8)for(const hit of run.hits){const p=this.targets[hit.pid];this.text(this.demo?'演出示意':`−${hit.amount}${hit.absorbed?' · 盾 '+hit.absorbed:''}`,p.x,p.y-18-(t-.7)*10,'#ffd4b5');}
+    if(t>.7&&t<1.8)for(const hit of run.hits){const p=this.targets[hit.pid],y=this.arenaSize?p.y+(p.y<this.source.y?1:-1)*(12+(t-.7)*6):p.y-18-(t-.7)*10;this.text(this.demo?'演出示意':`−${hit.amount}${hit.absorbed?' · 盾 '+hit.absorbed:''}`,p.x,y,'#ffd4b5');}
     if(this.demo&&t<1.85)this.text(run.event.name||skill.name,this.w/2,22);
    }
    c.restore();syncPreferences();this.canvas.dataset.running=String(this.runs.length>0);if(this.runs.length)this.wake();
