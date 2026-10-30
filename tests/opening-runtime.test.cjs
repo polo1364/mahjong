@@ -61,7 +61,7 @@ function openingGame(seed = 3, withOpening = true) {
         return nodes.get(id);
       },
       createElement: makeNode, head: makeNode(), body: makeNode(),
-      addEventListener() {}, querySelectorAll: () => []
+      addEventListener() {}, querySelector: () => null, querySelectorAll: () => []
     },
     window: {
       addEventListener() {}, AudioContext: function () {},

@@ -109,7 +109,7 @@ test('normal mode and narrator cues never route to character voices, invalid her
 test('engine captures actor hero ID rather than the current turn and keeps preview overrides', () => {
   const {run}=game(23,{cultivation:true,heroId:'su-lingheng'});
   run('soundEnabled=true;voiceEnabled=true;window.recorded=[];window.MahjongVoice={play:(cue,options)=>window.recorded.push({cue,options})};');
-  run("S.turn=2;playVoice('tile-w1',{pid:0});playVoice('pong',{pid:1});playVoice('win',{pid:3});playVoice('chow',{heroId:'hua-jianlu'});");
+  run("S.turn=2;playVoice('tile-w1',{pid:0});playVoice('tile-b1',{pid:1});playVoice('ready',{pid:3});playVoice('tile-t1',{heroId:'hua-jianlu'});");
   assert.equal(run('window.recorded[0].options.heroId'),'su-lingheng');
   assert.equal(run('window.recorded[1].options.heroId'),run('S.cultivation.players[1].heroId'));
   assert.equal(run('window.recorded[2].options.heroId'),run('S.cultivation.players[3].heroId'));
@@ -289,12 +289,13 @@ test('game voice gates block hidden events, honor both controls, and recover in 
   assert.equal(run('announced.length'), 2);
 });
 
-test('game routes only cultivation hands to chants while keeping display and cue names unchanged', () => {
+test('cultivation committed skills replace legacy action calls while normal calls and ready stay available', () => {
   const {run}=recordedGame();
-  run(`playVoice('chow');S.cultivation={};playVoice('pong');playVoice('flower',{tileKey:'H3'});S.cultivation=null;playVoice('win');`);
-  assert.equal(run('announced.join(",")'),'chow,pong,flower,win');
-  assert.equal(run('announcedOptions.map(o=>o.cultivation).join(",")'),'false,true,true,false');
-  assert.equal(run('announcedOptions[2].tileKey'),'H3');
+  run(`playVoice('chow');S.cultivation={};
+    for(const cue of ['chow','pong','kong','concealed-kong','win','self-draw','flower']) playVoice(cue,{tileKey:'H3'});
+    playVoice('ready');S.cultivation=null;playVoice('win');`);
+  assert.equal(run('announced.join(",")'),'chow,ready,win');
+  assert.equal(run('announcedOptions.map(o=>o.cultivation).join(",")'),'false,true,false');
 });
 
 test('game forwards public flower keys while initial dealing never queues flower names', () => {

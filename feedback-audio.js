@@ -149,6 +149,7 @@
       enabled = Boolean(value);
       if (!enabled) stopAll();
       syncAmbience();
+      window.MahjongMusic?.syncPreferences();
     },
     setVolume(value) {
       if (typeof value !== 'number' || !Number.isFinite(value)) return;
@@ -158,6 +159,7 @@
       });
       if (!volume) stopAll();
       syncAmbience();
+      window.MahjongMusic?.syncPreferences();
     },
     setDucked(value) {
       ducked = Boolean(value);
@@ -165,6 +167,7 @@
         voice.audio.volume = volume * HEADROOM * CUES[voice.cue].gain * (ducked ? .28 : 1);
       });
       if (ambience) ambience.volume = ambienceVolume();
+      window.MahjongMusic?.syncPreferences();
     },
     setAmbience(value) {
       ambienceWanted = Boolean(value);

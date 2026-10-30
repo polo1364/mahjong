@@ -26,6 +26,7 @@
     dialog.className = `journey-screen ${className}`;
     dialog.setAttribute('aria-labelledby', 'journeyTitle');
     dialog.innerHTML = `<div class="journey-wrap"><header class="journey-header"><div><p>上古神兵 · 修仙論道</p><h1 id="journeyTitle" tabindex="-1">${esc(title)}</h1></div><span class="journey-chapter">CULTIVATION JOURNEY</span></header>${content}</div>`;
+    root.MahjongCultivationTerms?.render(dialog, true);
     document.body.append(dialog);
     current = dialog;
     dialog.showModal();
@@ -56,6 +57,7 @@
     const update = () => {
       dialog.querySelector('.journey-selected-art').innerHTML = `<picture><source media="(max-width: 1000px)" srcset="${esc(selected.thumbnail)}"><img src="${esc(imageURL(selected.image))}" alt="${esc(selected.name)}" width="480" height="520" decoding="async"></picture>`;
       dialog.querySelector('#journeyHeroDetails').innerHTML = heroDetails(selected);
+      root.MahjongCultivationTerms?.render(dialog.querySelector('#journeyHeroDetails'), true);
       dialog.querySelector('#journeyChooseConfirm').textContent = `與${selected.name}啟程 →`;
       dialog.querySelectorAll('[data-hero]').forEach(button => {
         const active = button.dataset.hero === selected.id;

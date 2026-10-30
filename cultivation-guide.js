@@ -8,7 +8,7 @@
   const openDialog = () => [...document.querySelectorAll('dialog[open]')].pop() || null;
   const prepOpen = () => document.querySelector('dialog.journey-preparation-screen[open]');
   const tips = [
-    { id: 'table', title: '牌桌即戰場', text: '每次出牌都會普攻怪物；吃、碰、槓會施放牌組技能，胡牌則打出終式連招。怪物卡上的倒數歸零時，它會攻擊仇恨最高的道友。',
+    { id: 'table', title: '牌桌即戰場', literal: true, text: '每次出牌都會普攻怪物；吃（引氣）、碰（聚靈）、槓（開陣）會施放牌組技能，胡牌（決勝）則打出終式連招。怪物卡上的倒數歸零時，它會攻擊仇恨最高的道友。',
       when: () => { const s = game(); return s?.cultivation && !s.cultivation.trial && s.phase === 'play' && !openDialog(); } },
     { id: 'result', title: '修為與歷練評分', text: '每局完成都有修為，累積到門檻可挑戰渡劫提升境界。歷練評分看戰鬥貢獻、牌局操作與胡牌，近三局平均達 60、75 分會永久解鎖該地區的稀有奇遇與進階首領。',
       when: () => !!document.querySelector('.result-panel .expedition-result, .result-panel .progression-result') },
@@ -35,7 +35,8 @@
     current = tip;
     card = document.createElement('aside');
     card.className = 'cult-guide'; card.setAttribute('role', 'status'); card.setAttribute('aria-live', 'polite');
-    card.innerHTML = `<p class="cult-guide-kicker">修仙指引</p><h3>${tip.title}</h3><p>${tip.text}</p><button type="button">知道了</button>`;
+    card.innerHTML = `<p class="cult-guide-kicker">修仙指引</p><h3>${tip.title}</h3><p${tip.literal ? ' data-cultivation-preserve' : ''}>${tip.text}</p><button type="button">知道了</button>`;
+    root.MahjongCultivationTerms?.render(card, true);
     card.querySelector('button').onclick = close;
     (openDialog() || document.body).append(card);
   }

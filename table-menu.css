@@ -405,6 +405,13 @@ html:not(.cultivation-mode) #tableMenu #tmPage-voice .hero-voice-preview { displ
   html:not(.cultivation-mode) #tableMenu #tmPage-voice .hero-voice-preview { display: none; }
 }
 
+/* Keep all five sound controls reachable on short landscape phones. */
+@media (max-height: 360px) {
+  #tableMenu #tmPage-sound .tm-page-head { display: none; }
+  #tableMenu #tmPage-sound .pref-row { min-height: 40px; padding: 2px 0; }
+  #tableMenu #tmPage-sound .pref-row-wide { grid-template-columns: minmax(0, 1fr) minmax(100px, 1.5fr); gap: 12px; }
+}
+
 /* App version label and update banner */
 .app-version { position: absolute; right: 14px; bottom: 8px; font: 11px/1 "Segoe UI", "Microsoft JhengHei", sans-serif; color: #8f9cb6; letter-spacing: .5px; pointer-events: none; opacity: .85; }
 #tableMenu .table-menu-heading { position: relative; }

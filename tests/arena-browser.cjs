@@ -41,7 +41,7 @@ const report={passed:false,cases:[],errors:[]};let server;
      await page.waitForFunction(e=>window.arenaTexts.some(t=>t.text===e.label&&Math.abs(t.x-e.x)<1&&Math.abs(t.y-e.y)<1),expected);
      await page.screenshot({path:path.join(out,`arena-${engineName}-${width}-${pid}-cast.png`)});
      await page.waitForFunction(e=>window.arenaTexts.some(t=>t.text===e.damage&&Math.abs(t.x-e.monsterX)<1&&t.y<e.monsterY),expected);
-     if(expected.heal)await page.waitForFunction(e=>window.arenaTexts.some(t=>t.text===e.heal&&Math.abs(t.x-e.x)<1&&t.y<e.y),expected);
+     if(expected.heal)await page.waitForFunction(e=>window.arenaTexts.some(t=>t.text===e.heal&&Math.abs(t.x-e.x)<1&&Math.abs(t.y-e.y)<40),expected);
     }
     // A committed visual fixture targets all four players; no game state is changed.
     const hitTargets=await page.evaluate(()=>{

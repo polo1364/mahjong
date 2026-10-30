@@ -261,6 +261,7 @@
       copy.append(tileRow(context.tiles));
     }
     element.append(copy);
+    window.MahjongCultivationTerms?.render(element, typeof S !== 'undefined' && !!S?.cultivation, { names: context?.name ? [context.name] : [] });
     document.body.append(element);
     active = element;
     place(element);

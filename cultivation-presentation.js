@@ -37,14 +37,14 @@
     seasons: 'orbs', gentlemen: 'leaves', dealer: 'bell', streak: 'pillar', seven: 'orbs', eight: 'orbs'
   };
   function hash(text) { return [...String(text)].reduce((v, c) => (v * 31 + c.charCodeAt(0)) >>> 0, 7); }
-  function profile(id, secret = false) {
+  function profile(id, secret = false, heroId = null) {
     if (secret) return { id: 'secret', name: '秘術', element: 'neutral', tier: 2, variant: 0, motion: 'orbit', form: 'brand', rank: 1, beats: 3, projectile: 'seal', impact: 'light', sound: 'seal' };
     const finisher = id?.startsWith('finisher:') && Finishers.get(id.slice(9));
     const skill = Skills.get(id);
     if (!skill && !finisher) return { id: 'basic', name: '普攻', element: 'neutral', tier: 0, variant: 0, motion: 'bolt', form: 'bolt', rank: 1, beats: 1 };
     const tier = finisher ? 4 : ({ chow: 1, pong: 2, exposed: 3, concealed: 3, added: 3, flower: 1, formation: 4, finish: 4 }[skill.action] || 1);
     const variant = hash(id);
-    const result = { id, name: (finisher || skill).name, element: skill?.element || 'neutral', tier, variant,
+    const result = { id, name: root.MahjongHeroSkillVoices?.name(heroId, id) || (finisher || skill).name, element: skill?.element || 'neutral', tier, variant,
       motion: finisher ? 'fall' : ({ chow: 'arc', pong: 'bolt', exposed: 'fall', concealed: 'orbit', added: 'spiral', flower: 'bloom', formation: 'orbit' }[skill.action] || 'bolt') };
     if (finisher) result.projectile = finisherShapes[finisher.id];
     else if (skill.family === 'honor') result.projectile = ({ FE: 'dragon', FS: 'phoenix', FW: 'tiger', FN: 'tortoise', DC: 'phoenix', DF: 'vines', DB: 'bell' })[skill.combo];
@@ -84,23 +84,25 @@
     return { projectile, impact, sound, form, color: e.color };
   }
   const statusNames = { heal: '回復', shield: '護盾', cleanse: '淨化', control: '封鎖', interrupted: '打斷', hurt: '受擊', ailment: '異常', kill: '擊破', spawn: '妖獸現身' };
-  function plan(effects) {
+  function plan(effects, before = null) {
     let current = profile(null), cursor = 0, segment = null, hitIndex = 0;
     const items = [];
     for (const effect of effects || []) {
+      const heroId = before?.players?.[effect.pid]?.heroId;
       if (effect.monsterSkillId && ['hurt', 'ailment'].includes(effect.type)) continue;
-      if (effect.type === 'skill') { current = profile(effect.skillId, effect.secret); segment = null; hitIndex = 0; }
-      if (effect.type === 'finisherPart') { current = profile('finisher:' + effect.segmentId); segment = effect.segmentId; hitIndex = 0; }
+      if (effect.type === 'skill') { current = effect.secret ? profile(null, true) : profile(effect.skillId, false, heroId); segment = null; hitIndex = 0; }
+      if (effect.type === 'finisherPart') { current = profile('finisher:' + effect.segmentId, false, heroId); segment = effect.segmentId; hitIndex = 0; }
       if (!['skill', 'finisherPart', 'damage', 'heal', 'shield', 'control', 'aura', 'cleanse', 'hurt', 'ailment', 'interrupted', 'kill', 'spawn'].includes(effect.type)) continue;
       if (['heal', 'shield', 'cleanse'].includes(effect.type) && !(effect.amount > 0)) continue;
       let recipe = current;
-      if (effect.type === 'damage' && (effect.source === 'basic' || effect.secondary)) recipe = profile(effect.skillId, effect.secret);
+      if (effect.type === 'damage' && (effect.source === 'basic' || effect.secondary)) recipe = effect.secret ? profile(null, true) : profile(effect.skillId, false, heroId);
       // Never use a private meld key or recipe to animate opponents' concealed kongs.
       if (effect.secret) recipe = profile(null, true);
-      const item = { ...effect, profile: recipe, at: cursor, duration: effect.type === 'damage' ? 900 : 760,
-        element: effect.element || recipe.element, segmentId: effect.segmentId || segment, hitIndex: effect.type === 'damage' ? hitIndex++ : 0 };
+      const visible = effect.secret ? Object.fromEntries(Object.keys(effect).filter(key => !['skillId', 'name', 'element'].includes(key)).map(key => [key, effect[key]])) : effect;
+      const item = { ...visible, profile: recipe, at: cursor, duration: effect.type === 'damage' ? 900 : 760,
+        element: effect.secret ? 'neutral' : effect.element || recipe.element, segmentId: effect.segmentId || segment, hitIndex: effect.type === 'damage' ? hitIndex++ : 0 };
       item.label = effect.type === 'damage' ? `${effect.source === 'counter' ? '反擊 ' : effect.source === 'dot' ? '持續 ' : effect.source === 'followup' ? '追擊 ' : ''}${Math.round(effect.amount)}`
-        : effect.type === 'skill' || effect.type === 'finisherPart' ? effect.name
+        : effect.type === 'skill' || effect.type === 'finisherPart' ? recipe.name
         : statusNames[effect.type] ? statusNames[effect.type] + (effect.amount ? ` ${Math.round(effect.amount)}` : '')
         : effect.op === 'aggro' ? effect.mode === 'reduce' ? '斂息 · 降仇' : '挑釁 · 引妖'
         : effect.op === 'dot' ? '持續印記' : effect.op === 'debuff' ? '破法' : effect.op === 'mark' ? '延遲印記' : effect.op === 'removeBuff' ? '驅散' : '靈力加持';

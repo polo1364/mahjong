@@ -61,7 +61,7 @@
   }
   function filter(rows, options = {}) {
     const terms = String(options.query || '').trim().split(/\s+/).map(normalize).filter(Boolean);
-    return rows.filter(row => (!options.action || row.action === options.action) && (!options.family || row.family === options.family) && (!options.role || row.roles.includes(options.role)) && terms.every(term => row.search.includes(term)));
+    return rows.filter(row => (!options.action || row.action === options.action) && (!options.family || row.family === options.family) && (!options.role || row.roles.includes(options.role)) && terms.every(term => row.search.includes(term) || normalize(root.MahjongCultivationTerms?.format(row.search) || '').includes(term)));
   }
   let dialog = null;
   function close() { if (dialog?.open) dialog.close(); }
@@ -92,10 +92,12 @@
   }
   function open(initial = {}) {
     if (dialog?.open) return;
-    const previous = document.activeElement, rows = records(), selected = new Set();
+    const previous = document.activeElement, selected = new Set();
+    const personalName = row => row.secret ? row.name : root.MahjongHeroSkillVoices?.name(initial.heroId, row.id) || row.name;
+    const rows = records().map(row => initial.secret ? row : { ...row, search: row.search + normalize(' ' + personalName(row)) });
     const single = initial.secret ? { id: 'secret', name: '秘術', action: 'concealed', element: 'neutral', keys: [], combo: '對手暗槓', roles: [], trigger: '暗槓成功時施放', description: '此牌組仍未公開，牌型、技能名稱與數值於結算後公開。', details: ['目前可見的生命、護盾、傷害與仇恨請查看玩家資訊及修仙戰況。', '查閱說明不會重新施放技能。'], secret: true } : rows.find(row => row.id === initial.skillId);
-    if (initial.skillId && !single) return;
-    const related = single ? (initial.related || []).map(item => {
+    if (!initial.secret && initial.skillId && !single) return;
+    const related = single && !single.secret ? (initial.related || []).map(item => {
       const row = rows.find(row => row.id === item.skillId);
       return row ? { ...row, completion: item.status } : null;
     }).filter(Boolean) : [];
@@ -114,10 +116,11 @@
     const modal = dialog, find = selector => modal.querySelector(selector);
     const readFilters = () => ({ query: find('#cultivationSkillSearch').value, family: find('#cultivationFamily').value, action: find('#cultivationAction').value, role: find('#cultivationPurpose').value });
     function card(row) {
+      const name = personalName(row);
       const tiles = row.keys.length ? `<div class="codex-tiles" aria-hidden="true">${row.keys.map(key => `<span>${root.MahjongCrystalTiles?.render(key) || escape(root.MahjongTileNames.getName(key))}</span>`).join('')}</div>` : '';
       const motion = row.secret ? null : row.monster ? '妖獸專屬攻擊' : root.MahjongCultivationPresentation?.profile(row.id)?.label;
       const element = elements[row.element] || (row.element === 'source' ? '依來源牌元素' : '多元素');
-      return `<article class="cult-skill-card codex-card" ${row.finisher ? `data-finisher="${escape(row.finisher)}"` : `data-skill="${escape(row.id)}"`} data-element="${row.element}">${row.completion ? `<p class="codex-formation-status">${escape(row.completion)}</p>` : ''}<div class="codex-card-top"><span>${actions[row.action]}</span><span>${element}</span></div><p class="codex-combo">${escape(row.combo)}</p>${tiles}${row.legacy ? `<p class="codex-legacy">原牌：${escape(row.legacy)}</p>` : ''}<h3>${escape(row.name)}</h3><p class="codex-trigger">${escape(row.trigger)}</p><div class="codex-tags">${row.roles.map(role => `<span>${purposes[role]}</span>`).join('')}</div><p>${escape(row.description)}</p><ul class="cult-skill-values">${row.details.filter(text => text !== row.description).map(text => `<li>${escape(text)}</li>`).join('')}</ul>${row.seal ? `<div class="codex-seal"><strong>下一局劫印</strong><p>${escape(row.seal)}</p></div>` : ''}${motion ? `<p class="codex-trigger codex-motion">招式演出 · ${escape(motion)}</p>` : ''}<div class="codex-card-actions"><button type="button" class="cult-skill-demo" data-demo="${escape(row.id)}" aria-label="試放與試聽：${escape(row.name)}">試放 · 試聽</button><label><input type="checkbox" data-compare="${escape(row.id)}" ${selected.has(row.id) ? 'checked' : ''}>比較<span class="sr-only">${escape(row.name)}</span></label></div></article>`;
+      return `<article class="cult-skill-card codex-card" ${row.finisher ? `data-finisher="${escape(row.finisher)}"` : `data-skill="${escape(row.id)}"`} data-element="${row.element}">${row.completion ? `<p class="codex-formation-status">${escape(row.completion)}</p>` : ''}<div class="codex-card-top"><span>${actions[row.action]}</span><span>${element}</span></div><p class="codex-combo">${escape(row.combo)}</p>${tiles}${row.legacy ? `<p class="codex-legacy">原牌：${escape(row.legacy)}</p>` : ''}<h3>${escape(name)}</h3>${name !== row.name ? `<p class="codex-legacy">原招式：${escape(row.name)}</p>` : ''}<p class="codex-trigger">${escape(row.trigger)}</p><div class="codex-tags">${row.roles.map(role => `<span>${purposes[role]}</span>`).join('')}</div><p>${escape(row.description)}</p><ul class="cult-skill-values">${row.details.filter(text => text !== row.description).map(text => `<li>${escape(text)}</li>`).join('')}</ul>${row.seal ? `<div class="codex-seal"><strong>下一局劫印</strong><p>${escape(row.seal)}</p></div>` : ''}${motion ? `<p class="codex-trigger codex-motion">招式演出 · ${escape(motion)}</p>` : ''}<div class="codex-card-actions"><button type="button" class="cult-skill-demo" data-demo="${escape(row.id)}" aria-label="試放與試聽：${escape(name)}">試放 · 試聽</button><label><input type="checkbox" data-compare="${escape(row.id)}" ${selected.has(row.id) ? 'checked' : ''}>比較<span class="sr-only">${escape(name)}</span></label></div></article>`;
     }
     function updateSelection() {
       find('#cultivationSelected').textContent = `已選 ${selected.size} / 3 招`;
@@ -146,6 +149,7 @@
       find('.codex-pages').hidden = comparing || list.length === 0;
       modal.classList.toggle('is-comparing', comparing);
       updateSelection();
+      root.MahjongCultivationTerms?.render(modal, true, { names: initial.preserveNames || [] });
       if (scroll) find('.codex-scroll').scrollTop = 0;
     }
     function reset() {
@@ -157,7 +161,7 @@
       if (!button) return;
       if (button.dataset.demo) {
         if(root.MahjongMonsterSkills?.get(button.dataset.demo))root.MahjongMonsterEffects?.showPreview(button.dataset.demo);
-        else root.MahjongCultivationEffects?.showPreview(button.dataset.demo);
+        else root.MahjongCultivationEffects?.showPreview(button.dataset.demo, initial.heroId);
       }
       else if (button.id === 'cultivationCodexClose') close();
       else if (button.id === 'cultivationFilterReset' || button.hasAttribute('data-reset')) reset();

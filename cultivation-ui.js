@@ -12,6 +12,8 @@
   let currentState = null;
   let activeChoice = null;
   let lastAnnouncement = '';
+  const heroId = (state, pid = 0) => state?.cultivation?.players?.[pid]?.heroId;
+  const skillName = (id, fallback, pid = 0, state = currentState) => root.MahjongHeroSkillVoices?.name(heroId(state, pid), id) || fallback;
 
   function playerName(state, pid) {
     if (state?.cultivation?.version >= 2) {
@@ -37,7 +39,7 @@
           if (!currentState?.cultivation) return;
           const latest = currentState.players[pid]?.melds[index];
           const reference = root.MahjongCultivationCatalog?.meldReference(latest, pid !== 0 && currentState.phase !== 'end');
-          if (reference) root.MahjongCultivationCatalog.open({ ...reference, source,
+          if (reference) root.MahjongCultivationCatalog.open({ ...reference, source, heroId: heroId(currentState, pid), preserveNames: root.MahjongCultivationTerms?.names(currentState),
             returnFocus: () => document.querySelectorAll(`#meldRail${pid} .rail-group`)[index] });
         };
         group.onclick = show;
@@ -61,7 +63,7 @@
       const show = event => {
         event.preventDefault(); event.stopPropagation();
         const latest = referenceFor(currentState);
-        if (latest) root.MahjongCultivationCatalog.open({ ...latest, source,
+        if (latest) root.MahjongCultivationCatalog.open({ ...latest, source, heroId: heroId(currentState, pid), preserveNames: root.MahjongCultivationTerms?.names(currentState),
           returnFocus: () => document.querySelector(`[data-flower-player="${pid}"][data-flower-key="${key}"]`) });
       };
       tile.onclick = show;
@@ -77,6 +79,7 @@
     const dialog = document.createElement('dialog'); dialog.id = 'cultivationInformation'; dialog.className = `cult-choice cult-information ${className}`.trim();
     dialog.setAttribute('aria-labelledby', 'cultivationInformationTitle');
     dialog.innerHTML = `<header><h2 id="cultivationInformationTitle">${escape(title)}</h2><button type="button">關閉 ×</button></header><div class="cult-information-body">${content}</div>`;
+    root.MahjongCultivationTerms?.render(dialog, true, { names: root.MahjongCultivationTerms.names(currentState) });
     document.body.append(dialog);
     const close = () => { dialog.close(); dialog.remove(); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
     dialog.querySelector('button').onclick = close;
@@ -99,7 +102,8 @@
     const skill = findSkill(action, keys);
     if (!skill) return '<span class="cult-skill-description">本次合法組牌成功後施放技能。</span>';
     const details = root.MahjongCultivationSkills?.details?.(skill) || [];
-    return `<span class="cult-skill-heading"><strong>${escape(skill.name)}</strong><span>${escape(elements[skill.element] || '五行')} · ${escape(actions[skill.action] || skill.action)}</span></span><span class="cult-skill-description">${escape(skill.description)}</span>${details.length ? `<span class="cult-skill-values">${escape(details.join('；'))}</span>` : ''}`;
+    const name = skillName(skill.id, skill.name);
+    return `<span class="cult-skill-heading"><strong>${escape(name)}</strong><span>${escape(elements[skill.element] || '五行')} · ${escape(actions[skill.action] || skill.action)}</span></span>${name !== skill.name ? `<span class="cult-skill-description">原招式：${escape(skill.name)}</span>` : ''}<span class="cult-skill-description">${escape(skill.description)}</span>${details.length ? `<span class="cult-skill-values">${escape(details.join('；'))}</span>` : ''}`;
   }
   function target(combat) {
     if (root.MahjongCultivationCombat?.target) return root.MahjongCultivationCombat.target(combat) ?? -1;
@@ -159,14 +163,14 @@
   function logText(state, entry) {
     if (typeof entry === 'string') return entry;
     const pid = entry.pid ?? entry.owner;
-    const skill = root.MahjongCultivationSkills?.get(entry.skillId);
     const secret = entry.secret && pid !== 0 && !state.cultivation.ended;
     if (secret && entry.type === 'skill') return `${playerName(state, pid)}施放秘術`;
+    const skill = secret ? null : root.MahjongCultivationSkills?.get(entry.skillId);
     if (entry.text || entry.message) return entry.text || entry.message;
-    if (skill || entry.type === 'skill') return `${playerName(state, pid)} · ${skill?.name || entry.name || '技能'}`;
+    if (skill || entry.type === 'skill') return `${playerName(state, pid)} · ${skillName(entry.skillId, skill?.name || entry.name || '技能', pid, state)}`;
     const actor = Number.isInteger(pid) ? playerName(state, pid) : '怪物';
     if (entry.type === 'damage') return `${actor}造成 ${number(entry.amount)} 傷害`;
-    if (entry.type === 'finisherPart') return `${actor} · ${entry.label} → ${entry.name}`;
+    if (entry.type === 'finisherPart') return `${actor} · ${entry.label} → ${skillName('finisher:' + entry.segmentId, entry.name, pid, state)}`;
     if (entry.type === 'heal') return `${actor}恢復 ${number(entry.amount || entry.actual)} 生命`;
     if (entry.type === 'hurt') return `${actor}受到 ${number(entry.amount)} 傷害`;
     if (entry.type === 'kill') return `${actor}擊敗${entry.name || '怪物'}`;
@@ -266,6 +270,8 @@
     }
     const announcement = entries[0] ? logText(state, entries[0]) : '';
     if (announcement !== lastAnnouncement) { lastAnnouncement = announcement; live.textContent = announcement; }
+    for (const node of [document.querySelector('.play-column'), log, statusReference, live])
+      root.MahjongCultivationTerms?.render(node, true, { names: root.MahjongCultivationTerms.names(state) });
     if (activeChoice && state.phase !== 'play') activeChoice(false);
     if (!root.MahjongImages?.isLoading()) {
       root.MahjongCultivationEffects?.sync(state);
@@ -280,7 +286,7 @@
     section.id = 'cultivationCatalog'; section.className = 'cult-catalog';
     section.innerHTML = `<div class="cult-catalog-entry"><div><h3>修仙技能圖鑑</h3><p>169 種牌組技能 · 38 項終式 · ${root.MahjongMonsterSkills?.all.length || 0} 招怪物技能<br>牌組、花陣、劫印與妖獸招式，一起查找比較。</p></div><button type="button" id="cultivationCatalogOpen">開啟圖鑑 →</button></div>
       <details class="cult-log-details"><summary>修仙戰況</summary><div id="cultivationStatusReference"></div><ol id="cultivationLog"></ol></details>`;
-    section.querySelector('#cultivationCatalogOpen').onclick = () => root.MahjongCultivationCatalog?.open();
+    section.querySelector('#cultivationCatalogOpen').onclick = () => root.MahjongCultivationCatalog?.open({ heroId: heroId(currentState) });
     body.prepend(section);
     const vfx = document.createElement('div'); vfx.className = 'cult-vfx-controls';
     vfx.innerHTML = '<label><input type="checkbox" id="cultivationVfxEnabled">上古神兵 · 技能攻擊特效</label><p>音效共用主音量；可在各招式下試放與試聽。減少動態效果會改為短促命中回饋。</p>';
@@ -358,6 +364,7 @@
     dialog.innerHTML = `<header><div><p>組牌 · 施法</p><h2 id="cultivationChoiceTitle">選擇這一招</h2></div><button type="button" class="cult-choice-cancel" aria-label="取消技能選擇">取消 ×</button></header><p>選擇合法牌組後立即施放。取消會返回牌桌，不消耗牌。</p><div class="cult-choice-options">${options.map((option, index) => `<button type="button" class="cult-choice-option" data-option="${index}"><span class="cult-choice-label">${escape(option.label || `${actions[option.action] || '組牌'} · ${(option.keys || [option.key]).filter(Boolean).map(k => root.MahjongTileNames?.getName?.(k) || k).join(' ')}`)}</span>${skillPreview(option)}</button>`).join('')}</div>`;
     dialog.classList.add('cult-choice-v2'); dialog.dataset.count = String(options.length);
     dialog.querySelectorAll('[data-option]').forEach(button => { try { decorateChoice(button, options[Number(button.dataset.option)], Number(button.dataset.option)); } catch (_) { /* decoration is optional */ } });
+    root.MahjongCultivationTerms?.render(dialog, true, { names: root.MahjongCultivationTerms.names(currentState) });
     document.body.append(dialog);
     let done = false;
     const close = (cancelled = true, selected = null) => {
@@ -394,7 +401,10 @@
     const summary = f
       ? `<section class="cfs-summary"><div><small>終式施放者</small><strong>${escape(playerName(state, f.pid))}</strong><i>${escape(method)}</i></div><div class="cfs-total"><small>終式總傷害</small><b>${number(f.total)}</b></div></section>`
       : '<section class="cfs-summary cfs-none"><strong>本局無胡牌終式</strong></section>';
-    const parts = (f?.parts || []).map((part, index) => `<li class="cfs-part"><span class="cfs-index">${index + 1}</span><span class="cfs-name"><i>${escape(part.label)}</i><strong>${escape(part.name)}</strong></span><span class="cfs-bar" aria-hidden="true"><em style="width:${Math.round((part.damage || 0) / top * 100)}%"></em></span><b>${number(part.damage)}</b></li>`).join('');
+    const parts = (f?.parts || []).map((part, index) => {
+      const name = skillName('finisher:' + part.id, part.name, f.pid, state);
+      return `<li class="cfs-part"><span class="cfs-index">${index + 1}</span><span class="cfs-name"><i>${escape(part.label)}${name !== part.name ? ' · 原招式：' + escape(part.name) : ''}</i><strong>${escape(name)}</strong></span><span class="cfs-bar" aria-hidden="true"><em style="width:${Math.round((part.damage || 0) / top * 100)}%"></em></span><b>${number(part.damage)}</b></li>`;
+    }).join('');
     const seals = combat.players.map((p, pid) => {
       const pending = p.pendingSeals?.length ? sealList(p, 'pendingSeals').split(/[；;]/).map(text => text.trim()).filter(Boolean) : [];
       if (!pending.length && !p.expiredSeals?.length) return '';
@@ -439,6 +449,7 @@
     const next = panel.querySelector('#btnContinueNext');
     if (next) next.textContent = combat.version >= 2 ? '前往整備 →' : '再戰一場 →';
     if (combat.version < 2 && head) head.insertAdjacentHTML('beforeend', '<p class="journey-muted">舊版旅程 · 保留既有修仙規則與劫印。重新開始旅程可選擇新英雄。</p>');
+    root.MahjongCultivationTerms?.render(panel, true, { names: root.MahjongCultivationTerms.names(state) });
     // The normal renderer preserves all physical tiles. Fit each existing full row without scrolling.
     requestAnimationFrame(() => {
       panel.querySelectorAll('.rs-tiles').forEach(rail => {

@@ -127,6 +127,7 @@
   cultivationResume.addEventListener('click', () => resumeMode('cultivation', cultivationResume));
 
   async function showHome() {
+    window.MahjongMusic?.setMode(null);
     state = 'loading';
     screen.hidden = false;
     root.classList.add('start-screen-active');

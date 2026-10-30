@@ -158,6 +158,7 @@
       ctx.drawImage(image, ...source, -size / 2, -size * aspect * stretch / 2, size, size * aspect * stretch); ctx.restore();
     }
     text(label, x, y, opacity, color = '#ffe3a2', size = 16) {
+      label = root.MahjongCultivationTerms?.format(label) ?? label;
       const ctx = this.ctx; ctx.save(); ctx.globalAlpha = clamp(opacity); ctx.font = `700 ${size}px "Microsoft JhengHei", sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = '#101b20'; ctx.fillStyle = color;
       ctx.strokeText(label, x, y, this.w * .64); ctx.fillText(label, x, y, this.w * .64); ctx.restore();
@@ -420,7 +421,7 @@
     if (seen.has(key)) return; seen.add(key);
     if (seen.size > 1000) seen.delete(seen.values().next().value);
     const snapshot = { monsterId: before.monster.id, speciesId: before.version >= 2 ? before.monster.speciesId : null, element: before.monster.element, name: before.monster.name };
-    const plan = P.plan(effects);
+    const plan = P.plan(effects, before);
     if (before.version < 2) { main.add(plan, snapshot); return; }
     const identities = new Map([[snapshot.monsterId, snapshot]]);
     for (const effect of effects) if (effect.type === 'spawn') {
@@ -461,7 +462,7 @@
     enabled = !!value; try { localStorage.setItem('mahjong.cultivation.vfx', enabled ? 'on' : 'off'); } catch (_) { /* Optional preference. */ }
   }
   function mountPreview(canvas) { return new Stage(canvas, true); }
-  function previewEvents(id, healthy = false) {
+  function previewEvents(id, healthy = false, heroId = null) {
     const C = root.MahjongCultivationCombat, F = root.MahjongCultivationFinishers, S = root.MahjongCultivationSkills;
     const state = C.create(21023), p = state.players[0];
     state.monster.hp = state.monster.maxHp = 20000; p.hp = healthy ? p.maxHp : 380; p.shield = 160; p.shieldTurns = 4; p.aggro = 600; p.damageTaken = 350;
@@ -494,26 +495,33 @@
       const turn = C.apply(result.state, { type: 'turn', pid: 0, id: result.state.seq + 1 });
       result = { state: turn.state, effects: [...result.effects, ...turn.effects] };
     }
-    return { plan: P.plan(result.effects), state, effects: result.effects };
+    return { plan: P.plan(result.effects, heroId ? { players: [{ heroId }] } : state), state, effects: result.effects };
   }
-  function showPreview(id) {
+  function showPreview(id, heroId = null) {
     preview?.close();
     const previous = document.activeElement, dialog = document.createElement('dialog'); dialog.className = 'cult-vfx-preview';
     const header = document.createElement('header'), title = document.createElement('h2'), closeButton = document.createElement('button');
-    title.textContent = P.profile(id).name; closeButton.textContent = '關閉 ×'; header.append(title, closeButton);
+    title.textContent = P.profile(id, false, heroId).name; closeButton.textContent = '關閉 ×'; header.append(title, closeButton);
     const canvas = document.createElement('canvas'); canvas.setAttribute('aria-label', '上古神兵技能施放預覽');
     const info = document.createElement('p'); info.textContent = '獨立演武：受傷、持盾與帶印記的測試角色；不影響本局。音量沿用設定。';
     const play = document.createElement('button'); play.textContent = '重播招式與音效';
     const full = document.createElement('button'); full.textContent = '滿血情境';
     const status = document.createElement('p'); status.setAttribute('role', 'status');
     dialog.append(header, canvas, info, play, full, status); document.body.append(dialog); dialog.showModal();
+    root.MahjongCultivationTerms?.render(dialog, true);
     const stage = mountPreview(canvas);
+    const voicePreview = heroId && id !== 'secret';
     const run = healthy => {
-      stage.stop(); const data = previewEvents(id, healthy);
+      stage.stop(); const data = previewEvents(id, healthy, heroId);
+      if (voicePreview) {
+        root.MahjongVoice?.stopAll();
+        root.MahjongVoice?.playSkill(id, { heroId });
+      }
       status.textContent = `演武結算傷害 ${data.plan.damage} · ${healthy ? '滿血' : '受傷'}情境`;
       stage.add(data.plan, { monsterId: data.state.monster.id, element: data.state.monster.element });
     };
     const close = () => {
+      if (voicePreview) root.MahjongVoice?.stopAll();
       stage.destroy(); dialog.close(); dialog.remove(); preview = null;
       const target = previous?.isConnected && previous.getClientRects().length ? previous : document.getElementById('tableMenuBtn');
       target?.focus({ preventScroll: true });

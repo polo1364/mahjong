@@ -34,6 +34,7 @@
     section.className = 'expedition-result';
     section.innerHTML = `<strong>歷練 ${s.total} / 100 分</strong><span>戰鬥 ${s.combat} · 操作 ${s.operation} · 胡牌 ${s.winning}</span><span>近期評分 ${r.recentScore.toFixed(1)} · 戰果指數 ${r.recentIndex.toFixed(1)}</span>`;
     host.append(section);
+    root.MahjongCultivationTerms?.render(section, true);
   }
   function details(player) { return `<p class="expedition-effect">奇遇：${esc(effectText(player.expeditionEffect) || '無')}（與裝備、境界、功法相加）</p>`; }
 

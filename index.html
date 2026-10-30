@@ -45,11 +45,13 @@
 <script src="image-assets.js"></script>
 <script src="image-loading.js"></script>
 <script src="tile-names.js"></script>
+<script src="cultivation-terms.js"></script>
 <script src="crystal-tiles.js"></script>
 <script src="cultivation-skills.js"></script>
 <script src="cultivation-finishers.js"></script>
 <script src="cultivation-heroes.js?v=journey-20261023-1"></script>
 <script src="hero-voices.js?v=hero-voices-20261023-1"></script>
+<script src="hero-skill-voices.js"></script>
 <script src="cultivation-monster-skills.js?v=monster-skills-1"></script>
 <script src="cultivation-monsters.js?v=monster-skills-1"></script>
 <script src="cultivation-progression.js"></script>
@@ -125,7 +127,7 @@
     <p class="start-footnote">單人論道 · 本機保存</p>
   </div>
 </main>
-<button id="tableMenuBtn" class="table-menu-trigger" type="button" aria-haspopup="dialog" aria-controls="tableMenu" aria-expanded="false"><span aria-hidden="true">⚙</span><span>設定</span><span id="tableMenuBadge" class="table-menu-badge" hidden></span></button>
+<button id="tableMenuBtn" class="table-menu-trigger" type="button" aria-haspopup="dialog" aria-controls="tableMenu" aria-expanded="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="display:block"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></span><span>設定</span><span id="tableMenuBadge" class="table-menu-badge" hidden></span></button>
 <div class="shell">
   <header class="masthead">
     <div class="brand"><div class="brand-symbol" aria-hidden="true">仙</div><div><h1>雀仙門</h1><div class="eyebrow">XIANMEN · MAHJONG SECT</div></div></div>
@@ -198,6 +200,7 @@
       <section role="tabpanel" id="tmPage-sound" class="tm-page" aria-labelledby="tmTab-sound" hidden><header class="tm-page-head"><h3>聲音</h3><p>所有聲音即時生效，關閉選單後保留設定。</p></header><div class="pref-group">
         <div class="pref-row"><span class="pref-name">聲音<small>總開關</small></span><span id="prefSoundSlot" class="pref-control"></span></div>
         <div class="pref-row pref-row-wide"><span class="pref-name">主音量 <span id="prefVolumeValueSlot"></span></span><span id="prefVolumeSlot" class="pref-control"></span></div>
+        <label class="pref-row"><span class="pref-name">背景音樂<small>依模式輪播兩首樂曲</small></span><span class="pref-control"><input id="backgroundMusic" type="checkbox" checked></span></label>
         <label class="pref-row"><span class="pref-name">語音報牌<small>念出牌名、吃碰槓胡與風位</small></span><span id="prefVoiceSlot" class="pref-control"></span></label>
         <label class="pref-row"><span class="pref-name">牌館環境音<small>背景循環</small></span><span id="prefAmbienceSlot" class="pref-control"></span></label>
       </div></section>
@@ -638,8 +641,9 @@ function effectContext(pid, tiles = [], faceDown = false) {
 
 function playVoice(cue, options) {
   if (!soundEnabled || !voiceEnabled || document.hidden) return;
+  if (S?.cultivation && ['chow', 'pong', 'kong', 'concealed-kong', 'win', 'self-draw', 'flower'].includes(cue)) return;
   const actor = Number.isInteger(options?.pid) ? S?.cultivation?.players?.[options.pid] : null;
-  window.MahjongVoice?.play(cue, { ...options, heroId: actor?.heroId || options?.heroId,
+  return window.MahjongVoice?.play(cue, { ...options, heroId: actor?.heroId || options?.heroId,
     cultivation: Boolean(S?.cultivation) });
 }
 
@@ -673,6 +677,7 @@ function log(msg) {
     // 若訊息包含「你」或由自己發起，套用高亮樣式
     if (seat === 0 || /你/.test(text)) line.classList.add('my-log');
   }
+  window.MahjongCultivationTerms?.render(line, !!S?.cultivation, { names: window.MahjongCultivationTerms.names(S) });
   el.appendChild(line);
   // 長時間對局只保留最近紀錄，避免版面分頁每次重新量測整份紀錄
   while (el.childElementCount > 300) el.firstElementChild.remove();
@@ -846,15 +851,22 @@ function cultivationEvent(event) {
     monsterId: S.cultivation.monster.id, ...event, id: S.cultivation.seq + 1
   });
   S.cultivation = next.state;
+  window.MahjongVoice?.consumeSkills?.(next.effects, before);
   window.MahjongCultivationEffects?.consume(next.effects, before);
   window.MahjongMonsterEffects?.consume(next.effects, before);
   window.MahjongCultivationEquipmentUI?.notifyLoot(before, next.state);
   if (event.type === 'meld' || event.type === 'flower') {
-    const skill = window.MahjongCultivationSkills.find(event.action || 'flower', event.keys || event.key);
-    if (skill && !next.effects.some(e => e.type === 'flowerPending' && e.skillId === skill.id)) log(`✨ ${playerName(event.pid)} 施放${event.action === 'concealed' && event.pid !== 0 ? '秘術' : '「' + skill.name + '」'}`);
+    if (event.action === 'concealed' && event.pid !== 0) log(`✨ ${playerName(event.pid)} 施放秘術`);
+    else {
+      const skill = window.MahjongCultivationSkills.find(event.action || 'flower', event.keys || event.key);
+      const heroId = before.players[event.pid]?.heroId;
+      if (skill && !next.effects.some(e => e.type === 'flowerPending' && e.skillId === skill.id))
+        log(`✨ ${playerName(event.pid)} 施放「${window.MahjongHeroSkillVoices?.name(heroId, skill.id) || skill.name}」`);
+    }
   }
-  for (const e of next.effects.filter(e => e.type === 'flowerPending')) log(`🌸 ${playerName(e.pid)}「${e.name}」待命，自己的回合施放`);
-  if (event.type === 'turn') for (const e of next.effects.filter(e => e.type === 'skill')) log(`✨ ${playerName(e.pid)} 施放「${e.name}」`);
+  const effectName = e => e.secret ? '秘術' : window.MahjongHeroSkillVoices?.name(before.players[e.pid]?.heroId, e.skillId) || e.name;
+  for (const e of next.effects.filter(e => e.type === 'flowerPending')) log(`🌸 ${playerName(e.pid)}「${effectName(e)}」待命，自己的回合施放`);
+  if (event.type === 'turn') for (const e of next.effects.filter(e => e.type === 'skill')) log(`✨ ${playerName(e.pid)} 施放「${effectName(e)}」`);
 }
 
 function settleCultivationFlowers() {
@@ -3742,6 +3754,7 @@ function startNewSession(mode = gameMode, options = {}) {
 
 function showCultivationPreparation() {
   if (S?.cultivation?.version < 2 || !S?.cultivation?.ended) return;
+  window.MahjongMusic?.setMode('cultivation');
   hideReactionPanel();
   window.MahjongCultivationJourneyUI.showPreparation(S, {
     progression: window.MahjongProgressionFlow?.preparationOptions(),
@@ -4287,6 +4300,7 @@ function updatePlayerWaits(p) {
 }
 
 function renderAll() {
+  window.MahjongMusic?.setMode(S.cultivation ? 'cultivation' : 'normal');
   window.MahjongImages?.watch(S);
   S.players.forEach(updatePlayerWaits);
 
@@ -4698,6 +4712,8 @@ function renderAll() {
     pass.classList.remove('active');
   }
   window.MahjongCultivationUI?.render(S);
+  for (const node of [document.querySelector('.play-column'), document.getElementById('roundinfo')])
+    window.MahjongCultivationTerms?.render(node, !!S.cultivation, { names: window.MahjongCultivationTerms.names(S) });
   document.getElementById('saveGameBtn').disabled = S.phase !== 'play' || !!S.cultivation?.trial;
   document.getElementById('loadGameBtn').disabled = !!S.cultivation?.trial;
 }
@@ -4742,6 +4758,7 @@ function showHandsAndContinue() {
     // Under the result title so the hand's cultivation reward is seen without scrolling on phones.
     (panel.querySelector('.rs-head')||panel.querySelector('.result-footer')).append(host);window.MahjongProgressionFlow.result(host,S);
   }
+  window.MahjongCultivationTerms?.render(panel, !!S.cultivation, { names: window.MahjongCultivationTerms.names(S) });
   panel.style.display = 'block';
   document.getElementById('overlay').style.display = 'block';
   document.getElementById('btnContinueNext').onclick = () => {
@@ -4776,6 +4793,7 @@ updateSettingsDisplay();
 // DOMContentLoaded 只顯示首頁；玩家選擇一般模式或繼續遊戲後才啟動牌局。
 </script>
 <script src="feedback-audio.js"></script>
+<script src="feedback-music.js"></script>
 <script src="feedback-voice.js?v=hero-voices-20261023-1"></script>
 <script src="feedback-effects.js"></script>
 <script src="feedback-controls.js?v=hero-voices-20261023-1"></script>

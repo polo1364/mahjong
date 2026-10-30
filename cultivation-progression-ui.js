@@ -150,6 +150,7 @@
     const trial = !!combat?.trial;
     host.innerHTML = `<section class="progression-card"><p class="progression-kicker">${trial ? '渡劫結果' : '本局修為'}</p><h3>${trial ? '獨立試煉' : options.error ? '修為尚未入帳' : options.pending ? '正在保存修為…' : earned ? `+${esc(earned)} 修為` : '本局無修為獎勵'}</h3><p>${trial ? '試煉不產出修為，也不消耗原旅程道具。' : options.pending ? '保存完成後更新永久進度。' : earned ? `完成牌局 12 點${earned > 12 ? `，吃、碰、槓、補花或胡牌操作加成 ${earned - 12} 點` : ''}。` : '中途離開、舊版旅程或未完成結算不會發放修為。'}</p>${valid(profile) ? progress(profile) : '<p class="progression-muted">永久資料尚未讀取。</p>'}<p class="progression-error" role="status" aria-live="polite">${esc(options.error?.message || options.error || '')}</p>${options.error && options.onRetry ? '<button type="button" data-progression-retry>重試保存</button>' : ''}</section>`;
     host.querySelector('[data-progression-retry]')?.addEventListener('click', () => options.onRetry());
+    root.MahjongCultivationTerms?.render(host, true);
   }
   root.MahjongProgressionUI = Object.freeze({home, preparation, result, details, close});
   if (typeof module !== 'undefined' && module.exports) module.exports = root.MahjongProgressionUI;

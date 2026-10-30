@@ -135,3 +135,15 @@ html .bottom-area #controls.table-actions #btnHu { flex: none !important; font-s
 .journey-stat-gain { margin-left: 4px; font-style: normal; font-size: .58em; font-weight: 700; color: #8fe0a8; vertical-align: super; }
 .journey-stat-gain.is-down { color: #ff9d8a; }
 .journey-stats-note { margin: 2px 0 0; font-size: 12px; }
+
+/* Short screens: the settings status becomes a dot, so the button never grows over the top seat's numbers. */
+@media (max-height: 520px) and (orientation: landscape) {
+  #tableMenuBadge.table-menu-badge:not([hidden]) { position: absolute; top: 5px; right: 5px; width: 10px; height: 10px; padding: 0; border: 0; border-radius: 50%; font-size: 0; background: #8fe9f4; box-shadow: 0 0 6px #8fe9f4; }
+}
+/* Short screens: dealer and ready badges sit in the side seat's top corner, so a three-character name is not cut off. */
+@media (max-height: 550px) and (orientation: landscape) {
+  html.cultivation-mode.table-scene.square-table .mahjong-table :is(.left-area, .right-area) .seat-name { overflow: visible; text-overflow: clip; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table :is(.left-area, .right-area) :is(.dealer-badge, .listen-badge) { position: absolute; top: 3px; margin: 0; z-index: 2; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table :is(.left-area, .right-area) .dealer-badge { right: 4px; }
+  html.cultivation-mode.table-scene.square-table .mahjong-table :is(.left-area, .right-area) .listen-badge { right: 24px; }
+}

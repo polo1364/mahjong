@@ -101,6 +101,9 @@
   const actionStatus = document.getElementById('tableMenuActionStatus');
   const badge = document.getElementById('tableMenuBadge');
   function updateActions() {
+    const cultivation = typeof S !== 'undefined' && !!S?.cultivation;
+    window.MahjongFeedbackControls?.syncMode();
+    window.MahjongCultivationTerms?.render(controls, cultivation);
     const enabled = [...controls.querySelectorAll('button:not(:disabled)')];
     const awaitingReaction = enabled.some(button => button.id === 'btnPass');
     const label = awaitingReaction ? '待回應' : enabled.length ? '可操作' : '';
@@ -113,6 +116,8 @@
       ? '請選擇亮起的吃、碰、槓、胡，或按「過」放棄本次反應。'
       : enabled.length ? `目前可用：${enabled.map(button => button.textContent).join('、')}。出牌請關閉選單後點選手牌。`
       : document.getElementById('turnMessage').textContent;
+    window.MahjongCultivationTerms?.render(menu, cultivation, { names: window.MahjongCultivationTerms.names(typeof S !== 'undefined' ? S : null) });
+    window.MahjongCultivationTerms?.render(trigger, cultivation);
   }
   function closeMenu(restoreFocus = true) {
     if (menu.hidden) return;
