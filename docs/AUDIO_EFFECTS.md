@@ -8,7 +8,7 @@
 
 打開 `index.html`，在「遊戲設定」的「聲光」區塊選擇特效風格、音量及預覽動作。聲音預設開啟並記住開關選擇；瀏覽器要在第一次點擊後才會出聲。聲光偏好使用獨立的 `qinghe_feedback_v1`，不寫入牌局存檔。
 
-「台灣口音語音報牌（ElevenLabs）」可獨立選擇，預設關閉。現已改用 48 個 ElevenLabs 本地人聲音檔，取代瀏覽器合成語音，詳細來源與本輪驗證見 [VOICE_VERIFICATION.md](verification/VOICE_VERIFICATION.md)。下列 12 種事件音效維持使用；遊戲不需連線至 ElevenLabs，也不包含 API 金鑰。
+「語音」（報牌與角色技能）可獨立選擇，預設開啟；更新前存過設定的玩家會先開啟一次，之後記住各自的選擇。現已改用 48 個 ElevenLabs 本地人聲音檔，取代瀏覽器合成語音，詳細來源與本輪驗證見 [VOICE_VERIFICATION.md](verification/VOICE_VERIFICATION.md)。下列 12 種事件音效維持使用；遊戲不需連線至 ElevenLabs，也不包含 API 金鑰。
 
 ## 原創特效
 

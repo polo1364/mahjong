@@ -169,7 +169,7 @@
           <label for="soundVolume">主音量 <output id="volumeValue" for="soundVolume">65%</output></label>
           <input id="soundVolume" type="range" min="0" max="100" step="5" value="65">
           <label class="feedback-check"><input id="reduceEffects" type="checkbox"> 減少動態效果</label>
-          <label class="feedback-check"><input id="voiceAnnouncements" type="checkbox"> 台灣口音語音報牌（ElevenLabs）</label>
+          <label class="feedback-check"><input id="voiceAnnouncements" type="checkbox" checked> 語音（報牌與角色技能）</label>
           <label class="feedback-check"><input id="ambienceSound" type="checkbox"> 牌館環境音（背景循環）</label>
           <label for="feedbackCue">試聽與預覽</label>
           <div class="feedback-preview"><select id="feedbackCue"><option value="chow">吃</option><option value="pong">碰</option><option value="kong">槓</option><option value="concealed-kong">暗槓</option><option value="flower">補花</option><option value="ready">報聽</option><option value="win">胡牌</option><option value="self-draw">自摸</option><option value="draw-game">流局</option><option value="draw">摸牌</option><option value="discard">落牌</option><option value="ui">確認</option><option value="shuffle">洗牌</option><option value="dice">擲骰</option><option value="wall">堆牌</option><option value="turn">輪到你</option><option value="session-end">整場結束</option></select><button id="previewFeedback">預覽</button></div>
@@ -201,7 +201,7 @@
         <div class="pref-row"><span class="pref-name">聲音<small>總開關</small></span><span id="prefSoundSlot" class="pref-control"></span></div>
         <div class="pref-row pref-row-wide"><span class="pref-name">主音量 <span id="prefVolumeValueSlot"></span></span><span id="prefVolumeSlot" class="pref-control"></span></div>
         <label class="pref-row"><span class="pref-name">背景音樂<small>依模式輪播兩首樂曲</small></span><span class="pref-control"><input id="backgroundMusic" type="checkbox" checked></span></label>
-        <label class="pref-row"><span class="pref-name">語音報牌<small>念出牌名、吃碰槓胡與風位</small></span><span id="prefVoiceSlot" class="pref-control"></span></label>
+        <label class="pref-row"><span class="pref-name">語音<small>角色技能、牌名與風位播報</small></span><span id="prefVoiceSlot" class="pref-control"></span></label>
         <label class="pref-row"><span class="pref-name">牌館環境音<small>背景循環</small></span><span id="prefAmbienceSlot" class="pref-control"></span></label>
       </div></section>
       <section role="tabpanel" id="tmPage-view" class="tm-page" aria-labelledby="tmTab-view" hidden><header class="tm-page-head"><h3>畫面</h3><p>調整牌桌特效與桌心資訊的呈現方式。</p></header><div class="pref-group">

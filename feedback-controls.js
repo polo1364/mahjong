@@ -88,6 +88,7 @@
   // Sound starts on unless the player turned it off before; browsers still hold audio until the first click or key.
   let soundPreference = true;
   music.checked = true;
+  voice.checked = true;
   try {
     const saved = JSON.parse(localStorage.getItem(key) || '{}');
     soundPreference = saved.sound !== false;
@@ -96,7 +97,9 @@
       volume.value = String(Math.max(0, Math.min(100, saved.volume)));
     }
     reduced.checked = saved.reduced === true;
-    voice.checked = saved.voice === true;
+    // Voice now starts on. Older saves recorded the old default as off, so only a save
+    // made since this change (voiceChosen) counts as the player's own choice.
+    voice.checked = saved.voiceChosen === true ? saved.voice === true : true;
     ambience.checked = saved.ambience === true;
     music.checked = saved.music !== false;
   } catch (_) { /* Storage may be disabled, or an old preference may be malformed. */ }
@@ -116,7 +119,7 @@
     if (effectDescription) effectDescription.textContent = descriptions[style.value];
     document.getElementById('volumeValue').textContent = volume.value + '%';
     if (save) try {
-      localStorage.setItem(key, JSON.stringify({ style: style.value, volume: Number(volume.value), reduced: reduced.checked, voice: voice.checked, ambience: ambience.checked, music: music.checked, sound: soundEnabled }));
+      localStorage.setItem(key, JSON.stringify({ style: style.value, volume: Number(volume.value), reduced: reduced.checked, voice: voice.checked, voiceChosen: true, ambience: ambience.checked, music: music.checked, sound: soundEnabled }));
     } catch (_) { status.textContent = '本次設定已套用；瀏覽器未允許保存偏好。'; }
   }
   style.addEventListener('change', () => apply(true));
@@ -142,7 +145,7 @@
       window.MahjongVoice?.stopAll();
       playVoice(voiceCue.value, { heroId: previewHeroId() });
       status.textContent = '正在試聽語音 · ' + voiceCue.selectedOptions[0].textContent;
-    } else status.textContent = '請開啟聲音、勾選台灣口音語音報牌，並提高音量後試聽。';
+    } else status.textContent = '請開啟聲音、勾選語音，並提高音量後試聽。';
   });
   window.addEventListener('mahjong-voice-status', event => {
     if (event.detail.type !== 'error') return;

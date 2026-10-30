@@ -111,3 +111,11 @@ test('normal mode preserves original preview options and mode switches restore t
   ui.window.MahjongFeedbackControls.syncMode();
   assert.deepEqual(ui.options(), original);
 });
+
+test('voice starts on, an old saved default turns on once, and a choice made since is kept', () => {
+  const checked = saved => controls(true, saved).document.getElementById('voiceAnnouncements').checked;
+  assert.equal(checked({}), true, 'a new player hears voices');
+  assert.equal(checked({ voice: false, sound: true }), true, 'a save from before the change recorded the old default');
+  assert.equal(checked({ voice: false, voiceChosen: true }), false, 'turning it off since is respected');
+  assert.equal(checked({ voice: true, voiceChosen: true }), true);
+});
