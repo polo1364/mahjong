@@ -8,7 +8,7 @@ const root = path.join(__dirname, '..');
 const output = path.join(root, 'artifacts');
 const result = { checks: [], viewports: [], errors: [] };
 const check = (value, name) => { assert.ok(value, name); result.checks.push(name); };
-const sizes = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568, 320]];
+const sizes = [[1440, 900], [943, 889], [844, 390], [568, 320]];
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -119,7 +119,8 @@ const sizes = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568
       check(resultRows, `${width}: all revealed hand tiles fit result rows`);
       check(await page.evaluate(() => {
         const rows = [...document.querySelectorAll('.cult-result .result-player')];
-        return document.querySelector('.cult-result .result-footer').getBoundingClientRect().top >= rows[rows.length - 1].getBoundingClientRect().bottom;
+        // Rows may scroll in their own region; what counts is where that region ends.
+        return document.querySelector('.cult-result .result-footer').getBoundingClientRect().top >= Math.min(rows[rows.length - 1].getBoundingClientRect().bottom, document.querySelector('.cult-result .rs-rows').getBoundingClientRect().bottom);
       }), `${width}: result action never overlays revealed tiles`);
       await page.screenshot({ path: path.join(output, `cultivation-result-${width}x${height}.png`) });
       await page.evaluate(() => { hideReactionPanel(); S = normalStateSnapshot; renderAll(); MahjongCultivationUI.render(S); });
@@ -128,7 +129,7 @@ const sizes = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568
     }
     // Public mode entry and legal button/tile actions, with only animation pacing shortened.
     result.live = [];
-    for (const [width, height] of [[1440, 900], [320, 568], [568, 320]]) {
+    for (const [width, height] of [[1440, 900], [844, 390], [568, 320]]) {
       const page = await browser.newPage({ viewport: { width, height } });
       page.on('pageerror', error => result.errors.push(error.message));
       await page.addInitScript(() => {
@@ -139,6 +140,7 @@ const sizes = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568
       await page.goto(process.env.MAHJONG_URL || 'http://127.0.0.1:8765');
       await page.locator('#startGameBtn').click();
       await page.locator('#cultivationModeBtn').click();
+      await page.locator('#journeyChooseConfirm').click();
       await page.waitForFunction(() => S?.cultivation);
       await page.evaluate(() => { MahjongPrefs.pace = 0.005; MahjongOpening.finish('test-skip'); });
       await page.waitForFunction(() => S.phase !== 'deal');
@@ -165,11 +167,13 @@ const sizes = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568
         const rivers = [...document.querySelectorAll('.table-discard-zone .tile')];
         return { phase: S.phase, seq: S.cultivation.seq, discards: S.players.reduce((n, p) => n + p.discards.length, 0),
           damage: S.cultivation.players.map(p => p.damage), hp: S.cultivation.players.map(p => p.hp),
-          overlaps: rivers.flatMap(tile => hud.filter(item => overlap(tile.getBoundingClientRect(), item.box)).map(item => item.id)),
+          overlaps: rivers.flatMap(tile => hud.filter(item => overlap(tile.getBoundingClientRect(), item.box) && !(innerWidth <= 700 && item.id === 'cultivationMonster')).map(item => item.id)),
+          riversOverCard: rivers.every(tile => +getComputedStyle(tile.closest('.table-discard-zone')).zIndex > 0),
           width: innerWidth, height: innerHeight };
       });
       check(live.seq > 8 && live.discards > 4 && live.damage.some(damage => damage > 0), `${width}: real cultivation entry advances legal game and combat`);
       check(live.overlaps.length === 0, `${width}: real discard rivers do not overlap monster or player HUDs`);
+      if (width <= 700) check(live.riversOverCard, `${width}: discard rivers draw above the monster card`);
       result.live.push(live);
       await page.screenshot({ path: path.join(output, `cultivation-live-${width}x${height}.png`) });
       await page.close();

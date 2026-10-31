@@ -25,6 +25,7 @@ async function audit(page,label,selector){
   report.checks.push({label,...result});console.log(result.issues.length?'ISSUE':'PASS',label,JSON.stringify(result.issues));
 }
 async function fixture(page,url){
+  await page.addInitScript(()=>localStorage.setItem('qinghe_cult_guide_v1',JSON.stringify({table:1,result:1,prep:1,skills:1,event:1,trial:1,boss:1})));
   await page.goto(url);await page.waitForFunction(()=>MahjongStartScreen?.state==='home'&&!document.querySelector('#startGameBtn').disabled);
   await page.evaluate(async()=>{const profile={...MahjongCultivationProgression.fresh(),realm:3,xp:2200},db=await initDB();await new Promise((resolve,reject)=>{const tx=db.transaction(['gameSaves'],'readwrite');tx.objectStore('gameSaves').put(profile,'cultivationProgressionV1');tx.oncomplete=resolve;tx.onerror=reject;});db.close();await MahjongStartScreen.showHome();});
   await page.locator('#startGameBtn').click();await page.locator('#cultivationModeBtn').click();await page.locator('#journeyChooseConfirm').click();await page.locator('.opening-skip').click({timeout:10000}).catch(()=>{});await page.waitForFunction(()=>S?.phase==='play'&&S.cultivation);
@@ -38,7 +39,7 @@ async function fixture(page,url){
     for(const item of MahjongCultivationItems.all)p.economy.items.counts[item.id]=99;
     p.economy.items.prepared=['heal','barrier'];showHandsAndContinue();
   });
-  await page.locator('#btnContinueNext').click();await page.locator('.prep-left-toggle').waitFor();await settle(page);
+  await page.locator('#btnContinueNext').click();await page.locator('.prep-left-tabs').waitFor();await settle(page);
 }
 async function left(page){if(!await page.locator('[data-left="progression"]').isVisible())await page.locator('.prep-left-toggle').click();await page.locator('[data-left="progression"]').click();await settle(page);}
 async function tab(page,id){await page.locator(`[data-tab="${id}"]`).click();try{await page.waitForFunction(id=>document.querySelector('.equip-tabs [aria-selected="true"]')?.dataset.tab===id&&!document.querySelector('.equip-tabs button').disabled,id);}catch(error){await shot(page,'tab-failure');throw Error(error.message+' '+JSON.stringify(await page.evaluate(()=>({tab:document.querySelector('.equip-tabs [aria-selected="true"]')?.dataset.tab,notice:document.querySelector('.equip-notice')?.textContent,confirmation:!!document.querySelector('.equip-confirm'),stateTab:S.cultivation.players[0].economy.items.tab}))));}await settle(page);}

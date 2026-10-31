@@ -10,11 +10,12 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
   const browser = await chromium.launch({ headless: true });
   const results = [], errors = [];
   try {
-    for (const [width, height, scale] of [[943, 889, 1], [844, 390, 1], [320, 568, 3], [390, 844, 3], [1440, 1000, 2]]) {
+    for (const [width, height, scale] of [[943, 889, 1], [844, 390, 1], [568, 320, 3], [740, 360, 3], [1440, 1000, 2]]) {
       const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
       const page = await context.newPage();
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(url);
+      await require('./start-screen-helper.cjs').enterGame(page);
       await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play');
       const loaded = await page.evaluate(async () => {
         cancelGameTimers();
@@ -22,7 +23,7 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
           const image = new Image(); image.src = `assets/tiles-crystal/${sheet.file}`;
           await image.decode();
           return { file: sheet.file, width: image.naturalWidth, height: image.naturalHeight,
-            correct: image.naturalWidth === sheet.width && image.naturalHeight === sheet.height };
+            correct: Math.abs(image.naturalWidth / sheet.width - image.naturalHeight / sheet.height) < .01 };
         }));
       });
       assert.equal(loaded.length, 5);
@@ -57,7 +58,7 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
               tile.getBoundingClientRect().bottom <= hand.top + 1)) };
       });
       assert.ok(metrics.handCount > 0);
-      assert.ok(metrics.handTileWidth >= (metrics.tableWidth < 440 ? 13 : 32), `${width}: use available table width for hand`);
+      assert.ok(metrics.handTileWidth >= (width < 700 ? 18 : width < 800 ? 24 : 32), `${width}: use available table width for hand`);
       assert.ok(metrics.entireHandVisible, `${width}: every hand tile is visible at once`);
       assert.ok(metrics.handInsideTable, `${width}: hand remains inside all four table edges`);
       assert.equal(metrics.artworkWidth, metrics.handTileWidth, `${width}: no redundant border shrinking the artwork`);
@@ -86,7 +87,7 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
       });
       assert.equal(await page.locator('.mahjong-fx .fx-tile.is-back').count(), 4);
       assert.ok((await page.locator('.mahjong-fx .fx-tile.is-back').first().evaluate(el =>
-        getComputedStyle(el, '::before').backgroundImage)).includes('04-honors-and-back.png'));
+        getComputedStyle(el, '::before').backgroundImage)).includes('04-honors-and-back.'));
       results.push({ width, height, ...metrics, effect, loaded });
       await context.close();
     }

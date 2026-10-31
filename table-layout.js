@@ -267,6 +267,12 @@
       const card = document.getElementById(`playerInfo${pid}`).getBoundingClientRect();
       const hasFlowers = !!flowers.querySelector('.flower-row .tile');
       flowers.style.setProperty('--flower-width', `${portrait ? 12 : short ? 16 : 24}px`);
+      if (!portrait && pid === 2 && hasFlowers) {
+        // The left tray must fit between the table edge and that seat's rail.
+        const room = document.getElementById('handBack2').getBoundingClientRect().left - card.left - 6;
+        const perRow = Math.min(4, flowers.querySelectorAll('.flower-row .tile').length);
+        flowers.style.setProperty('--flower-width', `${Math.max(10, Math.min(short ? 16 : 24, Math.floor((room - 60) / perRow)))}px`);
+      }
       // Flowers hang in a tray right under their owner's plate.
       // Side plates leave room for the 出牌中 badge that hangs below them.
       let x = card.left, y = card.bottom + (pid >= 2 ? 16 : 6);
@@ -294,6 +300,17 @@
         // Above the left plate; below the right one, clear of the 戰況 button under 設定.
         y = pid === 3 ? card.bottom + 6 : card.top - flowers.offsetHeight - 10;
         if (pid === 3) x = card.right - flowers.offsetWidth;
+      }
+      if (!portrait && pid === 2) {
+        // A full tray under the left plate would run into your own plate; it goes above instead.
+        const own = document.getElementById('playerInfo0').getBoundingClientRect();
+        if (y + flowers.offsetHeight > own.top - 4) y = card.top - flowers.offsetHeight - 10;
+      }
+      // Eight flowers make a wide tray: it never leaves the table.
+      x = Math.min(x, origin.right - flowers.offsetWidth - 6);
+      if (!portrait && pid === 3) {
+        const rail = document.getElementById('handBack3').getBoundingClientRect();
+        if (x < rail.right + 2 && y < rail.bottom + 4) y = rail.bottom + 4;
       }
       Object.assign(flowers.style, { left: `${x - origin.left - table.clientLeft}px`, right: 'auto', top: `${y - origin.top - table.clientTop}px`, bottom: 'auto', transform: 'none' });
       const cultivationNarrow = portrait && document.documentElement.classList.contains('cultivation-mode') && matchMedia('(max-width: 360px) and (max-height: 650px)').matches;

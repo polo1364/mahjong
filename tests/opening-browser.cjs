@@ -140,12 +140,14 @@ async function restart(page) {
   if (await page.locator('#settingsPanel').isVisible()) await page.locator('#settingsCancel').click();
   const previous = await page.evaluate(() => openingRecords.length);
   if (await page.locator('#tableMenu').isHidden()) await page.locator('#tableMenuBtn').click();
+  await page.locator('#tmTab-session').click();
   await page.locator('#newGameBtn').click();
   await page.waitForFunction(count => openingRecords.length === count + 1, previous);
 }
 
 async function feedbackSettings(page) {
   if (await page.locator('#tableMenu').isHidden()) await page.locator('#tableMenuBtn').click();
+  await page.locator('#tmTab-view').click();
 }
 
 async function fullSequence(page, label) {
@@ -302,7 +304,7 @@ async function squareContainerChecks(browser) {
     await video.delete();
     await recording.close();
 
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const context = await browser.newContext({ viewport: { width: 844, height: 390 } });
     await instrument(context);
     const page = await newPage(context);
     await fullSequence(page, 'mobile');
@@ -336,7 +338,7 @@ async function squareContainerChecks(browser) {
     checks.push({ scenario: 'cancel-during-restart', passed: true });
 
     await restart(page);
-    await page.setViewportSize({ width: 430, height: 932 });
+    await page.setViewportSize({ width: 932, height: 430 });
     const resized = await settled(page);
     assertClean(resized);
     assert.equal(resized.record.result.status, 'skipped');
@@ -415,7 +417,7 @@ async function squareContainerChecks(browser) {
     checks.push({ scenario: 'os-reduced-motion', durationMs: osReduced.record.durationMs, passed: true });
 
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    for (const [width, height] of [[320, 568], [844, 390]]) {
+    for (const [width, height] of [[568, 320], [844, 390]]) {
       await page.setViewportSize({ width, height });
       await restart(page);
       await page.waitForFunction(() => document.querySelector('.opening-overlay')?.dataset.phase === 'deal');

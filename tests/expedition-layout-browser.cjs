@@ -41,14 +41,14 @@ async function state(page) {
   return page.evaluate(()=>{
     const dialog=document.querySelector('.journey-preparation-screen'),pane=dialog.querySelector('.journey-expedition');
     const r=pane.getBoundingClientRect();
-    return {visible:r.width>0&&r.height>0,scroll:pane.scrollTop,expanded:dialog.querySelector('.prep-left-toggle').getAttribute('aria-expanded')};
+    return {visible:r.width>0&&r.height>0&&getComputedStyle(pane).visibility==='visible',scroll:pane.scrollTop,expanded:String(dialog.dataset.prepPane==='left'||innerWidth>=1100)};
   });
 }
 async function measure(page) {
   return page.evaluate(()=>{
     const issues=[],pane=document.querySelector('.journey-expedition'),tabs=document.querySelector('.prep-left-tabs');
     const pr=pane.getBoundingClientRect(),tr=tabs.getBoundingClientRect();
-    if(pr.top<tr.bottom-1||pr.bottom>innerHeight+1||pr.left<0||pr.right>innerWidth+1)issues.push('pane outside usable area');
+    if((pr.top<tr.bottom-1&&pr.left<tr.right-1)||pr.bottom>innerHeight+1||pr.left<0||pr.right>innerWidth+1)issues.push('pane outside usable area');
     if(pane.scrollWidth>pane.clientWidth+1)issues.push('horizontal pane overflow');
     if(document.documentElement.scrollWidth>innerWidth+1)issues.push('horizontal page overflow');
     const controls=[...document.querySelectorAll('#journeyHome,#journeyNext,.prep-left-toggle'),...tabs.querySelectorAll('button'),...pane.querySelectorAll('button')];
@@ -77,7 +77,7 @@ async function measure(page) {
       const page=await context.newPage();page.on('pageerror',err=>report.errors.push(err.message));
       await page.goto(url);await page.waitForFunction(()=>MahjongStartScreen?.state==='home'&&!document.querySelector('#startGameBtn').disabled);
       await fixture(page);
-      await page.locator('.prep-left-close').click();
+      await page.locator('[data-tab="loot"]').click();
       await page.locator('#journeyNext').click();
       const prompted=await state(page);
       const eventVisible=await page.locator('.expedition-event h3').evaluate(el=>{const r=el.getBoundingClientRect(),pane=el.closest('.journey-expedition').getBoundingClientRect();return r.top>=pane.top&&r.bottom<=pane.bottom;});

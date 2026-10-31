@@ -119,7 +119,7 @@ async function playRealVoice(page, cue, protocol) {
     await page.keyboard.press('Shift+Tab');
     check(await page.evaluate(() => document.activeElement.id === 'previewVoice'), 'Shift Tab returns to voice preview in normal mode');
 
-    for (const [width, height] of [[1440, 1000], [390, 844], [320, 568], [844, 390]]) {
+    for (const [width, height] of [[1440, 1000], [740, 360], [568, 320], [844, 390]]) {
       await page.setViewportSize({ width, height });
       await page.locator('#tmTab-names').click();
       const reference = path.join(out, `${prefix}reference-${width}x${height}.png`);

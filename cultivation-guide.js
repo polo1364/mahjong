@@ -44,7 +44,9 @@
     if (!game()?.cultivation && !prepOpen()) return;
     // A tip whose dialog closed is shown again later rather than lost.
     if (card && !card.isConnected) { card = null; current = null; }
-    if (card) return;
+    // A full-screen dialog opened over the tip: move it inside, or it could never be seen or dismissed.
+    // A small dialog (codex, skill choice) closes on its own, so the tip waits behind it instead of covering its controls.
+    if (card) { const open = openDialog(), host = !open ? document.body : open.matches('.journey-screen') ? open : card.parentElement; if (card.parentElement !== host) host.append(card); return; }
     const tip = tips.find(t => !seen[t.id] && (() => { try { return t.when(); } catch (_) { return false; } })());
     if (tip) show(tip);
   }

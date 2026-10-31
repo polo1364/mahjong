@@ -7,7 +7,7 @@ const dpr = desktop ? 1 : 3, prefix = desktop ? 'desktop-media' : 'mobile-media'
 let holdAudio = true;
 const pending = [];
 const server = http.createServer((req, res) => {
-  let name = new URL(req.url, 'http://localhost').pathname;
+  let name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
   if (name.endsWith('/')) name += 'index.html';
   const file = path.resolve(root, '.' + name);
   const send = () => {
@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
         const play = HTMLMediaElement.prototype.play;
         HTMLMediaElement.prototype.play = function () {
           const at = performance.now();
-          this.addEventListener('playing', () => window.testSoundStarts.push({ src: this.src, delay: performance.now() - at }), { once: true });
+          if (!this.src.includes('/music/')) this.addEventListener('playing', () => window.testSoundStarts.push({ src: this.src, delay: performance.now() - at }), { once: true });
           return play.call(this);
         };
       });

@@ -10,7 +10,7 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
   const browser = await chromium.launch({ headless: true });
   const results = [], errors = [];
   try {
-    for (const [width, height, scale] of [[320, 568, 3], [390, 844, 3], [943, 889, 1], [1440, 1000, 2]]) {
+    for (const [width, height, scale] of [[568, 320, 3], [844, 390, 3], [943, 889, 1], [1440, 1000, 2]]) {
       const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
       const page = await context.newPage();
       page.on('pageerror', error => errors.push(error.message));
@@ -112,6 +112,7 @@ const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
       await page.screenshot({ path: path.join(out, `result-layout-${width}-${scale}x.png`) });
       await page.locator('.result-panel').evaluate(panel => { panel.scrollTop = panel.scrollHeight; });
       const footer = await page.evaluate(() => {
+        const rows = document.querySelector('.rs-rows'); if (rows) rows.scrollTop = rows.scrollHeight;
         const button = document.getElementById('btnContinueNext').getBoundingClientRect();
         const last = document.querySelector('.result-player:last-of-type .rs-hand .tile:last-child').getBoundingClientRect();
         return { buttonTop: button.top, buttonBottom: button.bottom, lastTileBottom: last.bottom, height: innerHeight,

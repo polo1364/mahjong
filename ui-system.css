@@ -1,0 +1,521 @@
+/* 雀仙門 UI system. Loaded last: every screen shares these tokens and parts.
+   Look: ink-teal lacquer panels with gold corner brackets, cut-corner jade-tablet buttons, tile-shaped navigation.
+   Rules of thumb: one primary action per screen and always in view; tap targets at least 44px on touch. */
+:root {
+  --ui-ink: #061417; --ui-panel: #0b2126; --ui-panel-2: #10303400; --ui-raise: #143a40;
+  --ui-gold: #e6c784; --ui-gold-hi: #fff0c4; --ui-gold-lo: #a97f3c; --ui-line: #e6c78433; --ui-line-2: #e6c78466;
+  --ui-text: #f1ead8; --ui-mute: #a9bdb8; --ui-jade: #86dcc8; --ui-red: #e0694f;
+  --ui-title: "DFKai-SB", "KaiTi", "BiauKai", "STKaiti", serif;
+  --ui-body: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+  --ui-lacquer: url("assets/ui/lacquer.webp") 0 0 / 256px;
+  --ui-fill: linear-gradient(160deg, #15383e99, #0a1e23b0 55%, #071619d0), var(--ui-lacquer);
+  /* Art plates from tools/build-ui-art.cjs. The images are wider than the 1px border, so layout stays the same. */
+  --ui-frame: url("assets/ui/frame-panel.webp") 72 / var(--ui-frame-w, 36px) / 0 stretch;
+  --ui-frame-small: url("assets/ui/frame-small.webp") 24 / 12px / 0 stretch;
+  --ui-frame-card: url("assets/ui/frame-card.webp") 36 / 18px / 0 stretch;
+  --ui-frame-card-on: url("assets/ui/frame-card-on.webp") 36 / 18px / 0 stretch;
+  --ui-plate: url("assets/ui/btn-jade.webp") 30 48 fill / 15px 24px / 0 stretch;
+  --ui-plate-gold: url("assets/ui/btn-gold.webp") 30 48 fill / 15px 24px / 0 stretch;
+  --ui-title-plate: url("assets/ui/title-plate.webp") 0 78 fill / 0 39px / 0 stretch;
+  --ui-metal: linear-gradient(#fff0c4, #c99a4d);
+}
+
+/* Focus: a clear ring for keyboard users only; dialog titles take focus silently. */
+html:not(.ui-keyboard) :is(button, summary, select, input, [tabindex]):focus,
+html:not(.ui-keyboard) :is(button, summary, select, input, [tabindex]):focus-visible { outline: none !important; box-shadow: revert-layer; }
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus, h3[tabindex="-1"]:focus { outline: none !important; }
+html.ui-keyboard :is(button, summary, select, input):focus-visible { outline: 2px solid var(--ui-gold-hi) !important; outline-offset: -4px !important; }
+
+/* ---------- Buttons ---------- */
+.ui-btn,
+.start-screen button:not(.save-backup-row button),
+dialog.journey-screen .journey-footer button,
+#btnContinueNext, .prep-pager button, .save-backup-dialog button {
+  position: relative; min-height: 44px; padding: 0 22px; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; border-radius: 0 !important;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  color: var(--ui-text) !important; font: 700 15px/1.1 var(--ui-body) !important; letter-spacing: 1px;
+  background: none !important; box-shadow: none !important; cursor: pointer; text-shadow: 0 1px 2px #000a;
+  transform: none; transition: filter .12s, transform .08s;
+}
+#startScreen button.primary, dialog.journey-screen .journey-footer button.primary, #btnContinueNext {
+  color: #2b1a06 !important; border-image: var(--ui-plate-gold) !important; text-shadow: 0 1px 0 #fff5; min-height: 48px; padding: 0 28px;
+}
+:is(.start-screen button, .journey-footer button, #btnContinueNext, .prep-pager button):hover:not(:disabled) { filter: brightness(1.12) drop-shadow(0 0 6px #e6c78466); }
+:is(.start-screen button, .journey-footer button, #btnContinueNext, .prep-pager button):active:not(:disabled) { transform: translateY(1px) scale(.985); filter: brightness(.9); }
+:is(.start-screen button, .journey-footer button, #btnContinueNext, .prep-pager button):disabled { filter: saturate(.2) brightness(.65); cursor: not-allowed; }
+
+/* ---------- Home: full-bleed key art, logo and a stacked menu ---------- */
+#startScreen { padding: 0 !important; background: var(--ui-ink) !important; overflow: hidden; }
+#startScreen::before, #startScreen::after { display: none !important; }
+#startScreen .start-frame {
+  position: fixed; inset: 0; width: auto !important; max-width: none !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+  border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; overflow: hidden !important;
+}
+#startScreen .start-frame::before, #startScreen .start-frame::after, #startScreen .start-brand, #startScreen .start-footnote { display: none !important; }
+#startScreen .start-home { position: absolute !important; inset: 0; display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+#startScreen .start-hero { position: absolute !important; inset: 0; width: auto !important; max-width: none !important; height: auto !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; overflow: hidden; }
+#startScreen .start-hero img { display: block; width: max(72%, 150vh) !important; height: 100% !important; max-height: none !important; margin-left: auto; object-fit: cover; object-position: 50% 45%; border: 0 !important; border-radius: 0 !important; }
+#startScreen .start-hero figcaption { display: none !important; }
+#startScreen .start-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ui-ink) 26%, #06141700 56%), linear-gradient(0deg, #040e12b0 0%, #040e1200 30%); }
+#startScreen .start-home-copy {
+  position: absolute !important; z-index: 2; left: clamp(24px, 6vw, 96px); top: 0; bottom: 0; width: min(340px, 42vw) !important; max-width: none !important; padding: 0 !important; margin: 0 !important;
+  display: flex !important; flex-direction: column; justify-content: center; align-items: stretch; gap: 6px; text-align: left !important; background: none !important; border: 0 !important;
+}
+#startScreen .start-seal, #startScreen .start-divider, #startScreen .start-kicker, #startScreen .start-intro { display: none !important; }
+#startScreen #startTitle { position: relative; margin: 0 0 0 -3% !important; width: 106%; aspect-ratio: 1040 / 340; font-size: 0 !important; color: transparent !important; background: url("assets/ui/logo.webp") left center / contain no-repeat; }
+#startScreen .start-subtitle { margin: -12px 0 clamp(8px, 2.4vh, 22px) !important; font: 500 clamp(13px, 1.5vw, 18px)/1.4 var(--ui-body) !important; letter-spacing: .32em !important; color: var(--ui-gold) !important; text-align: left; }
+#startScreen .start-actions { display: flex !important; flex-direction: column; gap: 8px !important; width: 100% !important; margin: 0 !important; }
+#startScreen .start-actions button { width: 100%; justify-content: space-between; padding: 0 36px !important; }
+#startScreen .start-save-time { margin: 0 !important; font-size: 12px !important; color: var(--ui-mute) !important; text-align: left; }
+#startScreen .start-status { position: absolute; z-index: 3; left: clamp(24px, 6vw, 96px); bottom: 8px; margin: 0; font-size: 12px; color: var(--ui-mute); }
+#startScreen .start-status:empty { display: none; }
+/* Secondary home information sits in the corner, over the art. */
+#startScreen #cultivationProgressionHome {
+  position: fixed; z-index: 3; right: clamp(12px, 2.5vw, 36px); bottom: clamp(10px, 2.5vh, 32px); width: min(300px, 38vw); margin: 0 !important;
+}
+#startScreen #cultivationProgressionHome .progression-card { margin: 0; padding: 10px 14px; border: 1px solid transparent; border-image: var(--ui-frame-small) !important; border-radius: 2px; background: #071a1fd9; backdrop-filter: blur(4px); }
+#startScreen #cultivationProgressionHome .progression-kicker { display: none; }
+#startScreen #cultivationProgressionHome h3 { margin: 0 0 4px; font-size: 16px; }
+#startScreen .save-backup-row { position: fixed; z-index: 3; right: clamp(12px, 2.5vw, 36px); top: clamp(10px, 2.5vh, 28px); margin: 0 !important; gap: 8px; color: var(--ui-text); text-shadow: 0 1px 4px #000; }
+#startScreen .save-backup-row button { min-height: 44px; padding: 0 20px; border-radius: 0; border: 1px solid transparent; border-image: var(--ui-plate) !important; background: none; color: var(--ui-gold-hi); font: 700 13px var(--ui-body); }
+
+/* ---------- Mode select: two full-art cards, the whole card is the button ---------- */
+#startScreen .start-modes { position: absolute !important; inset: 0; z-index: 4; width: auto !important; max-width: none !important; margin: 0 !important; padding: clamp(8px, 2vh, 28px) clamp(10px, 2.4vw, 40px) clamp(10px, 2vh, 28px) !important; display: grid !important; grid-template-rows: auto minmax(0, 1fr); grid-template-columns: auto 1fr auto; gap: clamp(6px, 1.6vh, 18px) 12px; background: var(--ui-ink) url("assets/ui/bg-mist.webp") center / cover; }
+#startScreen .start-modes[hidden] { display: none !important; }
+#startScreen .start-modes > .start-kicker { display: none !important; }
+#startScreen .start-back { grid-column: 1; grid-row: 1; position: static !important; min-height: 44px; }
+#startScreen #startModesTitle { grid-column: 2; grid-row: 1; justify-self: center; margin: 0 96px 0 0 !important; align-self: center; text-align: center; padding: 5px 44px; border: 1px solid transparent; border-image: var(--ui-title-plate) !important; font: 400 clamp(22px, 3vw, 36px)/1 var(--ui-title) !important; letter-spacing: .24em; color: var(--ui-gold-hi) !important; }
+#startScreen .start-mode-grid { grid-column: 1 / -1; grid-row: 2; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: clamp(10px, 1.6vw, 22px) !important; min-height: 0; margin: 0 !important; width: 100% !important; max-width: none !important; }
+#startScreen .start-mode-card { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: 0 !important; height: auto !important; padding: clamp(12px, 2.4vh, 28px) clamp(14px, 2vw, 30px) !important; overflow: hidden; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: none !important; box-shadow: 0 10px 28px #000a !important; text-align: left; transition: filter .15s; }
+#startScreen .start-mode-card:hover { filter: brightness(1.1); }
+#startScreen .start-mode-art { position: absolute !important; inset: 0; z-index: -2; width: 100% !important; height: 100% !important; max-height: none !important; object-fit: cover !important; border: 0 !important; border-radius: 0 !important; margin: 0 !important; }
+#startScreen .start-mode-card { isolation: isolate; }
+#startScreen .start-mode-card::before { content: ""; position: absolute; inset: 0; z-index: -1; display: block !important; background: linear-gradient(0deg, #040e12f5 8%, #040e12b0 42%, #040e1200 70%); }
+#startScreen .start-mode-card::after { display: none !important; }
+#startScreen .start-mode-heading { display: block !important; margin: 0 !important; }
+#startScreen .start-mode-symbol { display: none !important; }
+#startScreen .start-mode-tag { display: block; font-size: 12px !important; letter-spacing: 2px; color: var(--ui-jade) !important; }
+#startScreen .start-cultivation .start-mode-tag { color: var(--ui-gold) !important; }
+#startScreen .start-mode-card h3 { margin: 2px 0 !important; font: 400 clamp(24px, 3.4vw, 42px)/1.15 var(--ui-title) !important; letter-spacing: .14em; color: var(--ui-gold-hi) !important; }
+#startScreen .start-mode-card p { margin: 0 0 clamp(6px, 1.4vh, 14px) !important; font-size: 13px !important; color: var(--ui-text) !important; }
+#startScreen .start-mode-card button { width: 100%; margin: 0 !important; flex: none; }
+#startScreen .start-mode-heading { margin-top: auto !important; }
+
+/* ---------- Journey dialogs: shared frame ---------- */
+dialog.journey-screen { background: var(--ui-ink) url("assets/ui/bg-mist.webp") center / cover !important; color: var(--ui-text); }
+dialog.journey-preparation-screen { background: linear-gradient(#061417d8, #061417b8), url("assets/cultivation-journey/preparation-courtyard.webp") center / cover, var(--ui-ink) !important; }
+dialog.journey-screen .journey-header h1 { width: fit-content !important; max-width: 100%; box-sizing: border-box; padding: 5px 44px !important; border: 1px solid transparent; border-image: var(--ui-title-plate) !important; font: 400 clamp(20px, 2.6vw, 34px)/1.15 var(--ui-title) !important; letter-spacing: .14em !important; color: var(--ui-gold-hi) !important; text-shadow: 0 1px 3px #000; }
+dialog.journey-screen .journey-chapter { display: none !important; }
+
+dialog.journey-screen :is(article, section, details, summary, select, aside, label, li, div):not(.tile):not(.tile *) { border-radius: 2px !important; }
+
+/* ---------- Hero select: roster, portrait, details; confirm is always in view ---------- */
+dialog.journey-selection-screen { overflow: hidden !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: 0 !important; border: 0 !important; }
+dialog.journey-selection-screen .journey-wrap { height: 100dvh !important; max-height: 100dvh; width: 100% !important; max-width: 1500px !important; margin: 0 auto !important; padding: clamp(6px, 1.6vh, 24px) clamp(10px, 2.4vw, 40px) !important; display: grid !important; grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(6px, 1.4vh, 16px); overflow: hidden !important; }
+dialog.journey-selection-screen .journey-header { display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; min-height: 0 !important; }
+dialog.journey-selection-screen .journey-header p { display: none !important; }
+dialog.journey-selection-screen .journey-intro { display: none !important; }
+dialog.journey-selection-screen .journey-selection { display: grid !important; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.4fr) !important; gap: clamp(8px, 1.4vw, 22px) !important; min-height: 0; height: 100%; margin: 0 !important; }
+dialog.journey-selection-screen .journey-hero-grid { display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; grid-auto-rows: minmax(0, 1fr) !important; grid-template-rows: repeat(2, minmax(0, 1fr)) !important; gap: clamp(4px, .7vw, 10px) !important; min-height: 0; height: 100%; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
+dialog.journey-selection-screen .journey-hero-option { display: flex !important; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px; min-width: 0 !important; min-height: 0 !important; height: 100% !important; width: auto !important; padding: 2px 2px 4px !important; overflow: hidden; border: 1px solid transparent !important; border-image: var(--ui-frame-card) !important; border-radius: 2px !important; background: linear-gradient(#143a40cc, #0a1e23e6) !important; box-shadow: none !important; transform: none !important; transition: filter .12s; }
+dialog.journey-selection-screen .journey-hero-option:hover { filter: brightness(1.15); }
+dialog.journey-selection-screen .journey-hero-option img { flex: 1 1 0; min-height: 0; width: 100% !important; height: auto !important; object-fit: contain; object-position: 50% 20%; }
+dialog.journey-selection-screen .journey-hero-option span { font: 400 clamp(12px, 1.25vw, 18px)/1.15 var(--ui-title) !important; letter-spacing: 0 !important; color: var(--ui-text) !important; white-space: nowrap; }
+dialog.journey-selection-screen .journey-hero-option small { padding: 0 !important; border: 0 !important; background: none !important; font-size: 11px !important; line-height: 1.2 !important; color: var(--ui-jade) !important; box-shadow: none !important; }
+dialog.journey-selection-screen .journey-hero-option.is-selected { border-image: var(--ui-frame-card-on) !important; background: radial-gradient(circle at 50% 35%, #e6c78455, #1a2c20e6 70%) !important; }
+dialog.journey-selection-screen .journey-hero-option.is-selected span { color: var(--ui-gold-hi) !important; }
+dialog.journey-selection-screen .journey-hero-detail { display: grid !important; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) !important; gap: clamp(6px, 1vw, 16px) !important; min-height: 0; height: 100%; margin: 0 !important; padding: clamp(10px, 1.6vh, 22px) clamp(12px, 1.4vw, 24px) !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill) !important; box-shadow: none !important; overflow: hidden !important; }
+dialog.journey-selection-screen .journey-selected-art, dialog.journey-selection-screen #journeyHeroDetails { grid-area: auto !important; grid-row: 1 !important; align-self: stretch !important; }
+dialog.journey-selection-screen .journey-selected-art { grid-column: 1 !important; position: static !important; min-height: 0; height: 100% !important; width: 100% !important; margin: 0 !important; overflow: hidden; }
+dialog.journey-selection-screen .journey-selected-art picture { display: block; height: 100%; }
+dialog.journey-selection-screen .journey-selected-art img { display: block; width: 100% !important; height: 100% !important; max-height: none !important; object-fit: contain !important; object-position: 50% 30%; }
+dialog.journey-selection-screen #journeyHeroDetails { grid-column: 2 !important; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
+dialog.journey-selection-screen #journeyHeroDetails h2 { margin: 2px 0 6px !important; font: 400 clamp(20px, 2.4vw, 32px)/1.15 var(--ui-title) !important; letter-spacing: .1em !important; color: var(--ui-gold-hi) !important; }
+dialog.journey-selection-screen .journey-role { display: inline-block; margin: 0 !important; padding: 2px 8px !important; border-radius: 1px !important; background: #86dcc822 !important; border: 1px solid #86dcc855; color: var(--ui-jade) !important; font-size: 12px !important; }
+dialog.journey-selection-screen .journey-footer { display: flex !important; justify-content: flex-end; align-items: center; gap: 12px; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; position: static !important; }
+dialog.journey-selection-screen .journey-footer p { flex: 1; margin: 0 !important; font-size: 12px !important; color: var(--ui-mute) !important; }
+dialog.journey-selection-screen .journey-footer > div { display: flex; gap: 10px; flex: none; }
+
+/* Stat tiles are shared by hero select and the role sheet. */
+dialog.journey-screen .journey-stats { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 4px !important; margin: 0 0 6px !important; }
+dialog.journey-screen .journey-stats > div { padding: 4px 6px !important; min-height: 0 !important; border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; border-radius: 1px !important; background: #071a1fcc !important; text-align: center; }
+dialog.journey-screen .journey-stats dt { font-size: 11px !important; color: var(--ui-mute) !important; }
+dialog.journey-screen .journey-stats dd { margin: 0 !important; font: 700 clamp(14px, 1.6vw, 22px)/1.2 "Segoe UI", var(--ui-body) !important; color: var(--ui-text) !important; }
+dialog.journey-screen .journey-stats dd small { font-size: 11px !important; color: var(--ui-gold) !important; }
+
+/* ---------- Preparation: one tile-shaped navigation rail replaces the two tab rows and the drawer ---------- */
+dialog.journey-preparation-screen { padding: 0 !important; margin: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; border: 0 !important; overflow: hidden !important; --rail-item: 60px; --rail-gap: 4px; --rail: calc(var(--rail-item) * 2 + var(--rail-gap)); --bar: 52px; }
+dialog.journey-preparation-screen.prep-noscroll .journey-wrap { display: grid !important; grid-template-rows: var(--bar) minmax(0, 1fr) !important; gap: 6px !important; height: 100dvh !important; max-height: 100dvh !important; width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 clamp(6px, 1vw, 16px) clamp(6px, 1vh, 14px) !important; overflow: hidden !important; box-sizing: border-box !important; }
+dialog.journey-preparation-screen.prep-noscroll .journey-header { display: flex !important; align-items: center !important; gap: 10px !important; height: var(--bar); margin: 0 !important; padding: 0 !important; border: 0 !important; border-bottom: 1px solid var(--ui-line) !important; min-width: 0; }
+dialog.journey-preparation-screen.prep-noscroll .journey-header > div:first-child { flex: 0 1 auto !important; min-width: 0; }
+dialog.journey-preparation-screen.prep-noscroll .journey-header > div:first-child > p { display: none !important; }
+dialog.journey-preparation-screen.prep-noscroll .journey-header h1 { margin: 0 !important; width: auto !important; white-space: nowrap; font-size: clamp(18px, 2.2vw, 28px) !important; }
+dialog.journey-preparation-screen .prep-left-toggle, dialog.journey-preparation-screen .prep-left-tabs .prep-left-close { display: none !important; }
+dialog.journey-preparation-screen.prep-noscroll .journey-footer { display: flex !important; flex: 0 0 auto; margin: 0 0 0 auto !important; padding: 0 !important; border: 0 !important; background: none !important; align-items: center; gap: 8px; }
+dialog.journey-preparation-screen.prep-noscroll .journey-footer p { display: none !important; }
+dialog.journey-preparation-screen.prep-noscroll .journey-footer > div { display: flex; gap: 8px; }
+dialog.journey-preparation-screen.prep-noscroll .journey-footer button { min-height: 44px !important; height: 44px; padding: 0 16px !important; font-size: 14px !important; white-space: nowrap; }
+/* Both panes share one cell beside the rail; the inactive one is hidden but keeps its measured size. */
+dialog.journey-preparation-screen .journey-preparation-grid { position: relative !important; display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: minmax(0, 1fr) !important; gap: 0 !important; height: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 0 0 calc(var(--rail) + 8px) !important; overflow: visible !important; }
+dialog.journey-preparation-screen .journey-preparation-grid > .prep-left,
+dialog.journey-preparation-screen .journey-preparation-grid > .equip-ui,
+dialog.journey-preparation-screen .journey-preparation-grid > * { grid-area: 1 / 1 !important; min-width: 0 !important; min-height: 0 !important; height: 100% !important; width: auto !important; max-width: none !important; }
+dialog.journey-preparation-screen .prep-left { position: static !important; inset: auto !important; display: flex !important; flex-direction: column; transform: none !important; visibility: visible !important; padding: 0 !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill) !important; box-shadow: none !important; overflow: hidden; z-index: auto !important; }
+dialog.journey-preparation-screen .equip-ui { position: static !important; }
+dialog.journey-preparation-screen[data-prep-pane="left"] .equip-ui > *:not(.equip-tabs):not(.equip-wallet),
+dialog.journey-preparation-screen[data-prep-pane="left"] .equip-ui { visibility: hidden; pointer-events: none; }
+dialog.journey-preparation-screen[data-prep-pane="right"] .prep-left,
+dialog.journey-preparation-screen:not([data-prep-pane="left"]) .prep-left { visibility: hidden !important; pointer-events: none; }
+/* The tab groups stay real tabs in their own panes; they are only placed on the rail. */
+dialog.journey-preparation-screen .prep-left-tabs,
+dialog.journey-preparation-screen .equip-tabs { position: absolute !important; top: 0; bottom: 0; width: var(--rail-item) !important; height: auto !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; display: flex !important; flex-direction: column; gap: var(--rail-gap) !important; visibility: visible !important; pointer-events: auto; overflow: visible !important; }
+dialog.journey-preparation-screen .prep-left-tabs { left: 0; }
+dialog.journey-preparation-screen .equip-tabs { left: calc(var(--rail-item) + var(--rail-gap)); }
+dialog.journey-preparation-screen :is(.prep-left-tabs, .equip-tabs) button:not(.prep-left-close) {
+  flex: 0 0 calc((100% - var(--rail-gap) * 4) / 5) !important; max-height: 92px; min-height: 0 !important; width: 100% !important; margin: 0 !important; padding: 2px 0 !important;
+  display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid transparent !important; border-image: url("assets/ui/tile-jade.webp") 28 fill / 14px / 0 stretch !important; border-radius: 0 !important;
+  color: var(--ui-text) !important; font: 600 10.5px/1.15 var(--ui-body) !important; letter-spacing: 0 !important; white-space: nowrap; text-shadow: 0 1px 2px #000;
+  background: none !important; box-shadow: none !important; visibility: visible; pointer-events: auto; transition: filter .12s;
+}
+dialog.journey-preparation-screen :is(.prep-left-tabs, .equip-tabs) button:hover { filter: brightness(1.2); }
+dialog.journey-preparation-screen :is(.prep-left-tabs, .equip-tabs) button::before { content: ""; flex: 0 1 clamp(20px, 6vh, 34px); min-height: 0; aspect-ratio: 1; background: var(--ui-metal); -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+dialog.journey-preparation-screen [data-left="hero"] { --icon: var(--icon-hero); }
+dialog.journey-preparation-screen [data-left="progression"] { --icon: var(--icon-lotus); }
+dialog.journey-preparation-screen [data-left="expedition"] { --icon: var(--icon-compass); }
+dialog.journey-preparation-screen [data-left="road"] { --icon: var(--icon-road); }
+dialog.journey-preparation-screen [data-left="party"] { --icon: var(--icon-party); }
+dialog.journey-preparation-screen [data-tab="loot"] { --icon: var(--icon-chest); }
+dialog.journey-preparation-screen [data-tab="items"] { --icon: var(--icon-pouch); }
+dialog.journey-preparation-screen [data-tab="inventory"] { --icon: var(--icon-sword); }
+dialog.journey-preparation-screen [data-tab="shop"] { --icon: var(--icon-stall); }
+dialog.journey-preparation-screen [data-tab="forge"] { --icon: var(--icon-forge); }
+dialog.journey-preparation-screen[data-prep-pane="left"] .prep-left-tabs button[aria-selected="true"],
+dialog.journey-preparation-screen:not([data-prep-pane="left"]) .equip-tabs button[aria-selected="true"] {
+  border-image: url("assets/ui/tile-gold.webp") 28 fill / 14px / 0 stretch !important; color: #2b1a06 !important; text-shadow: none; transform: translateX(1px);
+}
+dialog.journey-preparation-screen[data-prep-pane="left"] .prep-left-tabs button[aria-selected="true"]::before,
+dialog.journey-preparation-screen:not([data-prep-pane="left"]) .equip-tabs button[aria-selected="true"]::before { background: #6b2415; }
+/* Resources live in the top bar, always visible. */
+dialog.journey-preparation-screen .equip-wallet { position: absolute !important; top: calc(-1 * var(--bar) - 6px); left: 172px; right: 300px; height: var(--bar); margin: 0 !important; padding: 0 !important; display: flex !important; align-items: center; gap: 14px; border: 0 !important; background: none !important; min-width: 0; visibility: visible; white-space: nowrap; overflow: hidden; }
+dialog.journey-preparation-screen .equip-wallet b { display: inline-flex; align-items: center; gap: 4px; font: 500 13px var(--ui-body) !important; color: var(--ui-mute) !important; }
+dialog.journey-preparation-screen .equip-wallet b::before { content: ""; width: 20px; height: 20px; background: var(--ui-metal); -webkit-mask: var(--icon-coin) center / contain no-repeat; mask: var(--icon-coin) center / contain no-repeat; }
+dialog.journey-preparation-screen .equip-wallet b:nth-of-type(2)::before { background: linear-gradient(#d8fff2, #46c3a6); -webkit-mask-image: var(--icon-crystal); mask-image: var(--icon-crystal); }
+dialog.journey-preparation-screen .equip-wallet b span { margin-left: 4px; font: 700 18px "Segoe UI", sans-serif !important; color: var(--ui-gold-hi) !important; }
+dialog.journey-preparation-screen .equip-wallet > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 12px; color: var(--ui-gold); }
+/* Panel chrome */
+dialog.journey-preparation-screen .prep-left-body { flex: 1; min-height: 0; padding: 10px 12px !important; overflow-y: auto; scrollbar-width: thin; }
+dialog.journey-preparation-screen #equipPanel { border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill) !important; box-shadow: none !important; }
+
+/* Save notices appear in the top bar instead of covering a card. */
+dialog.journey-preparation-screen .equip-notice { position: absolute !important; top: calc(-1 * var(--bar) - 6px); left: 380px; right: 310px; height: var(--bar); margin: 0 !important; padding: 0 !important; display: flex; align-items: center; border: 0 !important; background: none !important; font-size: 12px; color: var(--ui-jade); white-space: nowrap; overflow: hidden; pointer-events: none; visibility: visible; }
+/* Everyday buttons inside the preparation screens: cut corners and a comfortable height. */
+dialog.journey-screen button:not(.journey-footer button):not([role="tab"]):not(.journey-hero-option):not(.tile):not(:has(img)):not(.prep-pager button):not(.prep-left-close):not([data-expedition-event]) {
+  min-height: var(--ui-btn-h, 38px) !important; height: auto !important; padding: 4px 18px !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; border-radius: 0 !important; box-shadow: none !important;
+  color: var(--ui-gold-hi) !important; font: 700 13px/1.1 var(--ui-body) !important; letter-spacing: .5px; background: none !important; text-shadow: 0 1px 2px #000a;
+}
+dialog.journey-screen button:not(.journey-footer button):not([role="tab"]):not(.journey-hero-option):not(.tile):not(:has(img)):not(.prep-pager button):not(.prep-left-close):not([data-expedition-event]):disabled { color: #a9bdb8 !important; filter: saturate(.2) brightness(.7); }
+dialog.journey-screen select { min-height: 40px; border: 1px solid var(--ui-line-2) !important; background-color: #071a1f !important; color: var(--ui-text) !important; }
+dialog.journey-preparation-screen [class*="supply-prepared"], dialog.journey-preparation-screen .supply-carried { background: none !important; }
+
+/* Role page: portrait on the left, everything else beside it. */
+@media (max-width: 1099px) {
+  dialog.journey-preparation-screen .prep-left-body > .journey-prepared-hero[data-left-pane]:not([hidden]) { display: grid !important; grid-template-columns: clamp(96px, 16vw, 170px) minmax(0, 1fr) !important; gap: 0 14px !important; height: auto !important; column-count: auto !important; }
+  dialog.journey-preparation-screen .prep-left-body .journey-prepared-hero > .journey-prepared-art { position: sticky; top: 0; float: none !important; grid-row: 1 !important; width: 100% !important; max-height: min(100%, 240px) !important; margin: 0 !important; object-fit: contain; object-position: 50% 0; }
+  dialog.journey-preparation-screen .prep-left-body .journey-prepared-hero > div { display: block !important; min-width: 0; }
+}
+
+dialog.journey-screen button:has(img) { border-radius: 2px !important; }
+/* Very small phones: narrower rail, and the comparison stacks under the list. */
+@media (max-width: 700px) {
+  dialog.journey-preparation-screen { --rail-item: 52px; }
+  dialog.journey-preparation-screen :is(.prep-left-tabs, .equip-tabs) button:not(.prep-left-close) { font-size: 9.5px !important; }
+  dialog.journey-preparation-screen .equip-inventory-layout { grid-template-columns: minmax(0, 1fr) !important; }
+  dialog.journey-preparation-screen .equip-wallet { left: 96px; right: 250px; gap: 8px; }
+  dialog.journey-preparation-screen.prep-noscroll .journey-header h1 { padding: 0 !important; border: 0 !important; }
+  dialog.journey-preparation-screen .equip-notice { display: none; }
+  dialog.journey-preparation-screen.prep-noscroll .journey-footer button { padding: 0 10px !important; font-size: 13px !important; }
+}
+
+/* Two panes side by side when there is room. */
+@media (min-width: 1100px) {
+  dialog.journey-preparation-screen { --rail-item: 72px; --bar: 64px; }
+  dialog.journey-preparation-screen .journey-preparation-grid { grid-template-columns: minmax(360px, 460px) minmax(0, 1fr) !important; gap: 12px !important; }
+  dialog.journey-preparation-screen .journey-preparation-grid > .prep-left { grid-area: 1 / 1 !important; }
+  dialog.journey-preparation-screen .journey-preparation-grid > .equip-ui { grid-area: 1 / 2 !important; }
+  dialog.journey-preparation-screen[data-prep-pane] .prep-left, dialog.journey-preparation-screen[data-prep-pane] .equip-ui, dialog.journey-preparation-screen[data-prep-pane] .equip-ui > *:not(.equip-notice) { visibility: visible !important; pointer-events: auto !important; }
+  #startScreen .start-hero::after { background: linear-gradient(90deg, var(--ui-ink) 18%, #06141700 36%), linear-gradient(0deg, #040e12b0 0%, #040e1200 24%); }
+  dialog.journey-preparation-screen .prep-left-tabs button[aria-selected="true"], dialog.journey-preparation-screen .equip-tabs button[aria-selected="true"] { border-image: url("assets/ui/tile-gold.webp") 28 fill / 14px / 0 stretch !important; color: #2b1a06 !important; text-shadow: none; }
+  dialog.journey-preparation-screen .prep-left-tabs button[aria-selected="true"]::before, dialog.journey-preparation-screen .equip-tabs button[aria-selected="true"]::before { background: #6b2415; }
+  dialog.journey-preparation-screen :is(.prep-left-tabs, .equip-tabs) button { font-size: 12px !important; }
+  dialog.journey-preparation-screen .equip-wallet { left: 262px; right: 360px; }
+  dialog.journey-preparation-screen .equip-notice { left: 500px; right: 360px; }
+}
+
+/* ---------- Result: the continue button never scrolls away ---------- */
+#reactionPanel > .result-panel.rs-panel { overflow: hidden !important; padding-bottom: 0 !important; border-radius: 2px !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; background: var(--ui-fill) !important; box-shadow: 0 24px 70px #000d !important; }
+#reactionPanel:has(> .rs-panel) { border-radius: 2px; }
+#reactionPanel > .rs-panel .rs-head { flex: 0 1 auto; max-height: 42%; overflow-y: auto; scrollbar-width: thin; }
+#reactionPanel > .rs-panel .rs-rows { flex: 0 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+#reactionPanel > .rs-panel .result-footer { position: static; flex: none; margin: 0 -26px !important; padding: 8px 26px 10px !important; display: flex; justify-content: flex-end; background: #071619; border: 0 !important; border-top: 1px solid var(--ui-line) !important; }
+#reactionPanel > .rs-panel .result-player.rs-row { border-radius: 2px !important; border-color: transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1f99 !important; }
+#reactionPanel > .rs-panel .result-player.rs-row.winner { border-image: var(--ui-frame-card-on) !important; background: linear-gradient(100deg, #6b562488, #071a1f99 50%) !important; }
+
+#reactionPanel > .rs-panel :is(.progression-result, .expedition-result, section, article, div[class*="card"]) { border-radius: 2px !important; }
+
+/* ---------- Settings and other in-game panels ---------- */
+#tableMenu { border-radius: 2px !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; background: var(--ui-fill), #081a1e !important; box-shadow: 0 24px 70px #000d !important; }
+#tableMenu .table-menu-heading { background: #0b2126f7 !important; border-bottom: 1px solid var(--ui-line) !important; border-radius: 0 !important; box-shadow: none !important; }
+#tableMenu .tm-tabs { background: #06141799 !important; border-color: var(--ui-line) !important; }
+#tableMenu .tm-tab { border-radius: 2px !important; }
+#tableMenu .tm-tab[aria-selected="true"] { background: linear-gradient(90deg, #e6c78433, #e6c78408) !important; border-color: var(--ui-line-2) !important; }
+#tableMenu .tm-tab-icon { box-sizing: border-box; flex: none; width: 30px !important; height: 36px !important; font-size: 0 !important; border-radius: 0 !important; border: 1px solid transparent !important; border-image: url("assets/ui/tile-jade.webp") 28 fill / 12px / 0 stretch !important; background: none !important; box-shadow: none !important; display: grid; place-items: center; }
+#tableMenu .tm-tab-icon::before { content: ""; width: 20px; height: 20px; background: var(--ui-metal); -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+#tmTab-session { --icon: var(--icon-tile); }
+#tmTab-sound { --icon: var(--icon-speaker); }
+#tmTab-view { --icon: var(--icon-eye); }
+#tmTab-play { --icon: var(--icon-hand); }
+#tmTab-names { --icon: var(--icon-tag); }
+#tmTab-voice { --icon: var(--icon-voice); }
+#tmTab-cult { --icon: var(--icon-lotus); }
+#tableMenu .tm-tab[aria-selected="true"] .tm-tab-icon { border-image: url("assets/ui/tile-gold.webp") 28 fill / 12px / 0 stretch !important; }
+#tableMenu .tm-tab[aria-selected="true"] .tm-tab-icon::before { background: #6b2415; }
+#tableMenu .tm-page .pref-group { border-radius: 2px !important; background: #06141766 !important; border-color: var(--ui-line) !important; }
+#tableMenu button:not(.tm-tab):not(.tile):not([role="switch"]) { border-radius: 0 !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; box-shadow: none !important; background: none !important; color: var(--ui-gold-hi) !important; font-family: var(--ui-body) !important; letter-spacing: 1px !important; }
+#tableMenu button.primary, #tableMenu #newGameBtn { border: 1px solid transparent !important; border-image: var(--ui-plate-gold) !important; background: none !important; color: #2b1a06 !important; }
+#settingsPanel .settings-content, .save-backup-dialog, #landscapeNotice { border-radius: 2px !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; background: var(--ui-fill), #081a1e !important; color: var(--ui-text); }
+#settingsPanel .settings-group { border-radius: 2px !important; border-color: var(--ui-line) !important; background: #06141766 !important; }
+.reaction-panel:not(.rs-panel) { border-radius: 2px !important; border-color: var(--ui-line-2) !important; }
+
+/* ---------- Table: same panels, nothing overlaps the walls ---------- */
+.player-info-inline, html.cultivation-mode .player-info-inline { border-radius: 2px !important; border-color: transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1fe0 !important; }
+.player-info-inline.active-turn { border-image: var(--ui-frame-card-on) !important; }
+.table-menu-trigger { border-radius: 0 !important; border: 1px solid transparent !important; border-image: url("assets/ui/tile-jade.webp") 28 fill / 13px / 0 stretch !important; background: none !important; color: var(--ui-gold-hi) !important; box-shadow: none !important; }
+.cult-battle-feed { border-radius: 2px !important; border-color: var(--ui-line) !important; background: #071a1fe6 !important; }
+.cult-battle-feed .cult-feed-toggle { border-radius: 2px !important; }
+.cult-monster { border-radius: 2px !important; border-color: var(--ui-line) !important; }
+
+.cult-guide { border-radius: 2px !important; border: 1px solid transparent !important; border-image: var(--ui-frame) !important; background: var(--ui-fill), #0b2126 !important; box-shadow: 0 14px 36px #000c !important; }
+.cult-guide button { border-radius: 0 !important; border: 1px solid transparent !important; border-image: var(--ui-plate-gold) !important; background: none !important; color: #2b1a06 !important; min-height: 40px; }
+
+/* ---------- Roomy screens ---------- */
+@media (min-height: 700px) {
+  #startScreen .start-home-copy { gap: 10px; width: min(420px, 36vw) !important; }
+  #startScreen .start-actions button { min-height: 58px; font-size: 18px !important; }
+  dialog.journey-selection-screen .journey-intro { display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; color: var(--ui-mute); font-size: 14px; }
+  dialog.journey-selection-screen .journey-wrap { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+  dialog.journey-selection-screen .journey-hero-option img { object-position: 50% 50%; }
+  dialog.journey-selection-screen .journey-hero-option small { font-size: 13px !important; }
+  dialog.journey-selection-screen #journeyHeroDetails { font-size: 16px; }
+  dialog.journey-selection-screen #journeyHeroDetails p { line-height: 1.6; }
+  dialog.journey-selection-screen .journey-footer button { min-height: 54px; font-size: 17px !important; }
+}
+
+/* ---------- Phone landscape ---------- */
+@media (max-height: 560px) {
+  /* Settings becomes an icon; the top seat stays clear of the wall below it. */
+  .table-menu-trigger { width: 44px !important; min-width: 44px !important; height: 44px !important; padding: 0 !important; justify-content: center; }
+  .table-menu-trigger > span:not(:first-child):not(.table-menu-badge) { display: none !important; }
+  html.cultivation-mode #playerInfo1 { top: 4px !important; max-height: 70px; padding-top: 2px !important; padding-bottom: 2px !important; overflow: hidden; }
+  html.cultivation-mode #playerInfo1 .cult-player-stats { row-gap: 0 !important; line-height: 1.2; }
+  html.cultivation-mode #playerInfo1 .seat-name { width: fit-content !important; flex: 0 0 auto !important; justify-self: start; }
+  html.cultivation-mode #playerInfo1 .cult-statuses { position: absolute; right: 6px; top: 4px; max-width: 44%; margin: 0 !important; }
+
+  #startScreen .start-subtitle { letter-spacing: .24em !important; }
+  #startScreen .start-actions button { min-height: 44px; }
+  #startScreen #cultivationProgressionHome .progression-card { padding: 6px 10px; }
+  #startScreen #cultivationProgressionHome p { font-size: 11px; margin: 2px 0 0; }
+  #startScreen .start-mode-card p { display: none; }
+  dialog.journey-selection-screen .journey-footer p { display: none !important; }
+  /* The roster already shows every portrait; the details take the whole panel. */
+  dialog.journey-selection-screen .journey-selected-art { display: none !important; }
+  dialog.journey-selection-screen .journey-hero-detail { grid-template-columns: minmax(0, 1fr) !important; }
+  dialog.journey-selection-screen #journeyHeroDetails { grid-column: 1 !important; }
+  /* Result: keep the summary short so the players stay in view. */
+  #reactionPanel > .result-panel.rs-panel { padding: 8px 14px 0 !important; gap: 6px; }
+  #reactionPanel > .rs-panel .rs-head { gap: 2px 10px; padding-bottom: 4px; }
+  #reactionPanel > .rs-panel .rs-head .eyebrow { display: none; }
+  html.cultivation-mode #reactionPanel > .rs-panel .rs-head h3 { font-size: 18px !important; letter-spacing: 1px; }
+  #reactionPanel > .rs-panel .result-footer { margin: 0 -14px !important; padding: 4px 14px 6px !important; }
+  #reactionPanel > .rs-panel .progression-result, #reactionPanel > .rs-panel .expedition-result { margin: 0 !important; padding: 4px 10px !important; font-size: 12px; }
+  dialog.journey-selection-screen .journey-header h1 { margin: 0 !important; }
+  dialog.journey-screen .journey-stats dt { font-size: 10px !important; }
+}
+
+/* Expedition choices are the main action of their pane: full touch height. */
+dialog.journey-screen .expedition-card { --ui-btn-h: 44px; }
+
+/* Rules dialog: the whole panel scrolls inside the screen and its buttons stay pinned. */
+#settingsPanel .settings-content { box-sizing: border-box; max-height: calc(100dvh - 40px) !important; overflow-y: auto !important; padding-bottom: 0 !important; border-radius: 2px !important; }
+#settingsPanel .settings-content .settings-buttons { position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: flex-end; gap: 10px; margin: 12px -28px 0 !important; padding: 8px 28px 10px !important; background: #071619 !important; border-top: 1px solid var(--ui-line) !important; border-radius: 0 !important; }
+#settingsPanel select, #settingsPanel input:not([type="checkbox"]):not([type="range"]) { border-radius: 2px !important; border-color: var(--ui-line-2) !important; background-color: #071a1f !important; color: var(--ui-text) !important; }
+#settingsPanel .settings-buttons button { border-radius: 0 !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; box-shadow: none !important; background: none !important; color: var(--ui-gold-hi) !important; }
+#settingsPanel .settings-buttons button.primary { border: 1px solid transparent !important; border-image: var(--ui-plate-gold) !important; background: none !important; color: #2b1a06 !important; }
+
+/* Table centre shares the panel colours. */
+html[data-center-style].table-scene.square-table .mahjong-table .center-info-panel { background: linear-gradient(160deg, #123036f5, #071619f8) !important; border-color: var(--ui-line-2) !important; }
+#settingsPanel { border-radius: 2px !important; }
+#settingsPanel .settings-content .settings-buttons { justify-content: flex-start; }
+.cult-insight { border-radius: 2px !important; border-color: transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1ff2 !important; }
+
+/* ---------- Art layer: shared cards, form controls ---------- */
+html { accent-color: var(--ui-gold); scrollbar-color: #a97f3c88 transparent; }
+dialog.journey-screen :is(.equip-card, .supply-card, .supply-slot, .journey-slot, .expedition-card, .exp-boss-card, .progression-card, .journey-passive, .progression-details, .equip-worn button, .supply-summary > *):not(.tile) { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1fb8 !important; box-shadow: none !important; }
+dialog.journey-screen select, #settingsPanel select { -webkit-appearance: none; appearance: none; padding-right: 28px !important; background: #071a1f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4h8L6 9z' fill='%23e6c784'/%3E%3C/svg%3E") right 8px center / 12px no-repeat !important; }
+
+/* ---------- Motion: quick and never blocking ---------- */
+@keyframes ui-fade { from { opacity: 0; } }
+@keyframes ui-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes ui-sheen { 0%, 78% { background-position: 130% 0; } 100% { background-position: -30% 0; } }
+@keyframes ui-spark { from { opacity: .85; transform: translate(-50%, -50%) scale(.2); } to { opacity: 0; transform: translate(-50%, -50%) scale(1); } }
+dialog.journey-screen[open] { animation: ui-fade .24s ease-out; }
+html.ui-tab-fx dialog.journey-preparation-screen :is(.prep-left-body, #equipPanel) { animation: ui-fade .2s ease-out; }
+#startScreen .start-home-copy > * { animation: ui-rise .5s cubic-bezier(.2, .8, .3, 1) backwards; }
+#startScreen .start-home-copy > :nth-child(2) { animation-delay: .08s; }
+#startScreen .start-home-copy > :nth-child(3) { animation-delay: .16s; }
+#startScreen .start-home-copy > :nth-child(n+4) { animation-delay: .24s; }
+#startScreen .start-mode-card { animation: ui-rise .36s cubic-bezier(.2, .8, .3, 1) backwards; }
+#startScreen .start-mode-card:nth-child(2) { animation-delay: .07s; }
+#startScreen #startTitle::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, #fff0 42%, #fffbe8e6 50%, #fff0 58%) 130% 0 / 300% 100% no-repeat; -webkit-mask: var(--logo-mask) left center / contain no-repeat; mask: var(--logo-mask) left center / contain no-repeat; animation: ui-sheen 7s ease-in-out infinite; }
+:is(#startScreen button.primary, dialog.journey-screen .journey-footer button.primary, #btnContinueNext)::after { content: ""; position: absolute; inset: 7px 12px; pointer-events: none; background: linear-gradient(105deg, #fff0 42%, #ffffffa6 50%, #fff0 58%) 130% 0 / 300% 100% no-repeat; animation: ui-sheen 5s ease-in-out infinite; }
+.ui-spark { position: fixed; z-index: 2147483000; width: 74px; height: 74px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff0c400 38%, #fff0c4b0 54%, #e6c78400 70%); animation: ui-spark .34s ease-out forwards; }
+@media (prefers-reduced-motion: reduce) {
+  dialog.journey-screen[open], html.ui-tab-fx dialog.journey-preparation-screen :is(.prep-left-body, #equipPanel), #startScreen .start-home-copy > *, #startScreen .start-mode-card, #startScreen #startTitle::after, :is(#startScreen button.primary, dialog.journey-screen .journey-footer button.primary, #btnContinueNext)::after { animation: none !important; }
+  .ui-spark { display: none; }
+}
+
+/* Phones: a lighter frame so corners do not crowd the content. */
+@media (max-height: 560px) { :root { --ui-frame-w: 26px; } dialog.journey-preparation-screen.prep-noscroll .journey-header h1 { padding: 3px 34px !important; } }
+
+/* Seat stats: the lock tag stays inside the frame on narrow side seats. */
+@media (max-height: 560px) { html.cultivation-mode .player-info-inline .cult-life { gap: 3px; } html.cultivation-mode .player-info-inline .cult-life small, html.cultivation-mode .player-info-inline .cult-lock { font-size: 9.5px; white-space: nowrap; } }
+
+/* Wide screens: nudge the key art right so the logo clears the tiles. */
+@media (min-width: 1100px) { #startScreen .start-hero img { transform: translateX(8%); } #startScreen #cultivationProgressionHome { bottom: 38px; } }
+
+/* ---------- Older dialogs: same frame, lacquer, plates and form controls as every other screen ---------- */
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading) {
+  border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill), #081a1e !important; box-shadow: 0 24px 70px #000d !important; color: var(--ui-text);
+}
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading)::backdrop { background: #03100fd0; }
+:is(dialog.cult-choice, dialog.cult-codex, dialog.cult-vfx-preview) > header { border-radius: 0 !important; background: #0a2328 !important; border-bottom: 1px solid var(--ui-line-2) !important; box-shadow: none !important; }
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading) :is(h2, h3) { font-family: var(--ui-title) !important; color: var(--ui-gold-hi) !important; }
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading) button:not(.cult-choice-option):not(.tile):not(:has(img)):not([data-skill]) {
+  min-height: 38px; padding: 4px 20px !important; border: 1px solid transparent !important; border-image: var(--dialog-plate, var(--ui-plate)) !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+  color: var(--dialog-ink, var(--ui-gold-hi)) !important; font: 700 13px/1.1 var(--ui-body) !important; letter-spacing: .5px; text-shadow: 0 1px 2px #000a;
+}
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading) button:hover:not(:disabled) { filter: brightness(1.15); }
+:is(dialog.cult-choice, dialog.progression-dialog, dialog.cult-codex, dialog.cult-vfx-preview, dialog#imageLoading) button:disabled { opacity: 1 !important; filter: saturate(.2) brightness(.65); }
+dialog.progression-dialog footer button:last-child, dialog#imageLoading [data-retry], dialog.cult-codex .codex-footer button:last-child { --dialog-plate: var(--ui-plate-gold); --dialog-ink: #2b1a06; }
+dialog.progression-dialog [data-skill] { min-width: 38px; min-height: 38px; padding: 0 !important; border: 1px solid transparent !important; border-image: url("assets/ui/tile-jade.webp") 28 fill / 12px / 0 stretch !important; border-radius: 0 !important; background: none !important; color: var(--ui-gold-hi) !important; font-size: 18px !important; }
+dialog.progression-dialog .progression-skill { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; border-radius: 2px !important; background: #071a1fb8 !important; }
+
+/* Skill choice: cards take the shared frame; the element tag still names the element. */
+dialog.cult-choice-v2 .cult-choice-option { border: 1px solid transparent !important; border-image: var(--ui-frame-card) !important; border-radius: 2px !important; background: #071a1fd0 !important; box-shadow: none !important; }
+dialog.cult-choice-v2 .cult-choice-option:is(:hover, :focus-visible) { border-image: var(--ui-frame-card-on) !important; transform: none; }
+dialog.cult-choice-v2 .ccv-estimate { border-color: var(--ui-line) !important; }
+
+/* Information sheets: finisher, role. */
+dialog.cult-information .cult-information-body { background: none !important; }
+dialog.cult-information .cult-information-body :is(section, article, li, aside, [class*="card"], [class*="row"]) { border-radius: 2px !important; }
+dialog.cult-role-sheet .journey-stats > div, dialog.cult-role-sheet .journey-passive, dialog.cult-role-sheet [class*="slot"], dialog.cult-role-sheet .journey-equipment > *, dialog.cult-role-sheet .role-info [class*="equip"] > *, dialog.cult-role-sheet .progression-details { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; border-radius: 1px !important; background: #071a1fcc !important; box-shadow: none !important; }
+dialog.cult-role-sheet .role-portrait { border: 1px solid transparent !important; border-image: var(--ui-frame-card) !important; border-radius: 1px !important; background: #071a1f99 !important; }
+
+/* Codex */
+dialog.cult-codex .codex-card { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; border-radius: 1px !important; background: #071a1fb8 !important; box-shadow: none !important; }
+dialog.cult-codex .codex-guide, dialog.cult-codex .codex-footer { border-radius: 0 !important; border-color: var(--ui-line) !important; background: #071a1fd0 !important; }
+dialog.cult-codex input:not([type="checkbox"]), dialog.cult-codex select, #tableMenu select { border-radius: 2px !important; border: 1px solid var(--ui-line-2) !important; color: var(--ui-text) !important; }
+dialog.cult-codex input:not([type="checkbox"]) { background: #071a1f !important; }
+dialog.cult-codex select, #tableMenu select { -webkit-appearance: none; appearance: none; padding-right: 28px !important; background: #071a1f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4h8L6 9z' fill='%23e6c784'/%3E%3C/svg%3E") right 8px center / 12px no-repeat !important; }
+/* On a short screen the filters shrink to one row, so the results are what you see first. */
+@media (max-height: 560px) {
+  dialog.cult-codex .codex-scroll { padding: 8px 14px; }
+  dialog.cult-codex .codex-filters { grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)) auto !important; gap: 6px !important; margin-bottom: 6px; align-items: end; font-size: 11px; }
+  dialog.cult-codex .codex-filters .codex-search, dialog.cult-codex .codex-filters > button { grid-column: auto !important; }
+  dialog.cult-codex .codex-filters :is(input, select) { min-height: 36px !important; height: 36px; padding-top: 0 !important; padding-bottom: 0 !important; font-size: 13px; margin: 0 !important; }
+  dialog.cult-codex .codex-filters > button { width: auto; white-space: nowrap; }
+}
+@media (max-height: 560px) and (max-width: 700px) {
+  dialog.cult-codex .codex-filters { grid-template-columns: repeat(3, minmax(0, 1fr)) auto !important; }
+  dialog.cult-codex .codex-filters .codex-search { grid-column: 1 / -1 !important; }
+}
+
+/* Smaller parts */
+.opening-skip { min-height: 44px; padding: 0 22px !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; color: var(--ui-gold-hi) !important; }
+.cult-battle-feed { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; }
+#tableMenu .cult-catalog-entry, #tableMenu .tm-page section { border-radius: 2px !important; border-color: var(--ui-line) !important; background: #06141766 !important; box-shadow: none !important; }
+
+/* Expedition choices hold several lines, so they are framed cards rather than plates. */
+dialog.journey-screen button[data-expedition-event] { display: block !important; min-height: 44px !important; padding: 8px 14px !important; border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; background: linear-gradient(#17474cd0, #0c2d31d0) !important; color: var(--ui-text) !important; font-weight: 500 !important; line-height: 1.35 !important; text-align: left; }
+dialog.journey-screen button[data-expedition-event]:hover:not(:disabled) { border-image: var(--ui-frame-card-on) !important; }
+dialog.journey-screen button[data-expedition-event]:disabled { filter: saturate(.25) brightness(.65); }
+dialog.journey-preparation-screen .journey-equipment > * { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1fb8 !important; box-shadow: none !important; }
+dialog.journey-preparation-screen .equip-notice { left: 404px; }
+@media (min-width: 1100px) { dialog.journey-preparation-screen .equip-notice { left: 500px; } }
+@media (max-width: 700px) { dialog.journey-preparation-screen .equip-notice { display: none; } }
+
+/* Rules dialog: the button bar stays inside the frame. */
+#settingsPanel .settings-content .settings-buttons { margin-left: -27px !important; margin-right: -27px !important; }
+
+/* Result on a short screen: the summary and the finisher link stay whole; the players scroll below them. */
+@media (max-height: 560px) {
+  #reactionPanel > .rs-panel .rs-head { flex: none; max-height: 56%; overflow-y: auto; }
+  #reactionPanel > .rs-panel .cult-finish-detail { margin: 0 !important; min-height: 32px; padding: 2px 12px !important; font-size: 12px !important; }
+}
+#reactionPanel > .rs-panel .cult-finish-detail { border-radius: 2px !important; border-color: var(--ui-line-2) !important; background: #071a1fcc !important; color: var(--ui-gold-hi) !important; }
+dialog.cult-finish-sheet .cfs-summary { border: 1px solid transparent !important; border-image: var(--ui-frame-card-on) !important; border-radius: 2px !important; background: linear-gradient(100deg, #6b562466, #071a1f99 55%) !important; box-shadow: none !important; }
+dialog.cult-role-sheet .role-main .equip-role-info > p:nth-of-type(-n+3) { border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; border-radius: 1px !important; background: #071a1fcc !important; }
+
+/* Merchant seal exchange: one line inside the plate. */
+dialog.journey-screen button[data-action="redeem"] { padding: 4px 16px !important; font-size: 12px !important; white-space: nowrap; }
+.equip-redemptions .equip-actions { flex-wrap: wrap; }
+
+/* Small phones: the wallet shows icons and numbers, and the title keeps its room. */
+@media (max-width: 700px) {
+  dialog.journey-preparation-screen .equip-wallet { left: 106px; right: 244px; gap: 10px; }
+  dialog.journey-preparation-screen .equip-wallet b { font-size: 0 !important; }
+  dialog.journey-preparation-screen .equip-wallet b span { margin-left: 0; font-size: 15px !important; }
+  dialog.journey-preparation-screen .equip-wallet > span { display: none; }
+  dialog.journey-preparation-screen.prep-noscroll .journey-footer button { padding: 0 16px !important; }
+}
+/* Short screens: role portrait stays beside the details, and the skill preview keeps its buttons in view. */
+@media (max-height: 560px) {
+  dialog.cult-role-sheet .role-sheet { grid-template-columns: clamp(96px, 20vw, 190px) minmax(0, 1fr) !important; gap: 12px !important; }
+  dialog.cult-role-sheet .role-portrait { position: sticky; top: 0; height: auto !important; aspect-ratio: auto !important; max-height: calc(100dvh - 92px); }
+  dialog.cult-role-sheet .cult-information-body { padding: 10px 14px 14px !important; }
+}
+@media (max-height: 360px) { .cult-vfx-preview canvas { height: 120px; } .cult-vfx-preview h2 { margin-bottom: 4px; } }
+@media (max-width: 700px) { dialog.journey-preparation-screen.prep-noscroll .journey-header h1 { padding: 0 !important; border: 0 !important; border-image: none !important; } }
+@media (max-height: 560px) { dialog.cult-codex .codex-filters label { min-width: 0; } dialog.cult-codex .codex-filters select { width: 100%; min-width: 0; } }
+@media (max-height: 360px) { #reactionPanel > .rs-panel .rs-head { max-height: 42%; } }
+@media (max-height: 360px) { #reactionPanel > .rs-panel .rs-head { flex: 0 1 auto; } #reactionPanel > .rs-panel .cult-finish-detail { order: 1; } }
+
+/* Home entrance animation can report sub-pixel heights; keep touch targets safely above 44px. */
+#startScreen .save-backup-row button, #startScreen .start-back { min-height: 44.5px; }
+@media (max-height: 699px) { #startScreen .start-actions button { min-height: 44.5px; } }
+
+/* Short tablets and windows: settings pages tighten so every row fits without scrolling. */
+@media (max-height: 620px) {
+  #tableMenu .tm-page-head p { display: none; }
+  #tableMenu .tm-page-head { margin-bottom: 4px !important; padding-bottom: 4px !important; }
+  #tableMenu .pref-row { padding-top: 6px !important; padding-bottom: 6px !important; min-height: 0 !important; }
+}
+
+/* Phone landscape: the monster card stays in the centre column so it never hides a discarded tile. */
+@media (max-height: 520px) and (min-width: 701px) and (orientation: landscape) {
+  html.cultivation-mode #cultivationMonster.cult-monster {
+    --boss-w: clamp(240px, 33vw, 420px); --boss-stage: 100%; grid-template-columns: 44% minmax(0, 1fr); column-gap: 4px; padding: 4px 6px 4px 2px;
+    background: radial-gradient(ellipse 44% 70% at 22% 50%, color-mix(in srgb, var(--element) 26%, transparent), transparent 70%), linear-gradient(90deg, transparent 0 42%, #0c1b22e0 47%, #060f15ea);
+  }
+  html.cultivation-mode #cultivationMonster .cult-monster-body { inset: 42px 34px; }
+  html.cultivation-mode #cultivationMonster .cult-arena-player { --portrait: 26px; width: 32px; gap: 0; }
+  html.cultivation-mode #cultivationMonster .cult-arena-player > b { font-size: 9px; }
+  html.cultivation-mode #cultivationMonster .cult-arena-hp { width: 26px; }
+}
+/* The smallest phones cannot fit both side by side, so discarded tiles draw above the card. */
+@media (max-height: 520px) and (max-width: 700px) and (orientation: landscape) {
+  html.cultivation-mode .mahjong-table .table-discard-zone { z-index: 6; }
+}
+
+/* The empty action row must not swallow taps meant for what lies beneath it. */
+#controls.table-actions { pointer-events: none !important; }
+#controls.table-actions button { pointer-events: auto !important; }

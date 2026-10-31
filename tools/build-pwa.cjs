@@ -13,6 +13,9 @@ files.push(...require('../cultivation-heroes.js').all.map(hero => hero.thumbnail
 require('../crystal-tiles.js');
 files.push(...Object.values(globalThis.MahjongCrystalTiles.sheets)
   .map(sheet => 'assets/tiles-crystal/' + sheet.file.replace(/\.png$/, '.webp')));
+// Interface art is on every screen and small, so it ships with the shell.
+files.push(...fs.readdirSync(path.join(root, 'assets/ui'), { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => 'assets/ui/' + entry.name));
+
 files.sort();
 const hash = crypto.createHash('sha256');
 for (const file of [...files, 'sw.js']) {

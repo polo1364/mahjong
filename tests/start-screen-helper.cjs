@@ -3,6 +3,7 @@ async function enterGame(page, { skipOpening = true, waitForPlay = true, mode = 
   if (await page.locator('#startScreen').isVisible()) {
     await page.locator('#startGameBtn').click();
     await page.locator(mode === 'cultivation' ? '#cultivationModeBtn' : '#normalModeBtn').click();
+    if (mode === 'cultivation') await page.locator('#journeyChooseConfirm').click();
   }
   await page.waitForFunction(() => typeof S !== 'undefined' && !!S);
   if (skipOpening) {

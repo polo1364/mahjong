@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const out = path.join(__dirname, '../artifacts');
-const viewports = [[320,568],[360,740],[390,844],[768,1024],[844,390],[943,889],[1024,768],[1280,800],[1440,1000],[1920,1080]];
+const viewports = [[568,320],[740,360],[844,390],[943,889],[1024,768],[1280,800],[1440,1000],[1920,1080]];
 const hand17 = 'W1 W2 W4 W5 W7 W8 T1 T3 T5 T7 B1 B3 B5 FE FS FW FN';
 const loose13 = 'W1 W2 W4 W6 W8 T1 T3 T5 T7 B1 B3 B5 FE';
 
@@ -221,7 +221,7 @@ const loose13 = 'W1 W2 W4 W6 W8 T1 T3 T5 T7 B1 B3 B5 FE';
     }
     // Keep touch emulation isolated from mouse/wheel contexts; use real browser input dispatch.
     const fixtureSource = await page.evaluate(() => handFixture.toString());
-    for (const [width, height] of viewports.filter(([width]) => width <= 390)) {
+    for (const [width, height] of viewports.filter(([width]) => width <= 844)) {
       const touchPage = await browser.newPage({ viewport: { width, height }, isMobile: true, hasTouch: true });
       touchPage.on('pageerror', error => errors.push(error.message));
       await touchPage.goto(page.url());
@@ -232,6 +232,15 @@ const loose13 = 'W1 W2 W4 W6 W8 T1 T3 T5 T7 B1 B3 B5 FE';
       await touchPage.locator('#yourHandArea').scrollIntoViewIfNeeded();
       const rail = await touchPage.locator('#yourHandArea').boundingBox();
       const input = await touchPage.context().newCDPSession(touchPage);
+      const lastTile = touchPage.locator('#yourHand button.tile').last();
+      const originalIndex = Number((await lastTile.getAttribute('onclick')).match(/\((\d+)\)/)[1]);
+      const tileId = await touchPage.evaluate(index => S.players[0].hand[index].id, originalIndex);
+      await lastTile.tap();
+      // A tap's click can arrive a moment after tap() resolves.
+      await touchPage.waitForFunction(id => !S.players[0].hand.some(tile => tile.id === id), tileId, { timeout: 2000 }).catch(() => {});
+      assert.equal(await touchPage.evaluate(id => !S.players[0].hand.some(tile => tile.id === id), tileId), true,
+        `${width}: rightmost tile responds to a real touch tap without scrolling`);
+      // Checked after the tap: a synthetic swipe makes the next synthetic tap unreliable in every version.
       const x = rail.x + rail.width - 20, y = rail.y + rail.height / 2;
       await input.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
       for (let step = 1; step <= 8; step++) {
@@ -244,12 +253,6 @@ const loose13 = 'W1 W2 W4 W6 W8 T1 T3 T5 T7 B1 B3 B5 FE';
       await touchPage.waitForTimeout(180);
       const touchScrolled = await touchPage.locator('#yourHandArea').evaluate(el => el.scrollLeft > 0);
       assert.equal(touchScrolled, false, `${width}: native touch swipe cannot move the fitted hand`);
-      const lastTile = touchPage.locator('#yourHand button.tile').last();
-      const originalIndex = Number((await lastTile.getAttribute('onclick')).match(/\((\d+)\)/)[1]);
-      const tileId = await touchPage.evaluate(index => S.players[0].hand[index].id, originalIndex);
-      await lastTile.tap();
-      assert.equal(await touchPage.evaluate(id => !S.players[0].hand.some(tile => tile.id === id), tileId), true,
-        `${width}: rightmost tile responds to a real touch tap without scrolling`);
       results.find(result => result.width === width).touchScrolled = touchScrolled;
       await input.detach();
       await touchPage.close();

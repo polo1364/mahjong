@@ -31,6 +31,7 @@ const specialNames = ['八仙過海','七搶一','天胡','地胡','人胡','字
   page.on('pageerror', error => errors.push(error.message));
   try {
     await page.goto(process.env.MAHJONG_URL || pathToFileURL(path.join(__dirname, '../index.html')).href);
+    await require('./start-screen-helper.cjs').enterGame(page);
     await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play' && window.MahjongEffects?.showWin);
     await page.evaluate(() => {
       cancelGameTimers();
@@ -92,7 +93,7 @@ const specialNames = ['八仙過海','七搶一','天胡','地胡','人胡','字
       assert.deepEqual(result.physical, [144,144]);
       return result;
     }
-    for (const [width,height] of [[1440,1000],[390,844]]) {
+    for (const [width,height] of [[1440,1000],[844,390]]) {
       await page.setViewportSize({ width, height });
       for (const style of ['jade','ink','neon']) {
         await page.evaluate(style => { MahjongEffects.setStyle(style); MahjongEffects.setReduced(false); }, style);
@@ -118,7 +119,7 @@ const specialNames = ['八仙過海','七搶一','天胡','地胡','人胡','字
             await page.waitForTimeout(300);
             await page.screenshot({ path: path.join(out, `special-win-${style}-${width}.png`) });
             await page.waitForSelector('#btnContinueNext');
-            assert.ok((await page.locator('.result-summary').textContent()).includes(entry[0]));
+            assert.ok((await page.locator('.rs-summary').textContent()).includes(entry[0]));
           }
           await page.evaluate(() => {
             cancelGameTimers(); MahjongEffects.clear(); renderAll();

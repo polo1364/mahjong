@@ -219,7 +219,7 @@ async function installFixture(page) {
         size: getComputedStyle(element).backgroundSize, position: getComputedStyle(element).backgroundPosition,
         box: box(rectOf(element))
       }));
-      if (portraits.length !== 4 || portraits.some(portrait => !portrait.visible || !portrait.image.includes('player-portraits.png'))) fail('missing-portraits', { portraits });
+      if (portraits.length !== 4 || portraits.some(portrait => !portrait.visible || !/player-portraits\.(png|webp)/.test(portrait.image))) fail('missing-portraits', { portraits });
       if (new Set(portraits.map(portrait => portrait.position)).size !== 4) fail('portrait-quadrants-not-distinct', { portraits });
       return { table: box(table), groups, infos: infos.map(info => ({ pid: info.pid, box: box(info.rect), text: info.element.innerText })),
         physicalRendered: allTiles.length, minimumObservedGap: Number.isFinite(minimumObservedGap) ? +minimumObservedGap.toFixed(2) : null,

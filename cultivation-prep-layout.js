@@ -1,12 +1,14 @@
-/* 整備庭院 without page scrolling: the existing preparation dialog is regrouped into a fixed-height,
-   two-column layout (left: 角色/征途/同行 tabs, right: the supply tabs), and long lists are split into
-   pages that fit the space. Game logic and the existing markup builders are untouched. */
+/* 整備庭院 without page scrolling: the existing preparation dialog is regrouped into a fixed-height layout.
+   Both tab groups (角色/修行/巡歷/征途/同行 and the supply tabs) sit on one navigation rail; narrow screens
+   show the pane of the last tab used, wide screens show both. Long lists are split into pages that fit the
+   space. Game logic and the existing markup builders are untouched. */
 (function (root) {
   'use strict';
   const GRID = '.supply-grid, .equip-shop-grid, .equip-redemptions, .equip-item-list, .equip-sets, .supply-summary';
   const KEEP = '.equip-comparison, .supply-toolbar, .equip-filters, .equip-worn, .equip-npc-intro';
   const pageOf = new Map();        // remembered page per screen part, so a re-render keeps your place
   let leftTab = 'hero';
+  let activePane = 'right';
 
   function flowItems(box) {
     const out = [];
@@ -58,6 +60,10 @@
     const header = dialog.querySelector('.journey-header'), intro = dialog.querySelector('.journey-intro'), footer = dialog.querySelector('.journey-footer');
     if (!wrap || !grid || !equip || !hero || !header || !footer) return;
     dialog.classList.add('prep-noscroll');
+    dialog.dataset.prepPane = activePane;
+    const showPane = pane => { activePane = pane; dialog.dataset.prepPane = pane; };
+    // Supply tabs re-render with their host, so listen on the dialog.
+    dialog.addEventListener('click', event => { if (event.target.closest('.equip-tabs [data-tab]')) showPane('right'); else if (event.target.closest('.prep-left-tabs [data-left]')) showPane('left'); });
     // Header carries the title, the hand summary and the two navigation buttons, always in view.
     const titleBox = header.firstElementChild; if (intro) titleBox?.append(intro);
     // On short screens the left column folds away behind this button.
@@ -107,7 +113,8 @@
   }
   function layoutLeft(dialog) {
     const pane = dialog.querySelector(`.prep-left-body > [data-left-pane="${leftTab}"]`); if (!pane) return;
-    if (leftTab === 'progression' || leftTab === 'expedition') {
+    // Short screens scroll the pane instead of paging it.
+    if (leftTab === 'progression' || leftTab === 'expedition' || root.matchMedia('(max-height: 560px)').matches) {
       dialog.querySelector('.prep-left-body > .prep-pager')?.remove();
       pane.querySelectorAll('.prep-off').forEach(el => el.classList.remove('prep-off'));
       return;

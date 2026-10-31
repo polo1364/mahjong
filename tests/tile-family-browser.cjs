@@ -24,8 +24,8 @@ async function bounds(page,selector,label){const box=await page.locator(selector
           await page.evaluate(key=>{const t=generateTiles().find(t=>tileKey(t)===key);S.players[0].hand[0]=t;renderAll();},key);
           // Image-ready redraws replace hand buttons; focus only after that redraw completes.
           await page.waitForFunction(()=>!MahjongImages.isLoading());
-          await page.locator('#yourHand button[onclick="onClickYourTile(0)"]').evaluate(el=>el.focus({preventScroll:true}));
-          await page.locator('#cultInsight:not([hidden])').waitFor();
+          // A later redraw can still replace the button and drop its focus, so focus whichever button is current.
+          await page.waitForFunction(()=>{const el=document.querySelector('#yourHand button[onclick="onClickYourTile(0)"]');if(el&&document.activeElement!==el)el.focus({preventScroll:true});return document.querySelector('#cultInsight')?.hidden===false;},null,{timeout:8000});
           const text=await page.locator('#cultInsight').innerText();check(label+' '+key+' base',text.includes(title+'普攻')&&text.includes(String(base)),text);
           await bounds(page,'#cultInsight',label+' '+key+' tooltip');
           const result=await page.evaluate(key=>{
