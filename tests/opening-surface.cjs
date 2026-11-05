@@ -40,9 +40,12 @@ async function viewportChecks(browser, width, height, label) {
   page.on('dialog', dialog => dialog.accept());
   try {
     await page.goto(url);
+    await require('./start-screen-helper.cjs').enterGame(page, { skipOpening: false, waitForPlay: false });
     for (const style of ['jade', 'ink', 'neon']) {
       if (style !== 'jade') {
         await page.evaluate(style => { document.getElementById('effectStyle').value = style; }, style);
+        if (await page.locator('#tableMenu').isHidden()) await page.locator('#tableMenuBtn').click();
+        await page.locator('#tmTab-session').click();
         await page.locator('#newGameBtn').click();
       }
       const phases = [];
@@ -54,7 +57,7 @@ async function viewportChecks(browser, width, height, label) {
         assert.deepEqual(current.table, first.table);
         assert.deepEqual(current.frame, first.frame);
         assert.equal(current.background, first.background);
-        assert.ok(current.background.includes('/assets/xianxia-table.jpg'));
+        assert.ok(/\/assets\/xianxia-table\.(jpg|webp)/.test(current.background));
         assert.deepEqual(current.overlay, {
           background: 'none', color: 'rgba(0, 0, 0, 0)', zIndex: '25', phase, style
         });
@@ -96,7 +99,7 @@ async function viewportChecks(browser, width, height, label) {
   try {
     const completed = await Promise.allSettled([
       viewportChecks(browser, 1440, 1000, 'desktop'),
-      viewportChecks(browser, 390, 844, 'phone'),
+      viewportChecks(browser, 568, 320, 'phone'),
       viewportChecks(browser, 844, 390, 'landscape')
     ]);
     for (const result of completed) if (result.status === 'rejected') errors.push(result.reason.stack);

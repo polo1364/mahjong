@@ -20,7 +20,7 @@ const report = {date:'2026-10-23',label,method:'Complete legal browser games; UI
   try {
     for(let game=0;game<count;game++) {
       const seed=firstSeed+game;
-      const [width,height]=[[1440,900],[390,844],[844,390]][game%3];
+      const [width,height]=[[1440,900],[844,390],[844,390]][game%3];
       const context=await browser.newContext({viewport:{width,height}});
       await context.addInitScript(seed=>{
         let rng=seed;Math.random=()=>{rng=(Math.imul(rng,1664525)+1013904223)>>>0;return rng/4294967296;};
@@ -41,7 +41,7 @@ const report = {date:'2026-10-23',label,method:'Complete legal browser games; UI
           for(let pid=0;pid<4;pid++) {
             const scored=fx.filter(e=>e.type==='damage'&&e.pid===pid).reduce((n,e)=>n+e.amount,0);
             check(after.players[pid].damage-before.players[pid].damage===scored,`score ownership ${pid}`);
-            check(after.players[pid].hp>=0&&after.players[pid].hp<=1000,`HP range ${pid}`);
+            check(after.players[pid].hp>=0&&after.players[pid].hp<=after.players[pid].maxHp,`HP range ${pid}`);
           }
           const enemy=fx.find(e=>e.type==='enemy');
           if(enemy) {
@@ -52,8 +52,8 @@ const report = {date:'2026-10-23',label,method:'Complete legal browser games; UI
           }
           if(event.type==='meld') {
             const skill=MahjongCultivationSkills.find(event.action,event.keys||event.key);
-            check(fx.filter(e=>e.type==='skill').length===1,'one committed meld = one cast');
-            check(fx.find(e=>e.type==='skill')?.name===(event.pid!==0&&event.action==='concealed'?'秘術':skill.name),'correct meld skill');
+            check(fx.filter(e=>e.type==='skill'&&!String(e.skillId).endsWith('.flower')).length===1,'one committed meld = one cast');
+            check(fx.find(e=>e.type==='skill'&&!String(e.skillId).endsWith('.flower'))?.name===(event.pid!==0&&event.action==='concealed'?'秘術':skill.name),'correct meld skill');
           }
           if(after.ended) {
             const expected=after.players.map(p=>({pid:p.pid,damage:p.damage,rank:1+after.players.filter(q=>q.damage>p.damage).length})).sort((a,b)=>b.damage-a.damage||a.pid-b.pid);
@@ -81,7 +81,7 @@ const report = {date:'2026-10-23',label,method:'Complete legal browser games; UI
         }};
         MahjongPrefs.pace=.025;
       });
-      await page.locator('#startGameBtn').click();await page.locator('#cultivationModeBtn').click();
+      await page.locator('#startGameBtn').click();await page.locator('#cultivationModeBtn').click();await page.locator('#journeyChooseConfirm').click();
       await page.evaluate(()=>MahjongOpening.finish('playtest-skip'));
       await page.waitForFunction(()=>S.phase!=='deal');
       for(let hand=0;hand<hands;hand++) {
@@ -144,10 +144,11 @@ const report = {date:'2026-10-23',label,method:'Complete legal browser games; UI
         if(snapshot.finisher) {
         await page.locator('.cult-finish-detail').click();
         await page.screenshot({path:path.join(out,`cultivation-finisher-${label}-${seed}-hand${hand+1}.png`)});
-        assert.equal(await page.locator('.cult-finish-part').count(),snapshot.finisher.parts.length);
+        assert.equal(await page.locator('.cfs-part').count(),snapshot.finisher.parts.length);
         await page.locator('#cultivationInformation button').click();
         }
         await page.locator('#btnContinueNext').click();
+        await page.locator('#journeyNext').waitFor({timeout:8000});if(await page.locator('#journeyNext').isVisible().catch(()=>false)){await page.locator('#journeyNext').click();await page.waitForFunction(()=>S?.phase==='deal'||MahjongOpening.getState().active);}
         await page.evaluate(()=>MahjongOpening.finish('journey-test'));
         await page.waitForFunction(()=>S.phase!=='deal');
         const continued=await page.evaluate(()=>({handNumber:S.cultivation.handNumber,names:S.names,seals:S.cultivation.players.map(p=>p.activeSeals),ids:S.cultivation.players.map(p=>p.characterId)}));

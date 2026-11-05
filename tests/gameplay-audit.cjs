@@ -13,7 +13,7 @@ const out = path.join(__dirname, '../artifacts');
   const seedOption = process.argv.find(arg => arg.startsWith('--seeds='));
   const seeds = seedOption ? seedOption.slice(8).split(',').map(Number) : [1,7,19,23,41];
   assert.ok(seeds.length && seeds.every(Number.isSafeInteger), 'seeds must be comma-separated integers');
-  const page = await browser.newPage({ viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 } });
+  const page = await browser.newPage({ viewport: mobile ? { width: 844, height: 390 } : { width: 1440, height: 1000 } });
   const errors = [], checks = [], games = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('dialog', dialog => dialog.accept());
@@ -36,6 +36,7 @@ const out = path.join(__dirname, '../artifacts');
     };
   });
   await page.goto('http://127.0.0.1:8765');
+  await require('./start-screen-helper.cjs').enterGame(page);
   await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play');
   const feedbackStyle = process.argv.find(arg => arg.startsWith('--style='))?.slice(8);
   if (feedbackStyle || withVoice || process.argv.includes('--sound')) {

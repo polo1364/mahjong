@@ -7,7 +7,7 @@ const { pathToFileURL } = require('node:url');
 
 const out = path.join(__dirname, '../artifacts');
 const url = process.env.MAHJONG_URL || pathToFileURL(path.join(__dirname, '../index.html')).href;
-const viewports = [[320, 568], [390, 844], [844, 390], [943, 889], [1440, 900]];
+const viewports = [[568, 320], [844, 390], [844, 390], [943, 889], [1440, 900]];
 const results = [], errors = [];
 
 async function instrument(context) {

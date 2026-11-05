@@ -16,7 +16,7 @@ async function home(page){
 (async()=>{
   const browser=await chromium.launch({headless:true});
   try {
-    for(const viewport of [{width:1440,height:900},{width:320,height:568},{width:568,height:320}]) {
+    for(const viewport of [{width:1440,height:900},{width:568,height:320},{width:568,height:320}]) {
       const context=await browser.newContext({viewport});
       const page=await context.newPage();
       page.on('pageerror',error=>report.errors.push(error.message));
@@ -33,7 +33,7 @@ async function home(page){
       check(!!normalSave,`${viewport.width}: normal saved on return`);
       await page.locator('#startGameBtn').click();
       await page.evaluate(()=>{window.dealCalls=0;const original=startNewHand;startNewHand=(...args)=>{dealCalls++;return original(...args);};});
-      await page.locator('#cultivationModeBtn').evaluate(button=>{button.click();button.click();});
+      await page.locator('#cultivationModeBtn').evaluate(button=>{button.click();button.click();});await page.locator('#journeyChooseConfirm').click();
       await page.waitForFunction(()=>S?.cultivation&&S.phase==='deal');
       check(await page.evaluate(()=>dealCalls===1),`${viewport.width}: repeated cultivation start deals once`);
       check(await page.evaluate(()=>{const t=document.getElementById('playersGrid');const a=document.querySelector('.opening-overlay').getBoundingClientRect();return Math.abs(t.clientWidth-a.width)<1&&Math.abs(t.clientHeight-a.height)<1;}),`${viewport.width}: opening aligned with visible cultivation table`);

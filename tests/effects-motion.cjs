@@ -23,6 +23,7 @@ const variants = [
   page.on('pageerror', error => errors.push(error.message));
   try {
     await page.goto(process.env.MAHJONG_URL || pathToFileURL(path.join(__dirname, '../index.html')).href);
+    await require('./start-screen-helper.cjs').enterGame(page);
     await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play' && window.MahjongEffects?.showWin);
     await page.evaluate(() => {
       cancelGameTimers();

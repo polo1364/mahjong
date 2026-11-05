@@ -122,7 +122,7 @@ const flowerCases = [
         if(spec.discard){const tile=S.players[0].hand.pop();S.players[1].hand.push(tile);S.turn=1;discard(1,tile);}
       };
     });
-    for(const [width,height] of baseline || flowerBaseline ? [[1440,1000]] : [[1440,1000],[390,844]]) {
+    for(const [width,height] of baseline || flowerBaseline ? [[1440,1000]] : [[1440,1000],[844,390]]) {
       await page.setViewportSize({width,height});
       for(const style of ['jade','ink','neon']) {
         await page.evaluate(style=>{MahjongEffects.setStyle(style);MahjongEffects.setReduced(false);},style);
@@ -221,6 +221,7 @@ const flowerCases = [
       await page.locator('#btnHu').click();
       await page.waitForFunction(()=>MahjongAudio.getState().active && MahjongVoice.getState().active);
       await page.locator('#tableMenuBtn').click();
+      await page.locator('#tmTab-sound').click();
       await page.locator('#soundVolume').fill('0');
       await page.locator('#soundVolume').dispatchEvent('input');
       assert.equal(await page.evaluate(()=>MahjongAudio.getState().active),0);

@@ -525,7 +525,7 @@ document.getElementById('settingsConfirm').onclick = () => {
     document.getElementById('settingsError').textContent = '請輸入整數：底與每台 100–1,000,000，起始分數 10,000–100,000,000。';
     return;
   }
-  if (S && ['deal', 'play'].includes(S.phase) && !confirm('套用設定會重新開局並重設分數，確定套用嗎？')) return;
+  if (S && !S.cultivation && ['deal', 'play'].includes(S.phase) && !confirm('套用設定會重新開局並重設分數，確定套用嗎？')) return;
   RULES.points.base = base;
   RULES.points.perFan = perFan;
   RULES.initialPoints = initial;
@@ -561,8 +561,9 @@ document.getElementById('settingsConfirm').onclick = () => {
   
   log('⚙️ 遊戲設定已更新');
   
-  // 設定確認後自動開啟新局
-  if (S) {
+  // 設定確認後自動開啟新局；修仙論道不計分數，重開半局會讓戰鬥與牌桌對不上，所以只更新設定
+  if (S?.cultivation) log('⚙️ 修仙論道不計分數，新門規將在一般模式開局時生效');
+  else if (S) {
     startNewSession();
   }
   

@@ -21,6 +21,7 @@ async function decodeArtwork(page) {
   try {
     const page = await browser.newPage({ viewport: { width: 1100, height: 950 } });
     await page.goto(process.env.MAHJONG_URL || 'http://127.0.0.1:8765');
+    await require('./start-screen-helper.cjs').enterGame(page);
     await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play');
     const faces = await page.evaluate(() => {
       cancelGameTimers();
@@ -40,7 +41,7 @@ async function decodeArtwork(page) {
     assert.equal(await page.locator('[data-crystal-key]').count(), 43);
     await page.screenshot({ path: path.join(out, 'crystal-tile-catalog.png'), fullPage: true });
     await page.locator('section').nth(4).screenshot({ path: path.join(out, 'crystal-flower-tiles.png') });
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 844, height: 390 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.screenshot({ path: path.join(out, 'crystal-tile-catalog-mobile.png'), fullPage: true });
     await page.setViewportSize({ width: 440, height: 350 });

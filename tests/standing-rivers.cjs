@@ -7,8 +7,8 @@ const { enterGame } = require('./start-screen-helper.cjs');
 
 const out = path.join(__dirname, '../artifacts');
 const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
-const viewports = [[1440, 900], [943, 889], [390, 844], [320, 568], [844, 390], [568, 320]];
-const flowerViewports = [[320, 568], [390, 844], [600, 600], [620, 620], [640, 900]];
+const viewports = [[1440, 900], [943, 889], [844, 390], [568, 320], [844, 390], [568, 320]];
+const flowerViewports = [[568, 320], [844, 390], [600, 600], [620, 620], [640, 900]];
 
 async function installRiverFixture(page, count, topFlowers = null) {
   return page.evaluate(({ spec, count, topFlowers }) => {

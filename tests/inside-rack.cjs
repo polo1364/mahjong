@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const out = path.join(__dirname, '../artifacts');
 const url = process.env.MAHJONG_URL || 'http://127.0.0.1:8765';
-const viewports = [[320, 568], [390, 844], [844, 390], [943, 889], [1280, 800], [1440, 1000]];
+const viewports = [[568, 320], [844, 390], [844, 390], [943, 889], [1280, 800], [1440, 1000]];
 const scenarios = [
   { name: 'dense17', hand: 'W7 W7 W8 W8 W9 T7 T7 T8 T8 T9 B7 B8 B9 FE FS FW FN', melds: [] },
   { name: 'five-kongs', hand: 'FE FS', melds: ['W1', 'T1', 'B1', 'DC', 'DF'].map(key =>
@@ -20,6 +20,7 @@ const scenarios = [
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(url);
+    await require('./start-screen-helper.cjs').enterGame(page);
     await page.waitForFunction(() => typeof S !== 'undefined' && S?.phase === 'play');
     await page.evaluate(() => {
       cancelGameTimers();

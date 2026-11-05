@@ -519,3 +519,37 @@ dialog.journey-screen button[data-action="redeem"] { padding: 4px 16px !importan
 /* The empty action row must not swallow taps meant for what lies beneath it. */
 #controls.table-actions { pointer-events: none !important; }
 #controls.table-actions button { pointer-events: auto !important; }
+
+/* Claim choice and restore prompt share the same frame and plates. */
+#reactionPanel > .reaction-panel.xx-dialog { border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill), #081a1e !important; box-shadow: 0 24px 70px #000d !important; }
+#reactionPanel > .reaction-panel.xx-dialog::before, #reactionPanel > .reaction-panel.xx-dialog::after { display: none !important; }
+#reactionPanel > .xx-dialog h3 { font-family: var(--ui-title) !important; color: var(--ui-gold-hi) !important; }
+#reactionPanel > .xx-dialog .xx-actions button { min-height: 44px; padding: 4px 26px !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; color: var(--ui-gold-hi) !important; font-family: var(--ui-body) !important; }
+#reactionPanel > .xx-dialog .xx-actions button.primary { border-image: var(--ui-plate-gold) !important; color: #2b1a06 !important; }
+#reactionPanel > .chow-panel .chowOpt { border: 1px solid transparent !important; border-image: var(--ui-frame-card) !important; border-radius: 2px !important; background: #071a1fd0 !important; box-shadow: none !important; }
+#reactionPanel > .chow-panel .chowOpt:is(:hover, :focus-visible) { border-image: var(--ui-frame-card-on) !important; }
+
+/* Phone landscape: the battle feed is a small seal beside 設定, clear of the right seat's name. */
+@media (max-height: 420px) and (orientation: landscape) {
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed:not(.is-open) { top: max(6px, env(safe-area-inset-top)) !important; right: calc(max(10px, env(safe-area-inset-right)) + 52px) !important; }
+  html.cultivation-mode:not(.start-screen-active) .cult-battle-feed.is-open { top: max(6px, env(safe-area-inset-top)) !important; }
+  .cult-battle-feed:not(.is-open) .cult-feed-toggle { min-height: 44px; min-width: 44px; padding: 0 !important; justify-content: center; }
+  .cult-battle-feed:not(.is-open) :is(.cult-feed-grip, .cult-feed-title) { display: none !important; }
+}
+
+/* Other result panels (trial outcome, final standings) share the result frame. */
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) { border: 1px solid transparent !important; border-image: var(--ui-frame) !important; border-radius: 2px !important; background: var(--ui-fill), #081a1e !important; box-shadow: 0 24px 70px #000d !important; }
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) h3 { font-family: var(--ui-title) !important; color: var(--ui-gold-hi) !important; letter-spacing: .14em; }
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) .result-footer { border: 0 !important; background: none !important; }
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) button:not(.primary):not(#btnContinueNext) { min-height: 44px; padding: 4px 22px !important; border: 1px solid transparent !important; border-image: var(--ui-plate) !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; color: var(--ui-gold-hi) !important; }
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) button.primary:not(#btnContinueNext) { min-height: 48px; padding: 4px 28px !important; border: 1px solid transparent !important; border-image: var(--ui-plate-gold) !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; color: #2b1a06 !important; }
+#reactionPanel > .reaction-panel.result-panel:not(.rs-panel) { padding: clamp(12px, 3vh, 26px) clamp(16px, 3vw, 32px) !important; }
+#reactionPanel > .result-panel .result-ranking { padding: clamp(6px, 1.6vh, 14px) 12px !important; margin: 0 0 6px !important; border: 1px solid transparent !important; border-image: var(--ui-frame-small) !important; background: #071a1fb8 !important; }
+#reactionPanel > .result-panel .result-summary + .result-ranking { border-image: var(--ui-frame-card-on) !important; background: linear-gradient(100deg, #6b562466, #071a1fb8 55%) !important; }
+/* Short screens: the final standings and their button fit without scrolling. */
+@media (max-height: 420px) {
+  #reactionPanel > .reaction-panel.result-panel:not(.rs-panel) > .eyebrow, #reactionPanel > .reaction-panel.result-panel:not(.rs-panel) > .result-summary { display: none; }
+  #reactionPanel > .reaction-panel.result-panel:not(.rs-panel) > h3 { margin: 0 0 6px !important; font-size: 20px !important; }
+  #reactionPanel > .result-panel .result-ranking { padding: 4px 10px !important; margin-bottom: 4px !important; font-size: 14px; }
+  #reactionPanel > .reaction-panel.result-panel:not(.rs-panel) .result-footer { position: sticky; bottom: 0; margin-top: 6px !important; padding: 6px 0 0 !important; }
+}
